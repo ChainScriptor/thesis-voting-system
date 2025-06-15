@@ -1,0 +1,24 @@
+[
+  { "value": "student",       "label": "Φοιτητής" },
+  { "value": "teacher",       "label": "Καθηγητής" },
+  { "value": "engineer",      "label": "Μηχανικός" },
+  { "value": "doctor",        "label": "Ιατρός" },
+  { "value": "nurse",         "label": "Νοσηλευτής" },
+  { "value": "lawyer",        "label": "Δικηγόρος" },
+  { "value": "accountant",    "label": "Λογιστής" },
+  { "value": "architect",     "label": "Αρχιτέκτων" },
+  { "value": "programmer",    "label": "Προγραμματιστής" },
+  { "value": "designer",      "label": "Σχεδιαστής" },
+  { "value": "consultant",    "label": "Σύμβουλος" },
+  { "value": "manager",       "label": "Διευθυντής" },
+  { "value": "salesperson",   "label": "Πωλητής" },
+  { "value": "technician",    "label": "Τεχνικός" },
+  { "value": "artist",        "label": "Καλλιτέχνης" },
+  { "value": "musician",      "label": "Μουσικός" },
+  { "value": "writer",        "label": "Συγγραφέας" },
+  { "value": "chef",          "label": "Σεφ" },
+  { "value": "farmer",        "label": "Αγρότης" },
+  { "value": "freelancer",    "label": "Ελεύθερος Επαγγελματίας" },
+  { "value": "allo",             "label": "Αλλο" }
+
+]

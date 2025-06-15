@@ -1,0 +1,24 @@
+[
+  { "value": "athens",            "label": "Αθήνα" },
+  { "value": "thessaloniki",      "label": "Θεσσαλονίκη" },
+  { "value": "patras",            "label": "Πάτρα" },
+  { "value": "heraklion",         "label": "Ηράκλειο" },
+  { "value": "larissa",           "label": "Λάρισα" },
+  { "value": "volos",             "label": "Βόλος" },
+  { "value": "ioannina",          "label": "Ιωάννινα" },
+  { "value": "chania",            "label": "Χανιά" },
+  { "value": "serres",            "label": "Σέρρες" },
+  { "value": "kavala",            "label": "Καβάλα" },
+  { "value": "kalamata",          "label": "Καλαμάτα" },
+  { "value": "tripoli",           "label": "Τρίπολη" },
+  { "value": "agrinio",           "label": "Αγρίνιο" },
+  { "value": "xanthi",            "label": "Ξάνθη" },
+  { "value": "chalcis",           "label": "Χαλκίδα" },
+  { "value": "veria",             "label": "Βέροια" },
+  { "value": "alexandroupoli",    "label": "Αλεξανδρούπολη" },
+  { "value": "komotini",          "label": "Κομοτηνή" },
+  { "value": "kozani",            "label": "Κοζάνη" },
+  { "value": "drama",             "label": "Δράμα" },
+  { "value": "allo",             "label": "Αλλο" }
+
+]

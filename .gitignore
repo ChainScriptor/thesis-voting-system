@@ -1,0 +1,42 @@
+# Next.js build/output
+.next/
+out/
+dist/
+
+# Prisma
+/prisma/migrations/
+/prisma/.env                # αν χρησιμοποιείς ξεχωριστό .env για prisma
+
+# Clerk
+/.clerk/                    # προσωρινά αρχεία Clerk (αν υπάρχουν)
+
+# IDEs & OS
+.vscode/
+.idea/
+/*.suo
+/*.ntvs*
+/*.njsproj
+/*.sln
+/.DS_Store
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Local env overrides
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Test coverage
+/coverage/
+
+# Lock files (αν χρησιμοποιείς Yarn/PNPM, ήδη καλύπτονται)
+/yarn.lock
+/pnpm-lock.yaml
+node_modules
