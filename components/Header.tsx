@@ -8,6 +8,7 @@ import Form from "next/form";
 import { ClipboardPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ProfileVerificationDialog from "@/components/verification/ProfileVerificationDialog";
+import { TrueFocus } from "./ui/true-focus";
 
 export default function Header() {
   const { user } = useUser();
@@ -55,9 +56,17 @@ export default function Header() {
       <div className="flex items-center justify-between w-full">
         <Link
           href="/"
-          className="text-2xl font-bold text-blue-500 hover:opacity-50 cursor-pointer"
+          
         >
-          Ηλεκτρονικές Ψηφοφορίες
+          <TrueFocus
+            sentence="Ηλεκτρονικές Ψηφοφορίες"
+            
+            manualMode={false}
+            blurAmount={5}
+            borderColor="red"
+            animationDuration={2}
+            pauseBetweenAnimations={1}
+          />
         </Link>
 
         {user && (

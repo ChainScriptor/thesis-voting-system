@@ -2,7 +2,6 @@
 "use client";
 
 import { useUser, useAuth } from "@clerk/nextjs";
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,6 +9,7 @@ import { AlertCircle, CheckCircle, Vote } from "lucide-react";
 import { format, isAfter } from "date-fns";
 import VoteModal from "@/components/pages/VoteModal";
 import PollResultsTabs from "@/components/pages/PollResultsTabs";
+import  LTRVersion  from "@/components/pages/cards";
 
 interface Poll {
   id: number;
@@ -37,20 +37,7 @@ export default function HomePage() {
   const [voteModalPoll, setVoteModalPoll] = useState<number | null>(null);
   const [resultsPoll, setResultsPoll] = useState<number | null>(null);
 
-  // 1) Sync Clerk user into MySQL `user` table αμέσως μετά το sign-in
-  useEffect(() => {
-    if (!clerkLoaded || !authLoaded || !isSignedIn || !user?.id) return;
-
-    fetch("/api/users", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ clerkId: user.id }),
-    }).catch((err) =>
-      console.error("❌ Failed to sync user to MySQL:", err)
-    );
-  }, [clerkLoaded, authLoaded, isSignedIn, user?.id]);
-
-  // 2) Fetch user profile από MySQL
+  // 1) Fetch user profile από MySQL **και μετά** sync στο /api/users
   useEffect(() => {
     if (!clerkLoaded || !isSignedIn || !user?.id) return;
 
@@ -60,6 +47,15 @@ export default function HomePage() {
       .then((json) => {
         if (json.success) {
           setProfile(json.data);
+
+          // **Sync** Clerk user στο MySQL πίνακα
+          fetch("/api/users", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ clerkId: user.id }),
+          }).catch((err) =>
+            console.error("❌ Failed to sync user to MySQL:", err)
+          );
         }
       })
       .catch(console.error)
@@ -68,7 +64,7 @@ export default function HomePage() {
       });
   }, [clerkLoaded, isSignedIn, user?.id]);
 
-  // 3) Fetch filtered polls & vote status
+  // 2) Fetch filtered polls & vote status
   useEffect(() => {
     if (!clerkLoaded || !authLoaded || !isSignedIn || !user?.id) return;
 
@@ -100,25 +96,8 @@ export default function HomePage() {
 
   if (!isSignedIn || !user) {
     return (
-      <main className="max-w-4xl mx-auto p-8 text-center">
-        <h1 className="text-3xl font-bold mb-4">
-          Καλωσορίσατε στην πλατφόρμα ψηφοφορίας μας!
-        </h1>
-        <p className="mb-6">
-          Ψηφίστε για θέματα που σας ενδιαφέρουν και δείτε τα αποτελέσματα σε
-          πραγματικό χρόνο.
-        </p>
-        <Link href="/sign-up">
-          <Button className="px-6 py-3 text-lg font-semibold">
-            Ξεκινήστε τώρα
-          </Button>
-        </Link>
-        <p className="mt-4 text-sm text-gray-600">
-          Έχετε ήδη λογαριασμό;{" "}
-          <Link href="/sign-in" className="text-blue-600 hover:underline">
-            Σύνδεση
-          </Link>
-        </p>
+      <main >
+      <LTRVersion />
       </main>
     );
   }
@@ -224,6 +203,8 @@ export default function HomePage() {
           onClose={() => setResultsPoll(null)}
         />
       )}
+
     </main>
+  
   );
 }

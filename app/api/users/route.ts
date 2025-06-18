@@ -22,7 +22,6 @@ export async function GET(request: Request) {
 
   try {
     const conn = await createConnection();
-
     const baseCols = `
       id,
       clerkId,
@@ -33,7 +32,6 @@ export async function GET(request: Request) {
       location,
       gender
     `;
-
     const query = search
       ? `
         SELECT ${baseCols}
@@ -44,7 +42,6 @@ export async function GET(request: Request) {
         SELECT ${baseCols}
         FROM \`user\`
       `;
-
     const values = search
       ? [`%${search}%`, `%${search}%`, `%${search}%`]
       : [];
@@ -59,7 +56,6 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   const { clerkId } = await request.json();
-
   if (!clerkId) {
     return NextResponse.json(
       { success: false, message: "Missing clerkId" },
@@ -68,28 +64,24 @@ export async function POST(request: Request) {
   }
 
   try {
-    // — CALL clerkClient() to get the real client instance —
-    const cc = await clerkClient();
-    const u = await cc.users.getUser(clerkId);
+    // fetch the Clerk user
+    const u = await clerkClient.users.getUser(clerkId);
 
-    const fullName = `${u.firstName ?? ""} ${u.lastName ?? ""}`.trim() || u.fullName;
-    const username =
-      u.primaryEmailAddress?.emailAddress ??
-      u.emailAddresses[0]?.emailAddress ??
-      "";
+    const fullName = `${u.firstName ?? ""} ${u.lastName ?? ""}`.trim() || u.username;
+    const username = u.username ?? u.primaryEmailAddress?.emailAddress ?? "";
     const email = username;
     const gender = u.publicMetadata.gender ?? null;
     const birthdate = u.publicMetadata.birthdate ?? null;
     const occupation = u.publicMetadata.occupation ?? null;
     const location = u.publicMetadata.location ?? null;
 
-    // Upsert into your MySQL `user` table
+    // upsert into MySQL
     const conn = await createConnection();
     const sql = `
       INSERT INTO \`user\`
         (clerkId, fullName, username, email, gender, birthdate, occupation, location)
       VALUES
-        (?,       ?,        ?,        ?,     ?,      ?,         ?,          ?)
+        (?, ?, ?, ?, ?, ?, ?, ?)
       ON DUPLICATE KEY UPDATE
         fullName   = VALUES(fullName),
         username   = VALUES(username),
@@ -111,10 +103,7 @@ export async function POST(request: Request) {
     ];
     const [result] = await conn.execute<ResultSetHeader>(sql, vals);
 
-    return NextResponse.json({
-      success: true,
-      insertId: result.insertId,
-    });
+    return NextResponse.json({ success: true, insertId: result.insertId });
   } catch (error) {
     console.error("❌ Error in /api/users [POST]:", error);
     return NextResponse.json(
