@@ -16,7 +16,7 @@ export async function GET(request: Request) {
     }
 
     // φέρε όλα τα takeparts (που έχουν numberOfVotes) με τον υποψήφιο
-    const takeparts = await prisma.takePart.findMany({
+    const takepart = await prisma.takepart.findMany({
       where: { electionId },
       include: {
         candidate: {
@@ -27,7 +27,7 @@ export async function GET(request: Request) {
     });
 
     // format σε array { candidateId, candidateName, votes }
-    const results = takeparts.map((tp) => ({
+    const results = takepart.map((tp) => ({
       candidateId: tp.candidate.id,
       candidateName: tp.candidate.name,
       votes: tp.numberOfVotes,

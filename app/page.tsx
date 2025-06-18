@@ -27,7 +27,7 @@ interface Profile {
 
 export default function HomePage() {
   const { isLoaded: clerkLoaded, isSignedIn, user } = useUser();
-  const { isLoaded: authLoaded, userId } = useAuth();
+  const { isLoaded: authLoaded } = useAuth();
 
   const [polls, setPolls] = useState<Poll[]>([]);
   const [votedMap, setVotedMap] = useState<Record<number, boolean>>({});
@@ -37,16 +37,50 @@ export default function HomePage() {
   const [voteModalPoll, setVoteModalPoll] = useState<number | null>(null);
   const [resultsPoll, setResultsPoll] = useState<number | null>(null);
 
-  // Fetch filtered polls
+  // 1) Sync Clerk user into MySQL `user` table αμέσως μετά το sign-in
   useEffect(() => {
-    if (!clerkLoaded || !authLoaded || !isSignedIn || !userId) return;
+    if (!clerkLoaded || !authLoaded || !isSignedIn || !user?.id) return;
+
+    fetch("/api/users", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ clerkId: user.id }),
+    }).catch((err) =>
+      console.error("❌ Failed to sync user to MySQL:", err)
+    );
+  }, [clerkLoaded, authLoaded, isSignedIn, user?.id]);
+
+  // 2) Fetch user profile από MySQL
+  useEffect(() => {
+    if (!clerkLoaded || !isSignedIn || !user?.id) return;
+
+    setLoadingProfile(true);
+    fetch(`/api/profile?clerkId=${user.id}`)
+      .then((res) => res.json())
+      .then((json) => {
+        if (json.success) {
+          setProfile(json.data);
+        }
+      })
+      .catch(console.error)
+      .finally(() => {
+        setLoadingProfile(false);
+      });
+  }, [clerkLoaded, isSignedIn, user?.id]);
+
+  // 3) Fetch filtered polls & vote status
+  useEffect(() => {
+    if (!clerkLoaded || !authLoaded || !isSignedIn || !user?.id) return;
 
     fetch("/api/elections/filtered")
       .then((res) => res.json())
-      .then((data: Poll[]) => {
-        setPolls(data);
-        // fetch vote status per poll
-        data.forEach((p) => {
+      .then((data: unknown) => {
+        const arr = Array.isArray(data) ? (data as Poll[]) : [];
+        if (!Array.isArray(data)) {
+          console.error("Expected array from /api/elections/filtered:", data);
+        }
+        setPolls(arr);
+        arr.forEach((p) => {
           fetch(`/api/vote/status?electionId=${p.id}`)
             .then((r) => r.json())
             .then(({ hasVoted }) => {
@@ -58,20 +92,7 @@ export default function HomePage() {
         });
       })
       .catch(console.error);
-  }, [clerkLoaded, authLoaded, isSignedIn, userId]);
-
-  // Fetch user profile
-  useEffect(() => {
-    if (!clerkLoaded || !isSignedIn || !user?.id) return;
-
-    fetch(`/api/profile?clerkId=${user.id}`)
-      .then((res) => res.json())
-      .then((json) => {
-        if (json.success) setProfile(json.data);
-      })
-      .catch(console.error)
-      .finally(() => setLoadingProfile(false));
-  }, [clerkLoaded, isSignedIn, user?.id]);
+  }, [clerkLoaded, authLoaded, isSignedIn, user?.id]);
 
   if (!clerkLoaded || loadingProfile) {
     return <div className="p-8 text-center text-gray-500">Φόρτωση...</div>;
@@ -83,9 +104,14 @@ export default function HomePage() {
         <h1 className="text-3xl font-bold mb-4">
           Καλωσορίσατε στην πλατφόρμα ψηφοφορίας μας!
         </h1>
-        <p className="mb-6">Ψηφίστε για θέματα που σας ενδιαφέρουν και δείτε τα αποτελέσματα σε πραγματικό χρόνο.</p>
+        <p className="mb-6">
+          Ψηφίστε για θέματα που σας ενδιαφέρουν και δείτε τα αποτελέσματα σε
+          πραγματικό χρόνο.
+        </p>
         <Link href="/sign-up">
-          <Button className="px-6 py-3 text-lg font-semibold">Ξεκινήστε τώρα</Button>
+          <Button className="px-6 py-3 text-lg font-semibold">
+            Ξεκινήστε τώρα
+          </Button>
         </Link>
         <p className="mt-4 text-sm text-gray-600">
           Έχετε ήδη λογαριασμό;{" "}
@@ -98,7 +124,12 @@ export default function HomePage() {
   }
 
   // Check profile completeness
-  const requiredFields: (keyof Profile)[] = ["gender", "birthdate", "occupation", "location"];
+  const requiredFields: (keyof Profile)[] = [
+    "gender",
+    "birthdate",
+    "occupation",
+    "location",
+  ];
   const missing = requiredFields.filter((f) => !profile?.[f]);
   const isVerified = missing.length === 0;
 
@@ -114,13 +145,19 @@ export default function HomePage() {
       ) : (
         <div className="mb-6 flex items-center rounded-lg border border-green-500 bg-green-50 p-4">
           <CheckCircle className="w-5 h-5 text-green-500 mr-2" />
-          <span className="text-sm font-medium text-green-800">Εγγεγραμμένος χρήστης</span>
+          <span className="text-sm font-medium text-green-800">
+            Εγγεγραμμένος χρήστης
+          </span>
         </div>
       )}
 
       <section className="mt-12">
-        <h2 className="text-xl font-bold mb-4">Σύνολο Ψηφοφοριών: {polls.length}</h2>
-        {polls.length === 0 && <p className="text-gray-500">Δεν υπάρχουν διαθέσιμες ψηφοφορίες.</p>}
+        <h2 className="text-xl font-bold mb-4">
+          Σύνολο Ψηφοφοριών: {polls.length}
+        </h2>
+        {polls.length === 0 && (
+          <p className="text-gray-500">Δεν υπάρχουν διαθέσιμες ψηφοφορίες.</p>
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {polls.map((p) => {

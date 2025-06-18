@@ -1,59 +1,80 @@
-import { NextResponse } from "next/server";
+// app/api/verify/route.ts
+import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export async function POST(req: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const body = await req.json();
+    const body = await request.json();
 
     const {
-      idNumber,       // Clerk ID που συμπληρώνεται στη φόρμα
+      idNumber,       // clerkId
       gender,
-      email,
       birthdate,
       occupation,
       location,
-    } = body;
+    } = body as {
+      idNumber: string;
+      gender: string;
+      birthdate: string;
+      occupation: string;
+      location: string;
+    };
 
-    // Έλεγχος αν υπάρχει χρήστης με το συγκεκριμένο clerkId
-    const existingUser = await prisma.user.findUnique({
+    // 1) Έλεγχος όλων των πεδίων
+    if (
+      !idNumber ||
+      !gender ||
+      !birthdate ||
+      !occupation ||
+      !location
+    ) {
+      return NextResponse.json(
+        { success: false, message: "Λείπουν πεδία προς αποθήκευση." },
+        { status: 400 }
+      );
+    }
+
+    // 2) Υπάρχει ήδη χρήστης με αυτό το clerkId;
+    const existing = await prisma.user.findUnique({
       where: { clerkId: idNumber },
     });
 
-    if (!existingUser) {
+    if (!existing) {
       return NextResponse.json(
-        { success: false, message: "Ο χρήστης με το συγκεκριμένο ID δεν βρέθηκε." },
+        { success: false, message: "Δεν βρέθηκε χρήστης με αυτό το ID." },
         { status: 404 }
       );
     }
 
-    // Ενημέρωση πεδίων
-    const updatedUser = await prisma.user.update({
+    // 3) Κάνουμε update
+    const updated = await prisma.user.update({
       where: { clerkId: idNumber },
       data: {
         gender,
-        email,
         birthdate: new Date(birthdate),
         occupation,
         location,
       },
     });
 
-    return NextResponse.json({ success: true, user: updatedUser });
-
-  } catch (error) {
-  if (error instanceof Error) {
-    console.error("Error updating user:", error.message);
+    // 4) Επιστρέφουμε επιτυχία
     return NextResponse.json(
-      { success: false, message: "Αποτυχία αποθήκευσης: " + error.message },
+      { success: true, data: updated },
+      { status: 200 }
+    );
+  } catch (err) {
+    console.error("❌ Error in /api/verify:", err);
+    return NextResponse.json(
+      {
+        success: false,
+        message:
+          err instanceof Error
+            ? err.message
+            : "Απροσδιόριστο σφάλμα κατά την αποθήκευση.",
+      },
       { status: 500 }
     );
   }
-
-  return NextResponse.json(
-    { success: false, message: "Απροσδιόριστο σφάλμα κατά την αποθήκευση." },
-    { status: 500 }
-  );
-}
 }

@@ -6,26 +6,30 @@ import { auth } from "@clerk/nextjs/server";
 
 export async function GET() {
   try {
-    // 1) βγάλε το session για να δεις τι παίρνεις από Clerk
+    // 1) Έλεγχος authentication
     const session = await auth();
-
     const clerkId = session.userId;
     if (!clerkId) {
-      console.warn("⚠️ No clerkId in session");
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
-    // 2) fetch user από τη βάση
+    // 2) Φόρτωση προφίλ από DB
     const user = await prisma.user.findUnique({
       where: { clerkId },
-      select: { birthdate: true, occupation: true, location: true, gender: true },
+      select: {
+        birthdate: true,
+        occupation: true,
+        location: true,
+        gender: true,
+      },
     });
 
+    // 3) Αν δεν υπάρχει user record, επιστρέφουμε κενό array
     if (!user) {
-      return NextResponse.json({ error: "User record not found" }, { status: 404 });
+      return NextResponse.json([], { status: 200 });
     }
 
-    // 3) το query
+    // 4) Εφαρμογή των φίλτρων
     const elections = await prisma.election.findMany({
       where: {
         AND: [
@@ -50,7 +54,6 @@ export async function GET() {
               { target_location: "all" },
             ],
           },
-          // οι δύο birthdate comparisons – μόνο αν υπάρχει birthdate
           ...(user.birthdate
             ? [
                 { birthdate_min: { lte: user.birthdate } },
@@ -59,12 +62,11 @@ export async function GET() {
             : []),
         ],
       },
-      include: { takeparts: { include: { candidate: true } } },
+      include: { takepart: { include: { candidate: true } } },
       orderBy: { start_date: "desc" },
     });
 
-
-    // 4) formatting
+    // 5) Μετατροπή σε array με το σωστό σχήμα
     const formatted = elections.map((el) => ({
       id: el.id,
       title: el.title,
@@ -77,7 +79,7 @@ export async function GET() {
         roles: el.target_occupation ? [el.target_occupation] : [],
         locations: el.target_location ? [el.target_location] : [],
       },
-      candidates: el.takeparts.map((tp) => tp.candidate),
+      candidates: el.takepart.map((tp) => tp.candidate),
       createdAt: el.start_date.toISOString(),
     }));
 

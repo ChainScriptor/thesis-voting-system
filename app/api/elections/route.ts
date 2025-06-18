@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 export async function GET() {
   try {
     const elections = await prisma.election.findMany({
-      include: { takeparts: { include: { candidate: true } } },
+      include: { takepart: { include: { candidate: true } } },
       orderBy: { start_date: "desc" },
     });
 
@@ -22,7 +22,7 @@ export async function GET() {
         roles: el.target_occupation ? [el.target_occupation] : [],
         locations: el.target_location ? [el.target_location] : [],
       },
-      candidates: el.takeparts.map((tp) => tp.candidate),
+      candidates: el.takepart.map((tp) => tp.candidate),
       createdAt: el.start_date.toISOString(),
     }));
 

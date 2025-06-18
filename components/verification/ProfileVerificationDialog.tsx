@@ -1,3 +1,4 @@
+// components/verification/ProfileVerificationDialog.tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -45,7 +46,6 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-// ✅ Επέκταση props για να δέχεται onSuccess
 interface ProfileVerificationDialogProps {
   trigger: React.ReactNode;
   onSuccess?: () => void;
@@ -78,7 +78,8 @@ const ProfileVerificationDialog = ({
             const { gender, birthdate, occupation, location } = json.data;
             form.reset({
               gender,
-              birthdate: birthdate.slice(0, 10),
+              // Αν birthdate είναι null, βάζουμε κενό string
+              birthdate: birthdate ? birthdate.slice(0, 10) : "",
               occupation,
               location,
             });
@@ -114,11 +115,12 @@ const ProfileVerificationDialog = ({
           title: "Επιτυχία",
           description: "Τα στοιχεία σας αποθηκεύτηκαν επιτυχώς.",
         });
-        if (onSuccess) onSuccess(); // ✅ Εκτέλεση του callback
+        if (onSuccess) onSuccess();
       } else {
         toast({
           title: "Αποτυχία",
-          description: result.message || "Προέκυψε σφάλμα κατά την αποθήκευση.",
+          description:
+            result.message || "Προέκυψε σφάλμα κατά την αποθήκευση.",
           variant: "destructive",
         });
       }
@@ -163,7 +165,9 @@ const ProfileVerificationDialog = ({
                       <SelectItem value="male">Άνδρας</SelectItem>
                       <SelectItem value="female">Γυναίκα</SelectItem>
                       <SelectItem value="other">Άλλο</SelectItem>
-                      <SelectItem value="prefer_not_to_say">Προτιμώ να μην πω</SelectItem>
+                      <SelectItem value="prefer_not_to_say">
+                        Προτιμώ να μην πω
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -236,9 +240,11 @@ const ProfileVerificationDialog = ({
             />
 
             <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 rounded p-4 text-xs">
-              <strong>Σημαντική σημείωση:</strong><br />
-              Τα στοιχεία που παρέχετε χρησιμοποιούνται αποκλειστικά για την επαλήθευση της ταυτότητάς σας
-              και την αποτροπή πολλαπλών ψήφων στις ψηφοφορίες.
+              <strong>Σημαντική σημείωση:</strong>
+              <br />
+              Τα στοιχεία που παρέχετε χρησιμοποιούνται αποκλειστικά για την
+              επαλήθευση της ταυτότητάς σας και την αποτροπή πολλαπλών ψήφων στις
+              ψηφοφορίες.
             </div>
 
             <Separator className="my-4" />
