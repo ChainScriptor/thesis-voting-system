@@ -1,3 +1,4 @@
+// app/layout.tsx
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -15,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Voting System",
-  description: "Voting System",
+  title: "Σύστημα Ψηφοφορίας",
+  description: "Online Voting System – Πτυχιακή Εργασία",
 };
 
 export default function RootLayout({
