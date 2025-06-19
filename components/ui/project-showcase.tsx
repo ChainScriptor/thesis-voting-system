@@ -85,14 +85,13 @@ export const ProjectShowcase = ({
   mobile = {},
   imageAspectRatio = 1.37,
   isRTL = false,
-  onItemClick,
   outerRounding = "18.2px",
   innerRounding = "18px",
   outlineColor = "#33313d",
   hoverOutlineColor = "#403d4d",
   buttonInscriptions = {
-    previousButton: "Previous",
-    nextButton: "Next",
+    previousButton: "Προηγούμενο",
+    nextButton: "Επόμενο",
     openWebAppButton: "Open Web App"
   },
   halomotButtonGradient = "linear-gradient(to right, #a123f4, #603dec)",
@@ -337,22 +336,7 @@ export const ProjectShowcase = ({
                     ? { hoverTextColor: halomotButtonHoverTextColor }
                     : {})}
                 />
-                <HalomotButton
-                  inscription={buttonInscriptions.openWebAppButton}
-                  onClick={() =>
-                    onItemClick && onItemClick(testimonials[active].link || "")
-                  }
-                  fillWidth
-                  gradient={halomotButtonGradient}
-                  backgroundColor={halomotButtonBackground}
-                  textColor={halomotButtonTextColor}
-                  innerBorderRadius={halomotButtonInnerBorderRadius}
-                  outerBorderRadius={halomotButtonOuterBorderRadius}
-                  {...(halomotButtonHoverTextColor
-                    ? { hoverTextColor: halomotButtonHoverTextColor }
-                    : {})}
-                  href={testimonials[active].link}
-                />
+               
               </div>
             </div>
           </>
@@ -494,22 +478,7 @@ export const ProjectShowcase = ({
                     ? { hoverTextColor: halomotButtonHoverTextColor }
                     : {})}
                 />
-                <HalomotButton
-                  inscription={buttonInscriptions.openWebAppButton}
-                  onClick={() =>
-                    onItemClick && onItemClick(testimonials[active].link || "")
-                  }
-                  fillWidth
-                  gradient={halomotButtonGradient}
-                  backgroundColor={halomotButtonBackground}
-                  textColor={halomotButtonTextColor}
-                  innerBorderRadius={halomotButtonInnerBorderRadius}
-                  outerBorderRadius={halomotButtonOuterBorderRadius}
-                  {...(halomotButtonHoverTextColor
-                    ? { hoverTextColor: halomotButtonHoverTextColor }
-                    : {})}
-                  href={testimonials[active].link}
-                />
+                
               </div>
             </div>
           </>

@@ -13,18 +13,18 @@ const LTRVersion = () => (
           {
             name: "Καλωσορίσατε στην πλατφόρμα ηλεκτρονικών ψηφοφοριών!",
             quote:
-              'A cloud backup solution that employs the "ChaCha20 + Serpent-256 CBC + HMAC-SHA3-512" authenticated encryption scheme for data encryption and ML-KEM-1024 for quantum-resistant key exchange.',
-            designation: "Next.js Project",
-            src: "https://raw.githubusercontent.com/Northstrix/my-portfolio/refs/heads/main/public/plum-cave.webp",
-            link: "https://plum-cave.netlify.app/",
+              'Η πλατφόρμα μας προσφέρει πλήρη ασφάλεια και διαφάνεια . Εύκολη χρήση από οποιαδήποτε συσκευή. Aξιοπιστία και εμπιστοσύνη σε κάθε ψηφοφορία.',
+            designation: "Ασφαλείς & Διαφανείς Ηλεκτρονικές Ψηφοφορίες",
+            src: "/system.svg",
+            link: "",
           },
           {
-            name: "Namer UI",
+            name: "Πλήρης Διαχείριση Ψηφοφοριών",
             quote:
-              "A comprehensive collection of modern, attractive, and unique reusable TypeScript components crafted specifically for Next.js.",
-            designation: "Next.js Project",
-            src: "https://raw.githubusercontent.com/Northstrix/my-portfolio/refs/heads/main/public/namer-ui.webp",
-            link: "https://namer-ui.netlify.app/",
+              "Οργανώστε τις εκλογές σας με ευελιξία , ορίστε εύκολα χρονοδιαγράμματα. Παρακολουθήστε τη συμμετοχή ζωντανά και εξάγετε πλήρεις αναφορές για τα αποτελέσματα των ψηφοφοριών.",
+            designation: "Έλεγχος & Ανάλυση σε Πραγματικό Χρόνο",
+            src: "/second.svg",
+            link: "",
           },
           // [Μπορείς να συνεχίσεις και με τα υπόλοιπα...]
         ]}

@@ -9,7 +9,7 @@ import { AlertCircle, CheckCircle, Vote } from "lucide-react";
 import { format, isAfter } from "date-fns";
 import VoteModal from "@/components/pages/VoteModal";
 import PollResultsTabs from "@/components/pages/PollResultsTabs";
-import  LTRVersion  from "@/components/pages/cards";
+import LTRVersion from "@/components/pages/cards";
 
 interface Poll {
   id: number;
@@ -37,98 +37,105 @@ export default function HomePage() {
   const [voteModalPoll, setVoteModalPoll] = useState<number | null>(null);
   const [resultsPoll, setResultsPoll] = useState<number | null>(null);
 
-  // 1) Fetch user profile από MySQL **και μετά** sync στο /api/users
+  // Function to (re)fetch the profile from our API
+  const fetchProfile = async () => {
+    if (!user?.id) return;
+    setLoadingProfile(true);
+    try {
+      const res = await fetch(`/api/profile?clerkId=${user.id}`);
+      const json = await res.json();
+      if (json.success) {
+        setProfile(json.data);
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoadingProfile(false);
+    }
+  };
+
+  // 1) Initial profile load (and on sign-in)
   useEffect(() => {
     if (!clerkLoaded || !isSignedIn || !user?.id) return;
-
-    setLoadingProfile(true);
-    fetch(`/api/profile?clerkId=${user.id}`)
-      .then((res) => res.json())
-      .then((json) => {
-        if (json.success) {
-          setProfile(json.data);
-
-          // **Sync** Clerk user στο MySQL πίνακα
-          fetch("/api/users", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ clerkId: user.id }),
-          }).catch((err) =>
-            console.error("❌ Failed to sync user to MySQL:", err)
-          );
-        }
-      })
-      .catch(console.error)
-      .finally(() => {
-        setLoadingProfile(false);
-      });
+    fetchProfile();
   }, [clerkLoaded, isSignedIn, user?.id]);
 
-  // 2) Fetch filtered polls & vote status
+  // 2) Fetch filtered polls & vote status once signed in
   useEffect(() => {
     if (!clerkLoaded || !authLoaded || !isSignedIn || !user?.id) return;
 
     fetch("/api/elections/filtered")
       .then((res) => res.json())
-      .then((data: unknown) => {
-        const arr = Array.isArray(data) ? (data as Poll[]) : [];
-        if (!Array.isArray(data)) {
-          console.error("Expected array from /api/elections/filtered:", data);
-        }
+      .then((arr: Poll[]) => {
         setPolls(arr);
-        arr.forEach((p) => {
+        arr.forEach((p) =>
           fetch(`/api/vote/status?electionId=${p.id}`)
             .then((r) => r.json())
-            .then(({ hasVoted }) => {
-              setVotedMap((m) => ({ ...m, [p.id]: hasVoted }));
-            })
-            .catch(() => {
-              setVotedMap((m) => ({ ...m, [p.id]: false }));
-            });
-        });
+            .then(({ hasVoted }) =>
+              setVotedMap((m) => ({ ...m, [p.id]: hasVoted }))
+            )
+            .catch(() => setVotedMap((m) => ({ ...m, [p.id]: false })))
+        );
       })
       .catch(console.error);
   }, [clerkLoaded, authLoaded, isSignedIn, user?.id]);
 
-  if (!clerkLoaded || loadingProfile) {
+  // --- Rendering logic ---
+
+  // a) While Clerk SDK is loading
+  if (!clerkLoaded) {
     return <div className="p-8 text-center text-gray-500">Φόρτωση...</div>;
   }
 
+  // b) If signed-in, wait for profile fetch
+  if (isSignedIn && loadingProfile) {
+    return <div className="p-8 text-center text-gray-500">Φόρτωση...</div>;
+  }
+
+  // c) If not signed-in, show the public carousel
   if (!isSignedIn || !user) {
     return (
-      <main >
-      <LTRVersion />
+      <main>
+        <LTRVersion />
       </main>
     );
   }
 
-  // Check profile completeness
-  const requiredFields: (keyof Profile)[] = [
+  // d) Check which profile fields are still missing
+  const required: (keyof Profile)[] = [
     "gender",
     "birthdate",
     "occupation",
     "location",
   ];
-  const missing = requiredFields.filter((f) => !profile?.[f]);
-  const isVerified = missing.length === 0;
+  const missing = required.filter((f) => !profile?.[f]);
 
+  // e) If any are missing, prompt user to complete them
+  if (missing.length > 0) {
+    return (
+      <main className="p-8 text-center">
+        <AlertCircle className="mx-auto mb-4 h-12 w-12 text-red-500" />
+        <h2 className="text-xl font-semibold mb-2">
+          Συμπληρώστε τα στοιχεία σας
+        </h2>
+        <p className="mb-4">
+          Παρακαλώ ολοκληρώστε τα ακόλουθα πεδία στο προφίλ σας:{" "}
+          <strong>{missing.join(", ")}</strong>.
+        </p>
+        {/* Εδώ μπορείτε να βάλετε ένα link ή το ίδιο το ProfileForm component */}
+      </main>
+    );
+  }
+
+  // f) Finally: fully registered user – show polls
   return (
     <main className="max-w-7xl mx-auto p-4 md:p-8">
-      {missing.length > 0 ? (
-        <div className="mb-6 flex items-center rounded-lg border border-red-500 bg-red-50 p-4">
-          <AlertCircle className="w-5 h-5 text-red-500 mr-2" />
-          <span className="text-sm text-red-800">
-            Παρακαλώ συμπληρώστε: {missing.join(", ")} στο προφίλ σας.
-          </span>
-        </div>
-      ) : (
-        <div className="mb-6 flex items-center rounded-lg border border-green-500 bg-green-50 p-4">
-          <CheckCircle className="w-5 h-5 text-green-500 mr-2" />
-          <span className="text-sm font-medium text-green-800">
-            Εγγεγραμμένος χρήστης
-          </span>
-        </div>
-      )}
+      <div className="mb-6 flex items-center rounded-lg border border-green-500 bg-green-50 p-4">
+        <CheckCircle className="w-5 h-5 text-green-500 mr-2" />
+        <span className="text-sm font-medium text-green-800">
+          Εγγεγραμμένος χρήστης
+        </span>
+      </div>
 
       <section className="mt-12">
         <h2 className="text-xl font-bold mb-4">
@@ -142,7 +149,6 @@ export default function HomePage() {
           {polls.map((p) => {
             const hasVoted = votedMap[p.id] === true;
             const ended = isAfter(new Date(), new Date(p.dateRange.endDate));
-
             return (
               <Card key={p.id} className="p-6">
                 <h3 className="text-xl font-bold mb-2 flex items-center">
@@ -153,7 +159,6 @@ export default function HomePage() {
                 <p className="text-sm text-gray-500 mb-4">
                   Λήξη: {format(new Date(p.dateRange.endDate), "dd/MM/yyyy")}
                 </p>
-
                 {ended ? (
                   <Button
                     onClick={() => setResultsPoll(p.id)}
@@ -163,19 +168,15 @@ export default function HomePage() {
                   </Button>
                 ) : (
                   <Button
-                    disabled={!isVerified || hasVoted}
+                    disabled={hasVoted}
                     onClick={() => setVoteModalPoll(p.id)}
                     className={
-                      !isVerified || hasVoted
+                      hasVoted
                         ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                         : "bg-black text-white hover:bg-gray-800"
                     }
                   >
-                    {hasVoted
-                      ? "Έχεις ήδη ψηφίσει"
-                      : isVerified
-                      ? "Ψήφισε"
-                      : "Ολοκλήρωσε το προφίλ"}
+                    {hasVoted ? "Έχεις ήδη ψηφίσει" : "Ψήφισε"}
                   </Button>
                 )}
               </Card>
@@ -203,8 +204,6 @@ export default function HomePage() {
           onClose={() => setResultsPoll(null)}
         />
       )}
-
     </main>
-  
   );
 }

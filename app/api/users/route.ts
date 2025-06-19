@@ -64,8 +64,10 @@ export async function POST(request: Request) {
   }
 
   try {
-    // fetch the Clerk user
-    const u = await clerkClient.users.getUser(clerkId);
+    // ⚠️ ClerkClient is a function, so first await it:
+    const client = await clerkClient();
+    // then use its .users API:
+    const u = await client.users.getUser(clerkId);
 
     const fullName = `${u.firstName ?? ""} ${u.lastName ?? ""}`.trim() || u.username;
     const username = u.username ?? u.primaryEmailAddress?.emailAddress ?? "";
@@ -75,7 +77,6 @@ export async function POST(request: Request) {
     const occupation = u.publicMetadata.occupation ?? null;
     const location = u.publicMetadata.location ?? null;
 
-    // upsert into MySQL
     const conn = await createConnection();
     const sql = `
       INSERT INTO \`user\`
