@@ -29,7 +29,7 @@ export async function GET() {
       return NextResponse.json([], { status: 200 });
     }
 
-    // 4) Εφαρμογή των φίλτρων
+    // 4) Εφαρμογή των φίλτρων *ΧΩΡΙΣ* κανέναν έλεγχο για start/end date
     const elections = await prisma.election.findMany({
       where: {
         AND: [
@@ -54,12 +54,7 @@ export async function GET() {
               { target_location: "all" },
             ],
           },
-          ...(user.birthdate
-            ? [
-                { birthdate_min: { lte: user.birthdate } },
-                { birthdate_max: { gte: user.birthdate } },
-              ]
-            : []),
+          // **Αφαιρούμε** εντελώς τυχόν birthdate_min/birthdate_max check
         ],
       },
       include: { takepart: { include: { candidate: true } } },

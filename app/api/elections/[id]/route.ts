@@ -1,25 +1,21 @@
 // app/api/elections/[id]/route.ts
 
-export const dynamic = "force-dynamic"; // 👈 Σημαντικό
+export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-export async function GET(request: Request) {
+export async function GET(request: Request, { params }: { params: { id: string } }) {
+  const electionId = parseInt(params.id, 10);
+  if (isNaN(electionId)) {
+    return NextResponse.json({ error: "Invalid election id" }, { status: 400 });
+  }
+
   try {
-    const url = new URL(request.url);
-    const pathParts = url.pathname.split("/");
-    const id = pathParts[pathParts.length - 1];
-    const electionId = parseInt(id, 10);
-
-    if (isNaN(electionId)) {
-      return NextResponse.json({ error: "Invalid election id" }, { status: 400 });
-    }
-
     const election = await prisma.election.findUnique({
       where: { id: electionId },
       include: {
-        takeparts: {
+        takepart: {
           include: { candidate: true },
         },
       },
@@ -41,7 +37,7 @@ export async function GET(request: Request) {
         roles: election.target_occupation ? [election.target_occupation] : [],
         locations: election.target_location ? [election.target_location] : [],
       },
-      candidates: election.takeparts.map((tp) => tp.candidate),
+      candidates: election.takepart.map((tp) => tp.candidate),
       createdAt: election.start_date.toISOString(),
     };
 
