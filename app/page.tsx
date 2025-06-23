@@ -5,11 +5,17 @@ import { useUser, useAuth } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { AlertCircle, CheckCircle, Vote } from "lucide-react";
+import { AlertCircle, CheckCircle, Vote, BarChart } from "lucide-react";
 import { format, isAfter } from "date-fns";
 import VoteModal from "@/components/pages/VoteModal";
 import PollResultsTabs from "@/components/pages/PollResultsTabs";
 import LTRVersion from "@/components/pages/cards";
+import {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+} from "@/components/ui/tabs";
 
 interface Poll {
   id: number;
@@ -37,16 +43,16 @@ export default function HomePage() {
   const [voteModalPoll, setVoteModalPoll] = useState<number | null>(null);
   const [resultsPoll, setResultsPoll] = useState<number | null>(null);
 
-  // Function to (re)fetch the profile from our API
+  // Φόρτωση προφίλ
   const fetchProfile = async () => {
     if (!user?.id) return;
     setLoadingProfile(true);
     try {
-      const res = await fetch(`/api/profile?clerkId=${user.id}`);
+      const res = await fetch(`/api/profile?clerkId=${user.id}`, {
+        credentials: "include",
+      });
       const json = await res.json();
-      if (json.success) {
-        setProfile(json.data);
-      }
+      if (json.success) setProfile(json.data);
     } catch (e) {
       console.error(e);
     } finally {
@@ -54,54 +60,44 @@ export default function HomePage() {
     }
   };
 
-  // 1) Initial profile load (and on sign-in)
+  // 1) Load profile once signed in
   useEffect(() => {
     if (!clerkLoaded || !isSignedIn || !user?.id) return;
     fetchProfile();
   }, [clerkLoaded, isSignedIn, user?.id]);
 
-  // 2) Fetch filtered polls & vote status once signed in
+  // 2) Load only the polls user is eligible for
   useEffect(() => {
     if (!clerkLoaded || !authLoaded || !isSignedIn || !user?.id) return;
 
-    fetch("/api/elections/filtered")
-      .then((res) => res.json())
+    fetch("/api/elections/filtered", { credentials: "include" })
+      .then((r) => r.json())
       .then((arr: Poll[]) => {
         setPolls(arr);
+        // fetch each vote status
         arr.forEach((p) =>
-          fetch(`/api/vote/status?electionId=${p.id}`)
-            .then((r) => r.json())
+          fetch(`/api/vote/status?electionId=${p.id}`, {
+            credentials: "include",
+          })
+            .then((r2) => r2.json())
             .then(({ hasVoted }) =>
               setVotedMap((m) => ({ ...m, [p.id]: hasVoted }))
             )
-            .catch(() => setVotedMap((m) => ({ ...m, [p.id]: false })))
+            .catch(() =>
+              setVotedMap((m) => ({ ...m, [p.id]: false }))
+            )
         );
       })
       .catch(console.error);
   }, [clerkLoaded, authLoaded, isSignedIn, user?.id]);
 
-  // --- Rendering logic ---
-
-  // a) While Clerk SDK is loading
-  if (!clerkLoaded) {
+  // loading / unauthenticated / incomplete‐profile handling
+  if (!clerkLoaded)
     return <div className="p-8 text-center text-gray-500">Φόρτωση...</div>;
-  }
-
-  // b) If signed-in, wait for profile fetch
-  if (isSignedIn && loadingProfile) {
+  if (isSignedIn && loadingProfile)
     return <div className="p-8 text-center text-gray-500">Φόρτωση...</div>;
-  }
+  if (!isSignedIn || !user) return <main><LTRVersion /></main>;
 
-  // c) If not signed-in, show the public carousel
-  if (!isSignedIn || !user) {
-    return (
-      <main>
-        <LTRVersion />
-      </main>
-    );
-  }
-
-  // d) Check which profile fields are still missing
   const required: (keyof Profile)[] = [
     "gender",
     "birthdate",
@@ -109,8 +105,6 @@ export default function HomePage() {
     "location",
   ];
   const missing = required.filter((f) => !profile?.[f]);
-
-  // e) If any are missing, prompt user to complete them
   if (missing.length > 0) {
     return (
       <main className="p-8 text-center">
@@ -118,55 +112,61 @@ export default function HomePage() {
         <h2 className="text-xl font-semibold mb-2">
           Συμπληρώστε τα στοιχεία σας
         </h2>
-        <p className="mb-4">
+        <p>
           Παρακαλώ ολοκληρώστε τα ακόλουθα πεδία στο προφίλ σας:{" "}
           <strong>{missing.join(", ")}</strong>.
         </p>
-        {/* Εδώ μπορείτε να βάλετε ένα link ή το ίδιο το ProfileForm component */}
       </main>
     );
   }
 
-  // f) Finally: fully registered user – show polls
+  // διαχωρισμός ενεργών / ολοκληρωμένων
+  const now = new Date();
+  const activePolls = polls.filter((p) =>
+    isAfter(new Date(p.dateRange.endDate), now)
+  );
+  const finishedPolls = polls.filter((p) =>
+    !isAfter(new Date(p.dateRange.endDate), now)
+  );
+
   return (
-    <main className="max-w-7xl mx-auto p-4 md:p-8">
-      <div className="mb-6 flex items-center rounded-lg border border-green-500 bg-green-50 p-4">
+    <main className="max-w-7xl mx-auto p-4 md:p-8 space-y-6">
+      <div className="flex items-center p-4 rounded-lg border border-green-500 bg-green-50">
         <CheckCircle className="w-5 h-5 text-green-500 mr-2" />
         <span className="text-sm font-medium text-green-800">
           Εγγεγραμμένος χρήστης
         </span>
       </div>
 
-      <section className="mt-12">
-        <h2 className="text-xl font-bold mb-4">
-          Σύνολο Ψηφοφοριών: {polls.length}
-        </h2>
-        {polls.length === 0 && (
-          <p className="text-gray-500">Δεν υπάρχουν διαθέσιμες ψηφοφορίες.</p>
-        )}
+      <Tabs defaultValue="active" className="space-y-4">
+        <TabsList className="border-b">
+          <TabsTrigger value="active" className="px-4 py-2">
+            <Vote className="inline-block mr-1" />
+            Ενεργές
+          </TabsTrigger>
+          <TabsTrigger value="results" className="px-4 py-2">
+            <BarChart className="inline-block mr-1" />
+            Ολοκληρωμένες
+          </TabsTrigger>
+        </TabsList>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {polls.map((p) => {
-            const hasVoted = votedMap[p.id] === true;
-            const ended = isAfter(new Date(), new Date(p.dateRange.endDate));
-            return (
-              <Card key={p.id} className="p-6">
-                <h3 className="text-xl font-bold mb-2 flex items-center">
-                  <Vote className="mr-2 h-6 w-6 text-indigo-600" />
-                  {p.title}
-                </h3>
-                <p className="text-gray-600 mb-2">{p.description}</p>
-                <p className="text-sm text-gray-500 mb-4">
-                  Λήξη: {format(new Date(p.dateRange.endDate), "dd/MM/yyyy")}
-                </p>
-                {ended ? (
-                  <Button
-                    onClick={() => setResultsPoll(p.id)}
-                    className="bg-blue-600 text-white hover:bg-blue-700"
-                  >
-                    Δες Αποτελέσματα
-                  </Button>
-                ) : (
+        <TabsContent value="active" className="space-y-6">
+          <h2 className="text-xl font-bold">
+            {activePolls.length} ενεργές ψηφοφορίες
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {activePolls.map((p) => {
+              const hasVoted = votedMap[p.id];
+              return (
+                <Card key={p.id} className="p-6 hover:shadow-lg transition">
+                  <h3 className="text-xl font-bold mb-2 flex items-center">
+                    <Vote className="mr-2 text-indigo-600" />
+                    {p.title}
+                  </h3>
+                  <p className="text-gray-600 mb-2">{p.description}</p>
+                  <p className="text-sm text-gray-500 mb-4">
+                    Λήξη: {format(new Date(p.dateRange.endDate), "dd/MM/yyyy")}
+                  </p>
                   <Button
                     disabled={hasVoted}
                     onClick={() => setVoteModalPoll(p.id)}
@@ -176,24 +176,55 @@ export default function HomePage() {
                         : "bg-black text-white hover:bg-gray-800"
                     }
                   >
-                    {hasVoted ? "Έχεις ήδη ψηφίσει" : "Ψήφισε"}
+                    {hasVoted ? "Έχεις ήδη ψηφίσει" : "Ψήφισε τώρα"}
                   </Button>
-                )}
+                </Card>
+              );
+            })}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="results" className="space-y-6">
+          <h2 className="text-xl font-bold">
+            {finishedPolls.length} ολοκληρωμένες ψηφοφορίες
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {finishedPolls.map((p) => (
+              <Card key={p.id} className="p-6 hover:shadow-lg transition">
+                <h3 className="text-xl font-bold mb-2 flex items-center">
+                  <BarChart className="mr-2 text-blue-600" />
+                  {p.title}
+                </h3>
+                <p className="text-gray-600 mb-2">{p.description}</p>
+                <p className="text-sm text-gray-500 mb-4">
+                  Λήξη: {format(new Date(p.dateRange.endDate), "dd/MM/yyyy")}
+                </p>
+                <Button
+                  onClick={() => setResultsPoll(p.id)}
+                  className="bg-blue-600 text-white hover:bg-blue-700"
+                >
+                  Δες Αποτελέσματα
+                </Button>
               </Card>
-            );
-          })}
-        </div>
-      </section>
+            ))}
+          </div>
+        </TabsContent>
+      </Tabs>
 
       {/* Vote Modal */}
       <VoteModal
-        pollId={voteModalPoll?.toString() ?? ""}
+        pollId={voteModalPoll?.toString() || ""}
         open={!!voteModalPoll}
         onOpenChange={(open) => {
-          if (!open && voteModalPoll) {
+          // απλώς κλείσιμο → δεν σημαίνει ψήφισα
+          if (!open) setVoteModalPoll(null);
+        }}
+        onVoteSuccess={() => {
+          // μόνο εδώ σημαίνει “έχει ψηφίσει”
+          if (voteModalPoll) {
             setVotedMap((m) => ({ ...m, [voteModalPoll]: true }));
           }
-          if (!open) setVoteModalPoll(null);
+          setVoteModalPoll(null);
         }}
       />
 

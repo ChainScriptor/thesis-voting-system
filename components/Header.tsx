@@ -5,10 +5,9 @@ import { SignInButton, SignUpButton, UserButton, useUser } from "@clerk/nextjs";
 import Link from "next/link";
 import React, { useState, useEffect } from "react";
 import Form from "next/form";
-import { ClipboardPlus } from "lucide-react";
+import { ClipboardPlus, Vote } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ProfileVerificationDialog from "@/components/verification/ProfileVerificationDialog";
-import { TrueFocus } from "./ui/true-focus";
 
 export default function Header() {
   const { user } = useUser();
@@ -43,7 +42,7 @@ export default function Header() {
     };
 
     checkProfile();
-  }, [user?.id]); // 👉 μόνο όταν υπάρχει αλλαγή στο user.id
+  }, [user?.id]);
 
   const buttonClass = profileComplete
     ? "bg-green-500 hover:bg-green-600 text-white"
@@ -54,19 +53,11 @@ export default function Header() {
   return (
     <header className="flex flex-col sm:flex-row justify-between items-center px-4 py-2 w-full">
       <div className="flex items-center justify-between w-full">
-        <Link
-          href="/"
-          
-        >
-          <TrueFocus
-            sentence="Ηλεκτρονικές Ψηφοφορίες"
-            
-            manualMode={false}
-            blurAmount={5}
-            borderColor="red"
-            animationDuration={2}
-            pauseBetweenAnimations={1}
-          />
+        <Link href="/" className="flex items-center space-x-2">
+          <Vote className="w-6 h-6 text-black dark:text-white" />
+          <span className="text-xl font-bold text-black dark:text-white">
+            Ηλεκτρονικές Ψηφοφορίες
+          </span>
         </Link>
 
         {user && (
@@ -75,7 +66,7 @@ export default function Header() {
               type="text"
               name="query"
               placeholder="Αναζήτηση Ψηφοφορίας"
-              className="bg-gray-100 text-gray-800 px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 border w-full"
+              className="bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-white px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 border w-full"
             />
           </Form>
         )}
@@ -119,7 +110,6 @@ export default function Header() {
                   Εγγραφή
                 </span>
               </SignUpButton>
-
             </div>
           )}
         </div>

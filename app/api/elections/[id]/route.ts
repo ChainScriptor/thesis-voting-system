@@ -1,12 +1,17 @@
 // app/api/elections/[id]/route.ts
-
 export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
-  const electionId = parseInt(params.id, 10);
+export async function GET(request: Request) {
+  // Παίρνουμε το id από το URL
+  const url = new URL(request.url);
+  const segments = url.pathname.split("/");
+  // segments = ["", "api","elections","{id}","route.ts"];
+  const rawId = segments[3];
+  const electionId = parseInt(rawId, 10);
+
   if (isNaN(electionId)) {
     return NextResponse.json({ error: "Invalid election id" }, { status: 400 });
   }
@@ -15,9 +20,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
     const election = await prisma.election.findUnique({
       where: { id: electionId },
       include: {
-        takepart: {
-          include: { candidate: true },
-        },
+        takepart: { include: { candidate: true } },
       },
     });
 
