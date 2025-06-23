@@ -4,44 +4,55 @@
 import { SignInButton, SignUpButton, UserButton, useUser } from "@clerk/nextjs";
 import Link from "next/link";
 import React, { useState, useEffect } from "react";
-import Form from "next/form";
-import { ClipboardPlus, Vote } from "lucide-react";
+import { ClipboardPlus, Vote, Sun, Moon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ProfileVerificationDialog from "@/components/verification/ProfileVerificationDialog";
+import { Switch } from "@/components/ui/switch";
 
 export default function Header() {
   const { user } = useUser();
   const isAdmin = user?.publicMetadata?.role === "voting_admin";
-
   const [profileComplete, setProfileComplete] = useState(false);
+
+  // dark mode state
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  useEffect(() => {
+    // load saved theme on mount
+    const stored = localStorage.getItem("theme");
+    if (stored === "dark") {
+      document.documentElement.classList.add("dark");
+      setIsDarkMode(true);
+    }
+  }, []);
+
+  const toggleDarkMode = () => {
+    if (isDarkMode) {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+      setIsDarkMode(false);
+    } else {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+      setIsDarkMode(true);
+    }
+  };
 
   useEffect(() => {
     if (!user?.id) return;
-
-    const checkProfile = async () => {
-      try {
-        const res = await fetch(`/api/profile?clerkId=${user.id}`);
-        const json = await res.json();
-
-        if (
+    // check profile completeness
+    fetch(`/api/profile?clerkId=${user.id}`)
+      .then(r => r.json())
+      .then(json => {
+        const complete =
           json.success &&
-          json.data &&
-          json.data.gender &&
-          json.data.birthdate &&
-          json.data.occupation &&
-          json.data.location
-        ) {
-          setProfileComplete(true);
-        } else {
-          setProfileComplete(false);
-        }
-      } catch (error) {
-        console.error("Error fetching profile status:", error);
-        setProfileComplete(false);
-      }
-    };
-
-    checkProfile();
+          json.data?.gender &&
+          json.data?.birthdate &&
+          json.data?.occupation &&
+          json.data?.location;
+        setProfileComplete(!!complete);
+      })
+      .catch(() => setProfileComplete(false));
   }, [user?.id]);
 
   const buttonClass = profileComplete
@@ -51,27 +62,55 @@ export default function Header() {
   const buttonText = profileComplete ? "Εγγεγραμμένος" : "Εγγραφή στοιχείων";
 
   return (
-    <header className="flex flex-col sm:flex-row justify-between items-center px-4 py-2 w-full">
-      <div className="flex items-center justify-between w-full">
-        <Link href="/" className="flex items-center space-x-2">
-          <Vote className="w-6 h-6 text-black dark:text-white" />
-          <span className="text-xl font-bold text-black dark:text-white">
-            Ηλεκτρονικές Ψηφοφορίες
-          </span>
-        </Link>
+    <header className="sticky top-0 z-30 w-full bg-white dark:bg-black shadow-sm px-4 py-2">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        {/* Logo */}
+        <div className="flex justify-between items-center w-full sm:w-auto">
+          <Link href="/" className="flex items-center space-x-2">
+            <Vote className="w-6 h-6 text-black dark:text-white" />
+            <span className="text-xl font-bold text-black dark:text-white">
+              Ηλεκτρονικές Ψηφοφορίες
+            </span>
+          </Link>
+        </div>
 
+        {/* Search (only on sm+) */}
         {user && (
-          <Form action="/search" className="hidden sm:block w-full max-w-lg mx-4">
+          <form
+            action="/search"
+            className="hidden sm:block sm:w-full max-w-lg mx-auto"
+          >
             <input
               type="text"
               name="query"
               placeholder="Αναζήτηση Ψηφοφορίας"
-              className="bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-white px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 border w-full"
+              className="w-full border rounded px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-          </Form>
+          </form>
         )}
 
-        <div className="flex items-center space-x-2">
+        {/* Actions */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 gap-2 sm:gap-0">
+          {/* Dark mode toggle */}
+          <div className="flex items-center space-x-1 px-2">
+            <Sun
+              className={`h-5 w-5 transition-opacity ${
+                isDarkMode ? "opacity-50" : "opacity-100"
+              }`}
+            />
+            <Switch
+              id="dark-mode-toggle"
+              checked={isDarkMode}
+              onCheckedChange={toggleDarkMode}
+            />
+            <Moon
+              className={`h-5 w-5 transition-opacity ${
+                isDarkMode ? "opacity-100" : "opacity-50"
+              }`}
+            />
+          </div>
+
+          {/* Admin link */}
           {user && isAdmin && (
             <Link
               href="/admin"
@@ -82,6 +121,7 @@ export default function Header() {
             </Link>
           )}
 
+          {/* Profile verification */}
           {user && (
             <ProfileVerificationDialog
               onSuccess={() => setProfileComplete(true)}
@@ -93,20 +133,20 @@ export default function Header() {
             />
           )}
 
+          {/* User buttons */}
           {user ? (
-            <div className="ml-4">
+            <div className="ml-0 sm:ml-4">
               <UserButton />
             </div>
           ) : (
             <div className="flex space-x-2">
               <SignInButton mode="modal">
-                <span className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                <span className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded cursor-pointer">
                   Σύνδεση
                 </span>
               </SignInButton>
-
               <SignUpButton mode="modal">
-                <span className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                <span className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded cursor-pointer">
                   Εγγραφή
                 </span>
               </SignUpButton>
