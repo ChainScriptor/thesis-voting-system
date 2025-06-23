@@ -16,7 +16,6 @@ import {
   CheckCircle,
 } from "lucide-react";
 import Image from "next/image";
-import DashboardLayout from "@/app/admin/layout/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {

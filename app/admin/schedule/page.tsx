@@ -18,7 +18,7 @@ interface Election {
     endDate: string;
   };
   createdAt: string;
-  candidates: unknown[]; // 👈 λύση στο ESLint error
+  candidates: unknown[];
   targeting: {
     roles: string[];
     locations: string[];
@@ -52,16 +52,21 @@ export default function SchedulePage() {
   }, [toast]);
 
   return (
-    <div className="max-w-6xl mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-6">Όλες οι Ψηφοφορίες</h1>
+    <div className="max-w-6xl mx-auto p-4 bg-background text-foreground">
+      <h1 className="text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100">
+        Όλες οι Ψηφοφορίες
+      </h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {loading
           ? Array.from({ length: 3 }).map((_, i) => (
-              <Card key={i}>
+              <Card
+                key={i}
+                className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-neutral-800"
+              >
                 <CardContent className="p-4 space-y-2">
-                  <Skeleton className="h-5 w-3/4" />
-                  <Skeleton className="h-4 w-1/2" />
-                  <Skeleton className="h-6 w-16" />
+                  <Skeleton className="h-5 w-3/4 bg-gray-200 dark:bg-gray-700" />
+                  <Skeleton className="h-4 w-1/2 bg-gray-200 dark:bg-gray-700" />
+                  <Skeleton className="h-6 w-16 bg-gray-200 dark:bg-gray-700" />
                 </CardContent>
               </Card>
             ))
@@ -71,13 +76,13 @@ export default function SchedulePage() {
               return (
                 <Card
                   key={poll.id}
-                  className="rounded-xl border border-gray-200"
+                  className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-neutral-800"
                 >
                   <CardContent className="p-4 space-y-2">
-                    <h3 className="text-lg font-semibold text-gray-900 truncate">
+                    <h3 className="text-lg font-semibold truncate text-gray-900 dark:text-gray-100">
                       {poll.title}
                     </h3>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
                       {format(
                         new Date(poll.dateRange.startDate),
                         "dd/MM/yyyy",
@@ -92,9 +97,10 @@ export default function SchedulePage() {
                     </p>
                     <Badge
                       className={
-                        isExpired
-                          ? "bg-gray-200 text-gray-600 text-sm py-1 px-2 rounded-full"
-                          : "bg-green-100 text-green-800 text-sm py-1 px-2 rounded-full"
+                        (isExpired
+                          ? "bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400"
+                          : "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200") +
+                        " text-sm py-1 px-2 rounded-full"
                       }
                     >
                       {isExpired ? "Έληξε" : "Ενεργή"}
