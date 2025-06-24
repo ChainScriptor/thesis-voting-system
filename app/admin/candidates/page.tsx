@@ -79,7 +79,7 @@ export default function CandidatesPage() {
       );
   }, [toast]);
 
-  // 2) Φόρτωση υποψηφίων όταν αλλάζει ψήφο
+  // 2) Φόρτωση υποψηφίων όταν αλλάζει επιλογή ψηφοφορίας
   useEffect(() => {
     if (!selectedElection) {
       setCandidates([]);
@@ -135,10 +135,9 @@ export default function CandidatesPage() {
   const removeCandidate = async (candidateId: number) => {
     if (!selectedElection) return;
     try {
-      const res =await fetch(`/api/poll-candidates/${pcId}`, {
-  method: "DELETE",
-});
-
+      const res = await fetch(`/api/poll-candidates/${candidateId}`, {
+        method: "DELETE",
+      });
       if (!res.ok) throw new Error();
       setCandidates((prev) => prev.filter((c) => c.id !== candidateId));
       toast({ title: "Επιτυχία", description: "Υποψήφιος αφαιρέθηκε" });
@@ -192,7 +191,9 @@ export default function CandidatesPage() {
 
       {/* Modal Πρόσκληση */}
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild><Button><UserPlus className="mr-2 h-4 w-4" /> Προσθήκη</Button></DialogTrigger>
+        <DialogTrigger asChild>
+          <Button><UserPlus className="mr-2 h-4 w-4" /> Προσθήκη</Button>
+        </DialogTrigger>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>Προσθήκη Υποψηφίου</DialogTitle>

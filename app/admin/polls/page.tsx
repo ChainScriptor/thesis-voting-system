@@ -1,4 +1,3 @@
-// app/admin/polls/page.tsx
 "use client";
 
 import React, { useEffect, useState, FormEvent } from "react";
@@ -43,7 +42,6 @@ interface Poll {
 export default function AdminPollsPage() {
   const router = useRouter();
 
-  // State hooks
   const [polls, setPolls] = useState<Poll[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const [form, setForm] = useState({
@@ -59,7 +57,6 @@ export default function AdminPollsPage() {
   });
   const [creating, setCreating] = useState<boolean>(false);
 
-  // Φόρτωση των υφιστάμενων ψηφοφοριών
   useEffect(() => {
     fetch("/api/elections")
       .then((r) => r.json())
@@ -78,7 +75,6 @@ export default function AdminPollsPage() {
     }));
   };
 
-  // Δημιουργία νέας ψηφοφορίας
   const handleCreate = async (e: FormEvent) => {
     e.preventDefault();
     setCreating(true);
@@ -86,13 +82,24 @@ export default function AdminPollsPage() {
       const res = await fetch("/api/elections", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, is_active: true }),
+        body: JSON.stringify({
+          title: form.title,
+          description: form.description,
+          startDate: form.start_date,
+          endDate: form.end_date,
+          targetOccupation: form.target_occupation,
+          targetLocation: form.target_location,
+          birthdateMin: form.birthdate_min,
+          birthdateMax: form.birthdate_max,
+          targetGender: form.target_gender,
+          is_active: true,
+        }),
       });
       if (!res.ok) throw new Error();
+
       const r2 = await fetch("/api/elections");
       const data: Poll[] = await r2.json();
       setPolls(data);
-      // Καθαρισμός φόρμας
       setForm({
         title: "",
         description: "",
@@ -112,7 +119,6 @@ export default function AdminPollsPage() {
     }
   };
 
-  // Διαγραφή ψηφοφορίας
   const handleDelete = async (id: string) => {
     if (!confirm("Είστε σίγουροι ότι θέλετε να διαγράψετε αυτή την ψηφοφορία;"))
       return;
@@ -127,7 +133,6 @@ export default function AdminPollsPage() {
 
   return (
     <div className="p-6 space-y-6">
-      {/* Header */}
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Ψηφοφορίες</h1>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -148,106 +153,48 @@ export default function AdminPollsPage() {
             <form onSubmit={handleCreate} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium">Τίτλος</label>
-                <Input
-                  name="title"
-                  value={form.title}
-                  onChange={onChange}
-                  required
-                />
+                <Input name="title" value={form.title} onChange={onChange} required />
               </div>
               <div>
                 <label className="block text-sm font-medium">Περιγραφή</label>
-                <Textarea
-                  name="description"
-                  value={form.description}
-                  onChange={onChange}
-                  required
-                />
+                <Textarea name="description" value={form.description} onChange={onChange} required />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium">Έναρξη</label>
-                  <Input
-                    type="date"
-                    name="start_date"
-                    value={form.start_date}
-                    onChange={onChange}
-                    required
-                  />
+                  <Input type="date" name="start_date" value={form.start_date} onChange={onChange} required />
                 </div>
                 <div>
                   <label className="block text-sm font-medium">Λήξη</label>
-                  <Input
-                    type="date"
-                    name="end_date"
-                    value={form.end_date}
-                    onChange={onChange}
-                    required
-                  />
+                  <Input type="date" name="end_date" value={form.end_date} onChange={onChange} required />
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium">
-                  Επάγγελμα Στόχευσης
-                </label>
-                <select
-                  name="target_occupation"
-                  value={form.target_occupation}
-                  onChange={onChange}
-                  className="w-full border rounded px-3 py-2"
-                >
-                  <option value="" disabled>
-                    -- Επιλέξτε Επάγγελμα --
-                  </option>
+                <label className="block text-sm font-medium">Επάγγελμα Στόχευσης</label>
+                <select name="target_occupation" value={form.target_occupation} onChange={onChange} className="w-full border rounded px-3 py-2">
+                  <option value="" disabled>-- Επιλέξτε Επάγγελμα --</option>
                   {occupations.map((opt) => (
-                    <option key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </option>
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
                   ))}
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium">
-                  Τοποθεσία Στόχευσης
-                </label>
-                <select
-                  name="target_location"
-                  value={form.target_location}
-                  onChange={onChange}
-                  className="w-full border rounded px-3 py-2"
-                >
-                  <option value="" disabled>
-                    -- Επιλέξτε Τοποθεσία --
-                  </option>
+                <label className="block text-sm font-medium">Τοποθεσία Στόχευσης</label>
+                <select name="target_location" value={form.target_location} onChange={onChange} className="w-full border rounded px-3 py-2">
+                  <option value="" disabled>-- Επιλέξτε Τοποθεσία --</option>
                   {cities.map((opt) => (
-                    <option key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </option>
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
                   ))}
                 </select>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium">
-                    Ελάχιστη Ηλικία
-                  </label>
-                  <Input
-                    type="date"
-                    name="birthdate_min"
-                    value={form.birthdate_min}
-                    onChange={onChange}
-                  />
+                  <label className="block text-sm font-medium">Ελάχιστη Ηλικία</label>
+                  <Input type="date" name="birthdate_min" value={form.birthdate_min} onChange={onChange} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium">
-                    Μέγιστη Ηλικία
-                  </label>
-                  <Input
-                    type="date"
-                    name="birthdate_max"
-                    value={form.birthdate_max}
-                    onChange={onChange}
-                  />
+                  <label className="block text-sm font-medium">Μέγιστη Ηλικία</label>
+                  <Input type="date" name="birthdate_max" value={form.birthdate_max} onChange={onChange} />
                 </div>
               </div>
               <div>
@@ -281,7 +228,6 @@ export default function AdminPollsPage() {
         </Dialog>
       </div>
 
-      {/* Πίνακας Ψηφοφοριών */}
       <Table>
         <TableHeader>
           <TableRow>
@@ -299,9 +245,7 @@ export default function AdminPollsPage() {
             <TableRow key={poll.id}>
               <TableCell>
                 <div className="font-medium">{poll.title}</div>
-                <div className="text-sm text-gray-500 truncate max-w-[250px]">
-                  {poll.description}
-                </div>
+                <div className="text-sm text-gray-500 truncate max-w-[250px]">{poll.description}</div>
               </TableCell>
               <TableCell>
                 {new Date() < new Date(poll.dateRange.startDate) ? (
@@ -328,18 +272,10 @@ export default function AdminPollsPage() {
                 )}
               </TableCell>
               <TableCell>{poll.candidates.length}</TableCell>
-              <TableCell>
-                {format(new Date(poll.createdAt), "MMM d, yyyy")}
-              </TableCell>
+              <TableCell>{format(new Date(poll.createdAt), "MMM d, yyyy")}</TableCell>
               <TableCell className="text-right">
                 <div className="flex justify-end space-x-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() =>
-                      router.push(`/admin/poll-candidates/${poll.id}`)
-                    }
-                  >
+                  <Button variant="ghost" size="sm" onClick={() => router.push(`/admin/poll-candidates/${poll.id}`)}>
                     <Users className="h-4 w-4" />
                   </Button>
                   <Button

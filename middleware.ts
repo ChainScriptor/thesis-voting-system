@@ -1,13 +1,8 @@
-// middleware.ts
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
-// Προστατεύουμε το /admin UI
+// Route matchers για τα endpoints που απαιτούν auth.protect()
 const isProtectedPage = createRouteMatcher(["/admin/:path*"]);
-
-// Προστατεύουμε το filtered API
 const isFilteredAPI = createRouteMatcher(["/api/elections/filtered"]);
-
-// Προστατεύουμε τα νέα endpoints για την υποβολή και τον έλεγχο ψήφου
 const isVoteAPI = createRouteMatcher([
   "/api/vote",
   "/api/vote/status",
@@ -15,16 +10,18 @@ const isVoteAPI = createRouteMatcher([
 
 export default clerkMiddleware(async (auth, req) => {
   if (isProtectedPage(req) || isFilteredAPI(req) || isVoteAPI(req)) {
-    // για admin UI, filtered API και vote API απαιτείται session
-    await auth.protect();
+    await auth.protect(); // διατηρούμε το auth requirement εκεί που χρειάζεται
   }
+
+  // Δεν βάζουμε auth.protect για /api/elections — απλώς περνά από middleware
 });
 
 export const config = {
   matcher: [
-    "/admin/:path*",               // admin UI
-    "/api/elections/filtered",     // το νέο endpoint
-    "/api/vote",                   // προσθήκη για POST ψήφου
-    "/api/vote/status",            // προσθήκη για GET status ψήφου
+    "/admin/:path*",                // ✅ προστασία admin UI
+    "/api/elections/filtered",      // ✅ προστασία filtered API
+    "/api/vote",                    // ✅ προστασία vote POST
+    "/api/vote/status",             // ✅ προστασία vote status
+    "/api/elections",               // ✅ *μόνο* για να ενεργοποιηθεί το Clerk, όχι για auth.protect
   ],
 };

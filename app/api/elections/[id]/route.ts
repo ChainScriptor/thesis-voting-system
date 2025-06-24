@@ -1,4 +1,3 @@
-// app/api/elections/[id]/route.ts
 export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
@@ -8,7 +7,6 @@ export async function GET(request: Request) {
   // Παίρνουμε το id από το URL
   const url = new URL(request.url);
   const segments = url.pathname.split("/");
-  // segments = ["", "api","elections","{id}","route.ts"];
   const rawId = segments[3];
   const electionId = parseInt(rawId, 10);
 
@@ -48,5 +46,28 @@ export async function GET(request: Request) {
   } catch (error) {
     console.error("GET /api/elections/[id] error:", error);
     return NextResponse.json({ error: "Failed to fetch election" }, { status: 500 });
+  }
+}
+
+export async function DELETE(request: Request) {
+  // Παίρνουμε το id από το URL
+  const url = new URL(request.url);
+  const segments = url.pathname.split("/");
+  const rawId = segments[3];
+  const electionId = parseInt(rawId, 10);
+
+  if (isNaN(electionId)) {
+    return NextResponse.json({ error: "Invalid election id" }, { status: 400 });
+  }
+
+  try {
+    await prisma.election.delete({
+      where: { id: electionId },
+    });
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("DELETE /api/elections/[id] error:", error);
+    return NextResponse.json({ error: "Failed to delete election" }, { status: 500 });
   }
 }
