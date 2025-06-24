@@ -1,4 +1,3 @@
-// app/api/elections/route.ts
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
@@ -10,6 +9,19 @@ export const dynamic = "force-dynamic";
  */
 export async function GET() {
   try {
+    const session = await auth().catch(() => null);
+    const clerkId = session?.userId || null;
+
+    let dbUserId: number | null = null;
+
+    if (clerkId) {
+      const dbUser = await prisma.user.findUnique({
+        where: { clerkId },
+        select: { id: true },
+      });
+      dbUserId = dbUser?.id ?? null;
+    }
+
     const elections = await prisma.election.findMany({
       include: {
         takepart: { include: { candidate: true } },
@@ -32,6 +44,7 @@ export async function GET() {
       candidates: el.takepart.map((tp) => tp.candidate),
       createdAt: el.start_date.toISOString(),
       isActive: el.is_active,
+      createdByCurrentUser: dbUserId === el.userId, // ✅ νέο πεδίο
     }));
 
     return NextResponse.json(formatted);
@@ -132,6 +145,7 @@ export async function POST(request: Request) {
         candidates: [],
         createdAt: newEl.start_date.toISOString(),
         isActive: newEl.is_active,
+        createdByCurrentUser: true, // ✅ γιατί μόλις τη δημιούργησε αυτός
       },
       { status: 201 }
     );

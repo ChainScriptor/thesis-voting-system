@@ -37,6 +37,8 @@ interface Poll {
   targeting: { roles: string[]; locations: string[] };
   candidates: { id: number; name: string }[];
   createdAt: string;
+  isActive?: boolean;
+  createdByCurrentUser?: boolean; // ✅ προστέθηκε
 }
 
 export default function AdminPollsPage() {
@@ -274,19 +276,25 @@ export default function AdminPollsPage() {
               <TableCell>{poll.candidates.length}</TableCell>
               <TableCell>{format(new Date(poll.createdAt), "MMM d, yyyy")}</TableCell>
               <TableCell className="text-right">
-                <div className="flex justify-end space-x-2">
-                  <Button variant="ghost" size="sm" onClick={() => router.push(`/admin/poll-candidates/${poll.id}`)}>
-                    <Users className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleDelete(poll.id)}
-                    className="text-red-500 hover:bg-red-50"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
+                {poll.createdByCurrentUser && (
+                  <div className="flex justify-end space-x-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => router.push(`/admin/poll-candidates/${poll.id}`)}
+                    >
+                      <Users className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDelete(poll.id)}
+                      className="text-red-500 hover:bg-red-50"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
               </TableCell>
             </TableRow>
           ))}
