@@ -1,10 +1,8 @@
-export const dynamic = "force-dynamic";
-
+import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-export async function GET(request: Request) {
-  // Παίρνουμε το id από το URL
+export async function DELETE(request: Request) {
   const url = new URL(request.url);
   const segments = url.pathname.split("/");
   const rawId = segments[3];
@@ -15,52 +13,39 @@ export async function GET(request: Request) {
   }
 
   try {
+    const session = await auth();
+    const clerkId = session.userId;
+
+    if (!clerkId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // Βρίσκουμε τον χρήστη μας από τη βάση
+    const dbUser = await prisma.user.findUnique({
+      where: { clerkId },
+      select: { id: true },
+    });
+
+    if (!dbUser) {
+      return NextResponse.json({ error: "User not registered" }, { status: 404 });
+    }
+
+    // Βρίσκουμε την ψηφοφορία
     const election = await prisma.election.findUnique({
       where: { id: electionId },
-      include: {
-        takepart: { include: { candidate: true } },
-      },
+      select: { userId: true },
     });
 
     if (!election) {
       return NextResponse.json({ error: "Election not found" }, { status: 404 });
     }
 
-    const formatted = {
-      id: election.id,
-      title: election.title,
-      description: election.description,
-      dateRange: {
-        startDate: election.start_date.toISOString(),
-        endDate: election.end_date.toISOString(),
-      },
-      targeting: {
-        roles: election.target_occupation ? [election.target_occupation] : [],
-        locations: election.target_location ? [election.target_location] : [],
-      },
-      candidates: election.takepart.map((tp) => tp.candidate),
-      createdAt: election.start_date.toISOString(),
-    };
+    // Έλεγχος αν είναι δημιουργός
+    if (election.userId !== dbUser.id) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
 
-    return NextResponse.json(formatted);
-  } catch (error) {
-    console.error("GET /api/elections/[id] error:", error);
-    return NextResponse.json({ error: "Failed to fetch election" }, { status: 500 });
-  }
-}
-
-export async function DELETE(request: Request) {
-  // Παίρνουμε το id από το URL
-  const url = new URL(request.url);
-  const segments = url.pathname.split("/");
-  const rawId = segments[3];
-  const electionId = parseInt(rawId, 10);
-
-  if (isNaN(electionId)) {
-    return NextResponse.json({ error: "Invalid election id" }, { status: 400 });
-  }
-
-  try {
+    // Διαγραφή
     await prisma.election.delete({
       where: { id: electionId },
     });

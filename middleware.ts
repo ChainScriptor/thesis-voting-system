@@ -19,9 +19,10 @@ export default clerkMiddleware(async (auth, req) => {
 export const config = {
   matcher: [
     "/admin/:path*",                // ✅ προστασία admin UI
-    "/api/elections/filtered",      // ✅ προστασία filtered API
-    "/api/vote",                    // ✅ προστασία vote POST
-    "/api/vote/status",             // ✅ προστασία vote status
-    "/api/elections",               // ✅ *μόνο* για να ενεργοποιηθεί το Clerk, όχι για auth.protect
+    "/api/elections",               // ✅ GET/POST ψηφοφοριών
+    "/api/elections/:path*",        // ✅ προστέθηκε για dynamic routes (/api/elections/[id])
+    "/api/elections/filtered",      // ✅ filtered API
+    "/api/vote",                    // ✅ ψήφος
+    "/api/vote/status",             // ✅ status ψήφου
   ],
 };
