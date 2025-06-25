@@ -54,8 +54,22 @@ export async function GET() {
         },
         ...(user.birthdate
           ? [
-              { birthdate_min: { lte: user.birthdate } },
-              { birthdate_max: { gte: user.birthdate } },
+              {
+                OR: [
+                  {
+                    AND: [
+                      { birthdate_min: { lte: user.birthdate } },
+                      { birthdate_max: { gte: user.birthdate } },
+                    ],
+                  },
+                  {
+                    AND: [
+                      { birthdate_min: null },
+                      { birthdate_max: null },
+                    ],
+                  },
+                ],
+              },
             ]
           : []),
       ],

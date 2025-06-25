@@ -60,11 +60,12 @@ export default function AdminPollsPage() {
   const [creating, setCreating] = useState<boolean>(false);
 
   useEffect(() => {
-    fetch("/api/elections")
-      .then((r) => r.json())
-      .then((data: Poll[]) => setPolls(data))
-      .catch(console.error);
-  }, []);
+  fetch("/api/elections/my")  
+    .then((r) => r.json())
+    .then((data: Poll[]) => setPolls(data))
+    .catch(console.error);
+}, []);
+
 
   const onChange = (
     e: React.ChangeEvent<
@@ -99,7 +100,7 @@ export default function AdminPollsPage() {
       });
       if (!res.ok) throw new Error();
 
-      const r2 = await fetch("/api/elections");
+      const r2 = await fetch("/api/elections/my");
       const data: Poll[] = await r2.json();
       setPolls(data);
       setForm({
