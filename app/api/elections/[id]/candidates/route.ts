@@ -5,9 +5,10 @@ export const dynamic = "force-dynamic";
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }    // ← εδώ
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const electionId = parseInt(params.id, 10);
+  const { id } = await params;
+  const electionId = parseInt(id, 10);
   if (isNaN(electionId)) {
     return NextResponse.json({ error: "Invalid election id" }, { status: 400 });
   }
@@ -47,9 +48,10 @@ export async function GET(
 
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }    // ← κι εδώ
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const electionId = parseInt(params.id, 10);
+  const { id } = await params;
+  const electionId = parseInt(id, 10);
   if (isNaN(electionId)) {
     return NextResponse.json({ error: "Invalid election id" }, { status: 400 });
   }

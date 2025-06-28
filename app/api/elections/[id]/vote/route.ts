@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await auth();
   const clerkId = session.userId;
@@ -23,7 +23,8 @@ export async function POST(
     );
   }
 
-  const electionId = parseInt(params.id, 10);
+  const { id } = await params;
+  const electionId = parseInt(id, 10);
   if (isNaN(electionId)) {
     return NextResponse.json({ error: "Invalid election ID" }, { status: 400 });
   }
@@ -34,7 +35,7 @@ export async function POST(
   }
 
   try {
-    const takePart = await prisma.takePart.update({
+    const takepart = await prisma.takepart.update({
       where: {
         electionId_candidateId: {
           electionId,
@@ -46,7 +47,7 @@ export async function POST(
       },
     });
 
-    return NextResponse.json({ success: true, takePart });
+    return NextResponse.json({ success: true, takepart });
   } catch (error) {
     console.error("❌ Failed to vote:", error);
     return NextResponse.json({ error: "Failed to vote" }, { status: 500 });

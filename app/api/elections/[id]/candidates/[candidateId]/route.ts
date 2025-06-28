@@ -10,10 +10,11 @@ export const dynamic = "force-dynamic";
  */
 export async function DELETE(
   _request: NextRequest,
-  context: { params: { id: string; candidateId: string } }
+  context: { params: Promise<{ id: string; candidateId: string }> }
 ) {
-  const electionId = parseInt(context.params.id, 10);
-  const candidateId = parseInt(context.params.candidateId, 10);
+  const params = await context.params;
+  const electionId = parseInt(params.id, 10);
+  const candidateId = parseInt(params.candidateId, 10);
 
   if (Number.isNaN(electionId) || Number.isNaN(candidateId)) {
     return NextResponse.json(
