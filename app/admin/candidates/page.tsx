@@ -37,7 +37,7 @@ interface Election {
 }
 
 interface Candidate {
-  id: number;            // poll_candidates.id
+  id: number;       // poll_candidates.id
   poll_id: number;
   user_id: number;
   invited_at: string;
@@ -59,7 +59,7 @@ export default function CandidatesPage() {
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [open, setOpen] = useState<boolean>(false);
 
-  // 1) Φόρτωση ψηφοφοριών & χρηστών
+  // 1) Φόρτωση ψηφοφοριών
   useEffect(() => {
     fetch("/api/elections")
       .then((r) => r.json())
@@ -67,7 +67,10 @@ export default function CandidatesPage() {
       .catch(() =>
         toast({ title: "Σφάλμα", description: "Αποτυχία φόρτωσης ψηφοφοριών", variant: "destructive" })
       );
+  }, [toast]);
 
+  // 2) Φόρτωση χρηστών
+  useEffect(() => {
     fetch("/api/users")
       .then((r) => r.json())
       .then((data: User[]) => {
@@ -79,7 +82,7 @@ export default function CandidatesPage() {
       );
   }, [toast]);
 
-  // 2) Φόρτωση υποψηφίων όταν αλλάζει επιλογή ψηφοφορίας
+  // 3) Φόρτωση υποψηφίων όταν αλλάζει επιλογή ψηφοφορίας
   useEffect(() => {
     if (!selectedElection) {
       setCandidates([]);
@@ -93,23 +96,26 @@ export default function CandidatesPage() {
       );
   }, [selectedElection, toast]);
 
-  // Αναζήτηση χρηστών
+  // 4) Φιλτράρισμα διαθέσιμων χρηστών (όχι ήδη καλεσμένων) + αναζήτηση
+  useEffect(() => {
+    const invitedIds = new Set(candidates.map(c => c.user_id));
+    setFilteredUsers(
+      users
+        .filter(u => !invitedIds.has(u.id))
+        .filter(u =>
+          u.fullName.toLowerCase().includes(search.toLowerCase()) ||
+          u.email.toLowerCase().includes(search.toLowerCase()) ||
+          (u.occupation ?? "").toLowerCase().includes(search.toLowerCase())
+        )
+    );
+  }, [candidates, search, users]);
+
+  // 5) Χειριστής αναζήτησης
   const onSearch = (q: string) => {
     setSearch(q);
-    const low = q.toLowerCase();
-    setFilteredUsers(
-      q
-        ? users.filter(
-            (u) =>
-              u.fullName.toLowerCase().includes(low) ||
-              u.email.toLowerCase().includes(low) ||
-              (u.occupation ?? "").toLowerCase().includes(low)
-          )
-        : users
-    );
   };
 
-  // Πρόσκληση νέου υποψηφίου
+  // 6) Πρόσκληση νέου υποψηφίου
   const inviteUser = async (u: User) => {
     if (!selectedElection) {
       toast({ title: "Επιλέξτε ψηφοφορία πρώτα", variant: "destructive" });
@@ -123,7 +129,7 @@ export default function CandidatesPage() {
       });
       if (!res.ok) throw new Error();
       const newCand: Candidate = await res.json();
-      setCandidates((prev) => [...prev, newCand]);
+      setCandidates(prev => [...prev, newCand]);
       toast({ title: "Επιτυχία", description: "Υποψήφιος προστέθηκε" });
       setOpen(false);
     } catch {
@@ -131,15 +137,13 @@ export default function CandidatesPage() {
     }
   };
 
-  // Αφαίρεση υποψηφίου
+  // 7) Διαγραφή υποψηφίου
   const removeCandidate = async (candidateId: number) => {
     if (!selectedElection) return;
     try {
-      const res = await fetch(`/api/poll-candidates/${candidateId}`, {
-        method: "DELETE",
-      });
+      const res = await fetch(`/api/poll-candidates/${candidateId}`, { method: "DELETE" });
       if (!res.ok) throw new Error();
-      setCandidates((prev) => prev.filter((c) => c.id !== candidateId));
+      setCandidates(prev => prev.filter(c => c.id !== candidateId));
       toast({ title: "Επιτυχία", description: "Υποψήφιος αφαιρέθηκε" });
     } catch {
       toast({ title: "Σφάλμα", description: "Αποτυχία αφαίρεσης", variant: "destructive" });
@@ -155,13 +159,11 @@ export default function CandidatesPage() {
         <label className="block text-sm font-medium">Επιλογή Ψηφοφορίας</label>
         <select
           value={selectedElection}
-          onChange={(e) => setSelectedElection(e.target.value)}
+          onChange={e => setSelectedElection(e.target.value)}
           className="w-full border rounded px-3 py-2"
         >
-          <option value="" disabled>
-            -- Επιλέξτε --
-          </option>
-          {elections.map((el) => (
+          <option value="" disabled>-- Επιλέξτε --</option>
+          {elections.map(el => (
             <option key={el.id} value={el.id}>{el.title}</option>
           ))}
         </select>
@@ -174,13 +176,17 @@ export default function CandidatesPage() {
           <p className="text-gray-500">Δεν υπάρχουν υποψήφιοι.</p>
         ) : (
           <div className="space-y-2">
-            {candidates.map((c) => (
+            {candidates.map(c => (
               <div key={c.id} className="flex justify-between items-center border p-2 rounded">
                 <div>
                   <div className="font-medium">{c.fullName}</div>
                   <div className="text-sm text-gray-600">{c.email}</div>
                 </div>
-                <Button variant="destructive" size="sm" onClick={() => removeCandidate(c.id)}>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => removeCandidate(c.id)}
+                >
                   <X className="h-4 w-4" />
                 </Button>
               </div>
@@ -189,7 +195,7 @@ export default function CandidatesPage() {
         )}
       </div>
 
-      {/* Modal Πρόσκληση */}
+      {/* Modal Πρόσκλησης */}
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           <Button><UserPlus className="mr-2 h-4 w-4" /> Προσθήκη</Button>
@@ -208,7 +214,7 @@ export default function CandidatesPage() {
                   className="pl-10"
                   placeholder="Όνομα, email ή θέση..."
                   value={search}
-                  onChange={(e) => onSearch(e.target.value)}
+                  onChange={e => onSearch(e.target.value)}
                 />
               </div>
             </div>
@@ -223,13 +229,17 @@ export default function CandidatesPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredUsers.map((u) => (
+                  {filteredUsers.map(u => (
                     <TableRow key={u.id}>
                       <TableCell>{u.fullName}</TableCell>
                       <TableCell>{u.email}</TableCell>
                       <TableCell>{u.occupation ?? "-"}</TableCell>
                       <TableCell className="text-right">
-                        <Button size="sm" variant="outline" onClick={() => inviteUser(u)}>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => inviteUser(u)}
+                        >
                           <UserPlus className="mr-1 h-4 w-4" /> Προσθήκη
                         </Button>
                       </TableCell>
@@ -240,7 +250,9 @@ export default function CandidatesPage() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setOpen(false)}>Άκυρο</Button>
+            <Button variant="outline" onClick={() => setOpen(false)}>
+              Άκυρο
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

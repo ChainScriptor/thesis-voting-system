@@ -1,5 +1,3 @@
-// prisma/schema.prisma
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,19 +8,22 @@ datasource db {
 }
 
 model candidate {
-  id          Int        @id @default(autoincrement())
+  id          Int     @id @default(autoincrement())
   name        String
   description String?
   image       String?
   is_person   Boolean
-  clerkId     String?    @db.VarChar(255)
+  clerkId     String? @db.VarChar(255)
 
-  takepart    takepart[]
-  votes       Vote[]     // Σχέση με το μοντέλο Vote
+  // Σχέση με user μέσω clerkId (μοναδική)
+  user user? @relation(fields: [clerkId], references: [clerkId])
+
+  takepart takepart[]
+  votes    Vote[]
 }
 
 model election {
-  id                Int               @id @default(autoincrement())
+  id                Int       @id @default(autoincrement())
   title             String
   description       String?
   start_date        DateTime
@@ -35,10 +36,10 @@ model election {
   target_gender     String?
   userId            Int
 
-  user              user              @relation(fields: [userId], references: [id], map: "Election_userId_fkey")
-  poll_candidates   poll_candidates[]
-  takepart          takepart[]
-  votes             Vote[]            // Σχέση με το μοντέλο Vote
+  user            user              @relation(fields: [userId], references: [id], map: "Election_userId_fkey")
+  poll_candidates poll_candidates[]
+  takepart        takepart[]
+  votes           Vote[]
 
   @@index([userId], map: "Election_userId_fkey")
 }
@@ -49,8 +50,8 @@ model poll_candidates {
   user_id    Int
   invited_at DateTime @default(now()) @db.DateTime(0)
 
-  election   election @relation(fields: [poll_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "fk_pc_poll")
-  user       user     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "fk_pc_user")
+  election election @relation(fields: [poll_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "fk_pc_poll")
+  user     user     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "fk_pc_user")
 
   @@index([poll_id], map: "idx_poll")
   @@index([user_id], map: "idx_user")
@@ -61,40 +62,43 @@ model takepart {
   candidateId   Int
   numberOfVotes Int
 
-  candidate     candidate @relation(fields: [candidateId], references: [id], map: "TakePart_candidateId_fkey")
-  election      election  @relation(fields: [electionId], references: [id], map: "TakePart_electionId_fkey")
+  candidate candidate @relation(fields: [candidateId], references: [id], map: "TakePart_candidateId_fkey")
+  election  election  @relation(fields: [electionId], references: [id], map: "TakePart_electionId_fkey")
 
   @@id([electionId, candidateId])
   @@index([candidateId], map: "TakePart_candidateId_fkey")
 }
 
 model user {
-  id              Int               @id @default(autoincrement())
-  clerkId         String            @unique(map: "User_clerkId_key")
-  fullName        String
-  username        String            @unique(map: "User_username_key")
-  password        String
-  isAdmin         Boolean
-  gender          String?
-  email           String            @unique(map: "User_email_key")
-  birthdate       DateTime?
-  occupation      String?
-  location        String?
+  id         Int       @id @default(autoincrement())
+  clerkId    String    @unique(map: "User_clerkId_key")
+  fullName   String
+  username   String    @unique(map: "User_username_key")
+  password   String
+  isAdmin    Boolean
+  gender     String?
+  email      String    @unique(map: "User_email_key")
+  birthdate  DateTime?
+  occupation String?
+  location   String?
+
+  // Αντίστροφη σχέση από candidate προς user μέσω clerkId
+  candidates candidate[]
 
   election        election[]
   poll_candidates poll_candidates[]
-  votes           Vote[]            // Σχέση με το μοντέλο Vote
+  votes           Vote[]
 }
 
 model Vote {
-  id           Int       @id @default(autoincrement())
-  user         user      @relation(fields: [userId], references: [id])
-  userId       Int
-  election     election  @relation(fields: [electionId], references: [id])
-  electionId   Int
-  candidate    candidate @relation(fields: [candidateId], references: [id])
-  candidateId  Int
-  votedAt      DateTime  @default(now())
+  id          Int       @id @default(autoincrement())
+  user        user      @relation(fields: [userId], references: [id])
+  userId      Int
+  election    election  @relation(fields: [electionId], references: [id])
+  electionId  Int
+  candidate   candidate @relation(fields: [candidateId], references: [id])
+  candidateId Int
+  votedAt     DateTime  @default(now())
 
   @@unique([userId, electionId])
 }

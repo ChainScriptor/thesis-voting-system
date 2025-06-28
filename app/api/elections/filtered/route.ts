@@ -1,86 +1,47 @@
 // app/api/elections/filtered/route.ts
+
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 
 export async function GET() {
-  // 1) Έλεγχος authentication
   const session = await auth();
-  const clerkId = session.userId;
-  if (!clerkId) {
-    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-  }
+  if (!session.userId) return NextResponse.json([], { status: 401 });
 
-  // 2) Φόρτωση profile από DB
-  const user = await prisma.user.findUnique({
-    where: { clerkId },
-    select: {
-      birthdate: true,
-      occupation: true,
-      location: true,
-      gender: true,
-    },
+  // φέρε user
+  const dbUser = await prisma.user.findUnique({ 
+    where: { clerkId: session.userId },
+    select: { id: true, gender: true, occupation: true, location: true, birthdate: true }
   });
+  if (!dbUser) return NextResponse.json([], { status: 200 });
 
-  // 3) Αν δεν υπάρχει user record, δεν βλέπει καμία ψηφοφορία
-  if (!user) {
-    return NextResponse.json([], { status: 200 });
-  }
+  // φέρε ποιες έχει ήδη ψηφίσει
+  const voted = await prisma.vote.findMany({
+    where: { userId: dbUser.id },
+    select: { electionId: true },
+  });
+  const votedIds = voted.map((v) => v.electionId);
 
-  // 4) Φόρτωση των εκλογών με βάση τα φίλτρα του προφίλ
+  // **ΑΦΑΙΡΕΙ ΤΟ φίλτρο end_date > τώρα**
   const elections = await prisma.election.findMany({
     where: {
+      id: { notIn: votedIds },
       AND: [
-        {
-          OR: [
-            { target_gender: user.gender },
-            { target_gender: null },
-            { target_gender: "all" },
-          ],
-        },
-        {
-          OR: [
-            { target_occupation: user.occupation },
-            { target_occupation: null },
-            { target_occupation: "all" },
-          ],
-        },
-        {
-          OR: [
-            { target_location: user.location },
-            { target_location: null },
-            { target_location: "all" },
-          ],
-        },
-        ...(user.birthdate
+        { OR: [{ target_gender: dbUser.gender }, { target_gender: null }, { target_gender: "all" }] },
+        { OR: [{ target_occupation: dbUser.occupation }, { target_occupation: null }, { target_occupation: "all" }] },
+        { OR: [{ target_location: dbUser.location }, { target_location: null }, { target_location: "all" }] },
+        ...(dbUser.birthdate
           ? [
-              {
-                OR: [
-                  {
-                    AND: [
-                      { birthdate_min: { lte: user.birthdate } },
-                      { birthdate_max: { gte: user.birthdate } },
-                    ],
-                  },
-                  {
-                    AND: [
-                      { birthdate_min: null },
-                      { birthdate_max: null },
-                    ],
-                  },
-                ],
-              },
+              { birthdate_min: { lte: dbUser.birthdate } },
+              { birthdate_max: { gte: dbUser.birthdate } },
             ]
           : []),
       ],
     },
-    include: {
-      takepart: { include: { candidate: true } },
-    },
+    include: { takepart: { include: { candidate: true } } },
     orderBy: { start_date: "desc" },
   });
 
-  // 5) Μετατροπή σε API σχήμα
   const formatted = elections.map((el) => ({
     id: el.id,
     title: el.title,

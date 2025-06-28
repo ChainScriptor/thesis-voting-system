@@ -1,3 +1,4 @@
+//app/components/polls/VotingDialog.tsx
 "use client";
 
 import React, { useState } from "react";

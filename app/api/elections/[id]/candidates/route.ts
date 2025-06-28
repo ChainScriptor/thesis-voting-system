@@ -1,90 +1,30 @@
-// app/api/elections/[id]/candidates/route.ts
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
-/**
- * GET  /api/elections/:id/candidates
- * Επιστρέφει όλους τους υποψήφιους (takeparts) για μια εκλογή
- */
 export async function GET(
-  _req: Request,
-  { params }: { params: { id: string } }
+  request: Request,
+  { params }: { params: { id: string } }    // ← εδώ
 ) {
   const electionId = parseInt(params.id, 10);
   if (isNaN(electionId)) {
-    return NextResponse.json(
-      { error: "Invalid election id" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Invalid election id" }, { status: 400 });
   }
 
   try {
     const tps = await prisma.takepart.findMany({
       where: { electionId },
-      include: { candidate: true },
+      include: {
+        candidate: {
+          include: {
+            user: { select: { email: true, occupation: true } }
+          }
+        }
+      }
     });
 
-    // Διαμορφώνουμε το JSON που θέλει το frontend
     const result = tps.map((tp) => ({
-      id: tp.candidateId,           // χρησιμοποιεί το candidateId ως μοναδικό
-      poll_id: tp.electionId,
-      candidateId: tp.candidate.id,  // το πραγματικό id του candidate
-      numberOfVotes: tp.numberOfVotes,
-      name: tp.candidate.name,
-      description: tp.candidate.description,
-      image: tp.candidate.image,
-      is_person: tp.candidate.is_person,
-      clerkId: tp.candidate.clerkId,
-    }));
-
-    return NextResponse.json(result);
-  } catch (error) {
-    console.error("GET candidates error:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch candidates" },
-      { status: 500 }
-    );
-  }
-}
-
-/**
- * POST /api/elections/:id/candidates
- * Σώζει έναν νέο takepart (υποψήφιο) και επιστρέφει το αντικείμενο του
- * body: { userId: number }
- */
-export async function POST(
-  req: Request,
-  { params }: { params: { id: string } }
-) {
-  const electionId = parseInt(params.id, 10);
-  if (isNaN(electionId)) {
-    return NextResponse.json(
-      { error: "Invalid election id" },
-      { status: 400 }
-    );
-  }
-
-  const { userId } = await req.json();
-  if (typeof userId !== "number") {
-    return NextResponse.json(
-      { error: "Missing or invalid userId" },
-      { status: 400 }
-    );
-  }
-
-  try {
-    const tp = await prisma.takepart.create({
-      data: {
-        electionId,
-        candidateId: userId,
-        numberOfVotes: 0,
-      },
-      include: { candidate: true },
-    });
-
-    return NextResponse.json({
       id: tp.candidateId,
       poll_id: tp.electionId,
       candidateId: tp.candidate.id,
@@ -94,12 +34,64 @@ export async function POST(
       image: tp.candidate.image,
       is_person: tp.candidate.is_person,
       clerkId: tp.candidate.clerkId,
+      email: tp.candidate.user?.email ?? null,
+      occupation: tp.candidate.user?.occupation ?? null,
+    }));
+
+    return NextResponse.json(result);
+  } catch (err) {
+    console.error("GET /api/elections/:id/candidates error:", err);
+    return NextResponse.json({ error: "Failed to fetch candidates" }, { status: 500 });
+  }
+}
+
+export async function POST(
+  request: Request,
+  { params }: { params: { id: string } }    // ← κι εδώ
+) {
+  const electionId = parseInt(params.id, 10);
+  if (isNaN(electionId)) {
+    return NextResponse.json({ error: "Invalid election id" }, { status: 400 });
+  }
+
+  const { userId } = await request.json();
+  if (typeof userId !== "number") {
+    return NextResponse.json({ error: "Missing or invalid userId" }, { status: 400 });
+  }
+
+  try {
+    // 1) δημιουργούμε poll_candidate
+    const pc = await prisma.poll_candidates.create({
+      data: { poll_id: electionId, user_id: userId },
+      include: {
+        user: { select: { fullName: true, email: true, occupation: true } }
+      }
     });
-  } catch (error) {
-    console.error("POST candidates error:", error);
-    return NextResponse.json(
-      { error: "Failed to add candidate" },
-      { status: 500 }
-    );
+
+    // 2) δημιουργούμε/αρχικοποιούμε takepart με numberOfVotes=0
+    await prisma.takepart.create({
+      data: {
+        electionId,
+        candidateId: userId,
+        numberOfVotes: 0,
+      }
+    }).catch((e) => {
+      if (!/Unique constraint/.test(String(e))) console.error(e);
+    });
+
+    // 3) επιστρέφουμε στον client
+    return NextResponse.json({
+      id: pc.id,
+      poll_id: pc.poll_id,
+      user_id: pc.user_id,
+      invited_at: pc.invited_at,
+      fullName: pc.user.fullName,
+      email: pc.user.email,
+      occupation: pc.user.occupation,
+      numberOfVotes: 0,
+    });
+  } catch (err) {
+    console.error("POST /api/elections/:id/candidates error:", err);
+    return NextResponse.json({ error: "Failed to add candidate" }, { status: 500 });
   }
 }

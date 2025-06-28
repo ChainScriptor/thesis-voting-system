@@ -39,11 +39,10 @@ export default function HomePage() {
   const [votedMap, setVotedMap] = useState<Record<number, boolean>>({});
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loadingProfile, setLoadingProfile] = useState(true);
-
   const [voteModalPoll, setVoteModalPoll] = useState<number | null>(null);
   const [resultsPoll, setResultsPoll] = useState<number | null>(null);
 
-  // Φόρτωση προφίλ
+  // 1) Φόρτωση προφίλ
   const fetchProfile = async () => {
     if (!user?.id) return;
     setLoadingProfile(true);
@@ -60,21 +59,23 @@ export default function HomePage() {
     }
   };
 
-  // 1) Load profile once signed in
   useEffect(() => {
     if (!clerkLoaded || !isSignedIn || !user?.id) return;
     fetchProfile();
   }, [clerkLoaded, isSignedIn, user?.id]);
 
-  // 2) Load only the polls user is eligible for
+  // 2) Φόρτωση εκλογών (όλων: ενεργές + ληγμένες)
   useEffect(() => {
     if (!clerkLoaded || !authLoaded || !isSignedIn || !user?.id) return;
 
     fetch("/api/elections/filtered", { credentials: "include" })
-      .then((r) => r.json())
+      .then((r) => {
+        if (!r.ok) throw new Error("Σφάλμα φόρτωσης εκλογών");
+        return r.json();
+      })
       .then((arr: Poll[]) => {
         setPolls(arr);
-        // fetch each vote status
+        // votedMap
         arr.forEach((p) =>
           fetch(`/api/vote/status?electionId=${p.id}`, {
             credentials: "include",
@@ -91,13 +92,14 @@ export default function HomePage() {
       .catch(console.error);
   }, [clerkLoaded, authLoaded, isSignedIn, user?.id]);
 
-  // loading / unauthenticated / incomplete‐profile handling
+  // Loading / auth checks
   if (!clerkLoaded)
     return <div className="p-8 text-center text-gray-500">Φόρτωση...</div>;
   if (isSignedIn && loadingProfile)
     return <div className="p-8 text-center text-gray-500">Φόρτωση...</div>;
   if (!isSignedIn || !user) return <main><LTRVersion /></main>;
 
+  // ολοκληρωμένο προφίλ
   const required: (keyof Profile)[] = [
     "gender",
     "birthdate",
@@ -113,14 +115,13 @@ export default function HomePage() {
           Συμπληρώστε τα στοιχεία σας
         </h2>
         <p>
-          Παρακαλώ ολοκληρώστε τα ακόλουθα πεδία στο προφίλ σας:{" "}
-          <strong>{missing.join(", ")}</strong>.
+          Παρακαλώ ολοκληρώστε: <strong>{missing.join(", ")}</strong>.
         </p>
       </main>
     );
   }
 
-  // διαχωρισμός ενεργών / ολοκληρωμένων
+  // **Διαχωρισμός** ενεργών vs. ολοκληρωμένων
   const now = new Date();
   const activePolls = polls.filter((p) =>
     isAfter(new Date(p.dateRange.endDate), now)
@@ -216,11 +217,9 @@ export default function HomePage() {
         pollId={voteModalPoll?.toString() || ""}
         open={!!voteModalPoll}
         onOpenChange={(open) => {
-          // απλώς κλείσιμο → δεν σημαίνει ψήφισα
           if (!open) setVoteModalPoll(null);
         }}
         onVoteSuccess={() => {
-          // μόνο εδώ σημαίνει “έχει ψηφίσει”
           if (voteModalPoll) {
             setVotedMap((m) => ({ ...m, [voteModalPoll]: true }));
           }

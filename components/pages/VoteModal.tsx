@@ -16,12 +16,12 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 
 interface CandidateAPI {
-  id: number;          // poll_candidates.id
+  id: number;             // το poll_candidates.id
   poll_id: number;
-  user_id: number;
-  invited_at: string;
-  fullName: string;
-  email: string;
+  candidateId: number;    // πραγματικό id του candidate
+  numberOfVotes: number;
+  name: string;
+  email: string | null;
   occupation: string | null;
 }
 
@@ -47,83 +47,81 @@ export default function VoteModal({
 }: VoteModalProps) {
   const [poll, setPoll] = useState<PollAPI | null>(null);
   const [candidates, setCandidates] = useState<CandidateAPI[]>([]);
-  const [selectedCandidate, setSelectedCandidate] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(false);
-  const [errorMsg, setErrorMsg] = useState<string>("");
+  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
   useEffect(() => {
     if (!open) {
       setPoll(null);
       setCandidates([]);
-      setSelectedCandidate("");
+      setSelectedId(null);
       setErrorMsg("");
       return;
     }
-
     setLoading(true);
     (async () => {
       try {
-        // 1) Load poll data
+        // 1) Φόρτωσε τα βασικά της ψηφοφορίας
         const res = await fetch(`/api/elections/${pollId}`);
         if (!res.ok) throw new Error();
-        const found = await res.json();
+        const e = await res.json();
         setPoll({
-          id: found.id,
-          title: found.title,
-          description: found.description,
-          dateRange: found.dateRange,
+          id: e.id,
+          title: e.title,
+          description: e.description,
+          dateRange: e.dateRange,
         });
 
-        // 2) Load candidates
+        // 2) Φόρτωσε τους υποψήφιους
         const rc = await fetch(`/api/elections/${pollId}/candidates`);
         if (!rc.ok) throw new Error();
-        const cd = (await rc.json()) as CandidateAPI[];
+        const cd: CandidateAPI[] = await rc.json();
         setCandidates(cd);
       } catch {
-        setErrorMsg("Κάποιο σφάλμα συνέβη κατά τη φόρτωση.");
+        setErrorMsg("Κάποιο σφάλμα κατά τη φόρτωση.");
       } finally {
         setLoading(false);
       }
     })();
   }, [open, pollId]);
 
-  const handleSubmitVote = async () => {
-    if (!selectedCandidate) {
-      alert("Επιλέξτε πρώτα υποψήφιο.");
+  const handleSubmit = async () => {
+    if (selectedId === null) {
+      alert("Επιλέξτε υποψήφιο πρώτα.");
       return;
     }
     try {
-      const electionIdNum = Number(pollId);
-      const pollCandidateIdNum = Number(selectedCandidate);
-
-      // sync to get real candidateId
-      const sync = await fetch("/api/poll-candidates", {
+      // sync candidate (poll-candidates → candidateId)
+      const syncRes = await fetch("/api/poll-candidates", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ pollCandidateId: pollCandidateIdNum }),
+        body: JSON.stringify({ pollCandidateId: selectedId }),
       });
-      if (!sync.ok) throw new Error();
-      const { candidateId } = await sync.json();
+      if (!syncRes.ok) throw new Error();
+      const { candidateId } = await syncRes.json();
 
-      // submit vote
-      const vr = await fetch("/api/vote", {
+      // κάνε το vote
+      const voteRes = await fetch("/api/vote", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ electionId: electionIdNum, candidateId }),
+        body: JSON.stringify({
+          electionId: Number(pollId),
+          candidateId,
+        }),
       });
-      if (!vr.ok) {
-        if (vr.status === 409) {
-          alert("Έχετε ήδη ψηφίσει σε αυτή την ψηφοφορία.");
+      if (!voteRes.ok) {
+        if (voteRes.status === 409) {
+          alert("Έχετε ήδη ψηφίσει.");
           return;
         }
         throw new Error();
       }
-      await vr.json();
-
+      await voteRes.json();
       onOpenChange(false);
       onVoteSuccess?.();
     } catch {
-      alert("Υπήρξε σφάλμα κατά την αποθήκευση της ψήφου.");
+      alert("Σφάλμα κατά την υποβολή της ψήφου.");
     }
   };
 
@@ -154,17 +152,18 @@ export default function VoteModal({
               <p className="text-sm text-gray-600">{poll.description}</p>
               <p className="text-xs text-gray-500 mb-4">
                 Έναρξη:{" "}
-                {format(new Date(poll.dateRange.startDate), "dd/MM/yyyy")} Λήξη:{" "}
+                {format(new Date(poll.dateRange.startDate), "dd/MM/yyyy")} – Λήξη:{" "}
                 {format(new Date(poll.dateRange.endDate), "dd/MM/yyyy")}
               </p>
+
               {candidates.length === 0 ? (
                 <p className="text-center py-6 text-gray-500">
                   Δεν υπάρχουν υποψήφιοι.
                 </p>
               ) : (
                 <RadioGroup
-                  value={selectedCandidate}
-                  onValueChange={setSelectedCandidate}
+                  value={String(selectedId ?? "")}
+                  onValueChange={(v) => setSelectedId(Number(v))}
                   className="grid gap-2"
                 >
                   {candidates.map((c) => (
@@ -172,16 +171,16 @@ export default function VoteModal({
                       key={c.id}
                       className={cn(
                         "flex items-center space-x-2 rounded-lg border p-3 hover:bg-gray-50 cursor-pointer",
-                        selectedCandidate === String(c.id)
+                        selectedId === c.id
                           ? "border-black bg-gray-100"
                           : "border-gray-200"
                       )}
                     >
                       <RadioGroupItem value={String(c.id)} />
                       <div className="flex-1">
-                        <p className="font-medium">{c.fullName}</p>
+                        <p className="font-medium">{c.name}</p>
                         <p className="text-xs text-gray-500">
-                          {c.email} · {c.occupation ?? "-"}
+                          {c.email ?? "-"} · {c.occupation ?? "-"}
                         </p>
                       </div>
                     </label>
@@ -197,7 +196,7 @@ export default function VoteModal({
             Άκυρο
           </Button>
           <Button
-            onClick={handleSubmitVote}
+            onClick={handleSubmit}
             disabled={loading || !poll || candidates.length === 0}
           >
             Υποβολή ψήφου
