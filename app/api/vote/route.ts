@@ -60,7 +60,7 @@ export async function POST(request: Request) {
     }
 
     // 4) Ελέγχουμε αν υπάρχει ήδη εγγραφή στο takepart για το συγκεκριμένο ζευγάρι (electionId, candidateId).
-    const existingTakePart = await prisma.takePart.findUnique({
+    const existingTakePart = await prisma.takepart.findUnique({
       where: {
         electionId_candidateId: {
           electionId,
@@ -72,7 +72,7 @@ export async function POST(request: Request) {
     let updatedTakePart;
     if (existingTakePart) {
       // Αν υπάρχει ήδη, αυξάνουμε απλώς το numberOfVotes κατά 1
-      updatedTakePart = await prisma.takePart.update({
+      updatedTakePart = await prisma.takepart.update({
         where: {
           electionId_candidateId: {
             electionId,
@@ -85,7 +85,7 @@ export async function POST(request: Request) {
       });
     } else {
       // Αν δεν υπάρχει, δημιουργούμε νέο row στη takepart με numberOfVotes = 1
-      updatedTakePart = await prisma.takePart.create({
+      updatedTakePart = await prisma.takepart.create({
         data: {
           electionId,
           candidateId,
