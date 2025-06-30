@@ -5,19 +5,21 @@ dist/
 
 # Prisma
 /prisma/migrations/
-/prisma/.env                # αν χρησιμοποιείς ξεχωριστό .env για prisma
+/prisma/.env            # αν χρησιμοποιείς ξεχωριστό .env μόνο για Prisma
+# ⚠️ ΜΗΝ αγνοήσεις ολόκληρο τον φάκελο prisma/
+# ΜΗΝ βάλεις γραμμή όπως: /prisma/ ή prisma/
 
 # Clerk
-/.clerk/                    # προσωρινά αρχεία Clerk (αν υπάρχουν)
+/.clerk/                # προσωρινά αρχεία Clerk (αν υπάρχουν)
 
 # IDEs & OS
 .vscode/
 .idea/
-/*.suo
-/*.ntvs*
-/*.njsproj
-/*.sln
-/.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+.DS_Store
 
 # Logs
 logs/
@@ -36,7 +38,9 @@ pnpm-debug.log*
 # Test coverage
 /coverage/
 
-# Lock files (αν χρησιμοποιείς Yarn/PNPM, ήδη καλύπτονται)
+# Lock files (αν χρησιμοποιείς μόνο npm)
 /yarn.lock
 /pnpm-lock.yaml
-node_modules
+
+# Dependencies
+node_modules/
