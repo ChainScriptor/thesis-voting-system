@@ -1,84 +1,66 @@
-// app/api/vote-new/route.ts
+// app/api/vote/vote-new/route.ts
 
 import { NextResponse } from "next/server";
-import { createConnection } from "@/lib/db";
+import { prisma } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
-import type { RowDataPacket, ResultSetHeader } from "mysql2/promise";
 
 interface VoteBody {
   electionId: number;
-  candidateId: number;
+  candidateId: number; // This is the user_id of the candidate
 }
 
 export async function POST(request: Request) {
   try {
-    // 1) Βεβαιώσου ότι ο χρήστης είναι συνδεδεμένος μέσω Clerk
+    // 1) Get authenticated user's clerkId
     const { userId: clerkId } = await auth();
     if (!clerkId) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
-    // 2) Βρες το πραγματικό user.id από το clerkId
-    const conn = await createConnection();
-    const [rowsUser] = await conn.execute<RowDataPacket[]>(
-      "SELECT id FROM `user` WHERE clerkId = ?",
-      [clerkId]
-    );
-    if (!Array.isArray(rowsUser) || rowsUser.length === 0) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
-    const realUserId = (rowsUser[0] as RowDataPacket).id as number;
-
-    // 3) Διάβασε και επιβεβαίωσε το payload
+    // 2) Validate payload
     const body: VoteBody = await request.json();
     const { electionId, candidateId } = body;
-    if (
-      typeof electionId !== "number" ||
-      typeof candidateId !== "number"
-    ) {
+    if (typeof electionId !== "number" || typeof candidateId !== "number") {
       return NextResponse.json(
-        {
-          error: "Invalid payload: electionId and candidateId must be numbers.",
-        },
+        { error: "Invalid payload: electionId and candidateId must be numbers." },
         { status: 400 }
       );
     }
+    
+    // 3) Find the internal user ID from clerkId
+    const user = await prisma.user.findUnique({
+      where: { clerkId },
+      select: { id: true },
+    });
 
-    // 4) Έλεγξε αν ο χρήστης έχει ήδη ψηφίσει σε αυτήν την election
-    const [rowsVote] = await conn.execute<RowDataPacket[]>(
-      `SELECT id
-         FROM Vote
-        WHERE userId = ? AND electionId = ?`,
-      [realUserId, electionId]
-    );
-    if (Array.isArray(rowsVote) && rowsVote.length > 0) {
-      // Conflict: Έχει ήδη ψηφίσει
-      return NextResponse.json(
+    if (!user) {
+      return NextResponse.json({ error: "Authenticated user not found in the database." }, { status: 404 });
+    }
+    const realUserId = user.id;
+
+    // 4) Create the vote record.
+    // Prisma's unique constraint on (userId, electionId) will automatically
+    // prevent duplicate votes and throw an error.
+    const newVote = await prisma.vote.create({
+      data: {
+        userId: realUserId,
+        electionId: electionId,
+        candidateId: candidateId, // The candidate is also a user
+      },
+    });
+
+    return NextResponse.json({ success: true, voteId: newVote.id }, { status: 201 });
+
+  } catch (error) {
+    // Check if the error is due to a unique constraint violation (duplicate vote)
+    if (error instanceof Error && 'code' in error && error.code === 'P2002') {
+       return NextResponse.json(
         { error: "You have already voted in this election." },
-        { status: 409 }
+        { status: 409 } // 409 Conflict
       );
     }
 
-    // 5) Καταχώριση νέας ψήφου
-    try {
-      const [result] = await conn.execute<ResultSetHeader>(
-        `INSERT INTO Vote (userId, electionId, candidateId)
-         VALUES (?, ?, ?)`,
-        [realUserId, electionId, candidateId]
-      );
-      return NextResponse.json({
-        success: true,
-        insertId: result.insertId,
-      });
-    } catch (errInsert) {
-      console.error("Insert Vote error:", errInsert);
-      return NextResponse.json(
-        { error: "Failed to record vote (DB constraint)." },
-        { status: 500 }
-      );
-    }
-  } catch (e) {
-    console.error("POST /api/vote-new error:", e);
+    console.error("POST /api/vote-new error:", error);
     return NextResponse.json(
       { error: "Unexpected server error." },
       { status: 500 }

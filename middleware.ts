@@ -6,6 +6,7 @@ const isFilteredAPI = createRouteMatcher(["/api/elections/filtered"]);
 const isVoteAPI = createRouteMatcher([
   "/api/vote",
   "/api/vote/status",
+  "/api/vote-new",
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
@@ -24,5 +25,7 @@ export const config = {
     "/api/elections/filtered",      // ✅ filtered API
     "/api/vote",                    // ✅ ψήφος
     "/api/vote/status",             // ✅ status ψήφου
+    "/api/vote-new",                // ✅ νέο vote endpoint
+    // "/api/verify",                  // ✅ verification API - temporarily removed for testing
   ],
 };

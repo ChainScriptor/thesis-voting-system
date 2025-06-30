@@ -3,23 +3,21 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 model candidate {
-  id          Int     @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
   name        String
   description String?
   image       String?
   is_person   Boolean
-  clerkId     String? @db.VarChar(255)
+  clerkId     String?   @unique
 
-  // Σχέση με user μέσω clerkId (μοναδική)
-  user user? @relation(fields: [clerkId], references: [clerkId])
-
-  takepart takepart[]
-  votes    Vote[]
+  user        user?     @relation(fields: [clerkId], references: [clerkId])
+  takepart    takepart[]
+  votes       Vote[]
 }
 
 model election {
@@ -36,25 +34,25 @@ model election {
   target_gender     String?
   userId            Int
 
-  user            user              @relation(fields: [userId], references: [id], map: "Election_userId_fkey")
-  poll_candidates poll_candidates[]
-  takepart        takepart[]
-  votes           Vote[]
+  user              user              @relation(fields: [userId], references: [id])
+  poll_candidates   poll_candidates[]
+  takepart          takepart[]
+  votes             Vote[]
 
-  @@index([userId], map: "Election_userId_fkey")
+  @@index([userId])
 }
 
 model poll_candidates {
   id         Int      @id @default(autoincrement())
   poll_id    Int
   user_id    Int
-  invited_at DateTime @default(now()) @db.DateTime(0)
+  invited_at DateTime @default(now())
 
-  election election @relation(fields: [poll_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "fk_pc_poll")
-  user     user     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "fk_pc_user")
+  election   election @relation(fields: [poll_id], references: [id], onDelete: Cascade)
+  user       user     @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
-  @@index([poll_id], map: "idx_poll")
-  @@index([user_id], map: "idx_user")
+  @@index([poll_id])
+  @@index([user_id])
 }
 
 model takepart {
@@ -62,29 +60,27 @@ model takepart {
   candidateId   Int
   numberOfVotes Int
 
-  candidate candidate @relation(fields: [candidateId], references: [id], map: "TakePart_candidateId_fkey")
-  election  election  @relation(fields: [electionId], references: [id], map: "TakePart_electionId_fkey")
+  candidate     candidate @relation(fields: [candidateId], references: [id])
+  election      election  @relation(fields: [electionId], references: [id])
 
   @@id([electionId, candidateId])
-  @@index([candidateId], map: "TakePart_candidateId_fkey")
+  @@index([candidateId])
 }
 
 model user {
   id         Int       @id @default(autoincrement())
-  clerkId    String    @unique(map: "User_clerkId_key")
+  clerkId    String    @unique
   fullName   String
-  username   String    @unique(map: "User_username_key")
+  username   String    @unique
   password   String
   isAdmin    Boolean
   gender     String?
-  email      String    @unique(map: "User_email_key")
+  email      String    @unique
   birthdate  DateTime?
   occupation String?
   location   String?
 
-  // Αντίστροφη σχέση από candidate προς user μέσω clerkId
-  candidates candidate[]
-
+  candidates      candidate[]
   election        election[]
   poll_candidates poll_candidates[]
   votes           Vote[]
@@ -92,13 +88,14 @@ model user {
 
 model Vote {
   id          Int       @id @default(autoincrement())
-  user        user      @relation(fields: [userId], references: [id])
   userId      Int
-  election    election  @relation(fields: [electionId], references: [id])
   electionId  Int
-  candidate   candidate @relation(fields: [candidateId], references: [id])
   candidateId Int
   votedAt     DateTime  @default(now())
+
+  user        user      @relation(fields: [userId], references: [id])
+  election    election  @relation(fields: [electionId], references: [id])
+  candidate   candidate @relation(fields: [candidateId], references: [id])
 
   @@unique([userId, electionId])
 }

@@ -1,5 +1,7 @@
 // services/pollService.ts
 import { Poll } from "@/types/poll";
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 
 const BASE = "/api";
 
@@ -80,3 +82,52 @@ const pollService = {
 };
 
 export default pollService;
+
+export async function POST(request: Request) {
+  try {
+    const { action } = await request.json();
+
+    if (action === "create-candidates") {
+      // Get all users that don't have a corresponding candidate
+      const users = await prisma.user.findMany({
+        where: {
+          candidates: {
+            none: {}
+          }
+        }
+      });
+
+      const createdCandidates = [];
+
+      for (const user of users) {
+        const candidate = await prisma.candidate.create({
+          data: {
+            name: user.fullName,
+            description: `Αυτόματος υποψήφιος`,
+            image: "https://via.placeholder.com/150",
+            is_person: true,
+            clerkId: user.clerkId,
+          }
+        });
+        createdCandidates.push(candidate);
+      }
+
+      return NextResponse.json({
+        success: true,
+        message: `Created ${createdCandidates.length} candidates`,
+        candidates: createdCandidates
+      });
+    }
+
+    return NextResponse.json(
+      { error: "Invalid action" },
+      { status: 400 }
+    );
+  } catch (error) {
+    console.error("POST /api/services error:", error);
+    return NextResponse.json(
+      { error: "Failed to perform service action" },
+      { status: 500 }
+    );
+  }
+}

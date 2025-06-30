@@ -10,6 +10,7 @@ import { format, isAfter } from "date-fns";
 import VoteModal from "@/components/pages/VoteModal";
 import PollResultsTabs from "@/components/pages/PollResultsTabs";
 import LTRVersion from "@/components/pages/cards";
+import { useProfileSync } from "@/hooks/useProfileSync";
 import {
   Tabs,
   TabsList,
@@ -24,47 +25,17 @@ interface Poll {
   dateRange: { startDate: string; endDate: string };
 }
 
-interface Profile {
-  gender: string | null;
-  birthdate: string | null;
-  occupation: string | null;
-  location: string | null;
-}
-
 export default function HomePage() {
   const { isLoaded: clerkLoaded, isSignedIn, user } = useUser();
   const { isLoaded: authLoaded } = useAuth();
+  const { profileData, isLoading: isProfileLoading, hasProfile } = useProfileSync();
 
   const [polls, setPolls] = useState<Poll[]>([]);
   const [votedMap, setVotedMap] = useState<Record<number, boolean>>({});
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [loadingProfile, setLoadingProfile] = useState(true);
   const [voteModalPoll, setVoteModalPoll] = useState<number | null>(null);
   const [resultsPoll, setResultsPoll] = useState<number | null>(null);
 
-  // 1) Φόρτωση προφίλ
-  const fetchProfile = async () => {
-    if (!user?.id) return;
-    setLoadingProfile(true);
-    try {
-      const res = await fetch(`/api/profile?clerkId=${user.id}`, {
-        credentials: "include",
-      });
-      const json = await res.json();
-      if (json.success) setProfile(json.data);
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setLoadingProfile(false);
-    }
-  };
-
-  useEffect(() => {
-    if (!clerkLoaded || !isSignedIn || !user?.id) return;
-    fetchProfile();
-  }, [clerkLoaded, isSignedIn, user?.id]);
-
-  // 2) Φόρτωση εκλογών (όλων: ενεργές + ληγμένες)
+  // Φόρτωση εκλογών (όλων: ενεργές + ληγμένες)
   useEffect(() => {
     if (!clerkLoaded || !authLoaded || !isSignedIn || !user?.id) return;
 
@@ -95,27 +66,23 @@ export default function HomePage() {
   // Loading / auth checks
   if (!clerkLoaded)
     return <div className="p-8 text-center text-gray-500">Φόρτωση...</div>;
-  if (isSignedIn && loadingProfile)
-    return <div className="p-8 text-center text-gray-500">Φόρτωση...</div>;
+  if (isSignedIn && isProfileLoading)
+    return <div className="p-8 text-center text-gray-500">Φόρτωση προφίλ...</div>;
   if (!isSignedIn || !user) return <main><LTRVersion /></main>;
 
-  // ολοκληρωμένο προφίλ
-  const required: (keyof Profile)[] = [
-    "gender",
-    "birthdate",
-    "occupation",
-    "location",
-  ];
-  const missing = required.filter((f) => !profile?.[f]);
-  if (missing.length > 0) {
+  // Έλεγχος αν έχει ολοκληρωμένο προφίλ
+  if (!hasProfile) {
     return (
       <main className="p-8 text-center">
         <AlertCircle className="mx-auto mb-4 h-12 w-12 text-red-500" />
         <h2 className="text-xl font-semibold mb-2">
           Συμπληρώστε τα στοιχεία σας
         </h2>
-        <p>
-          Παρακαλώ ολοκληρώστε: <strong>{missing.join(", ")}</strong>.
+        <p className="mb-4">
+          Παρακαλώ ολοκληρώστε τα στοιχεία του προφίλ σας για να συμμετέχετε στις ψηφοφορίες.
+        </p>
+        <p className="text-sm text-gray-600">
+          Χρήστης: {profileData?.email || user.emailAddresses[0]?.emailAddress}
         </p>
       </main>
     );
@@ -135,7 +102,7 @@ export default function HomePage() {
       <div className="flex items-center p-4 rounded-lg border border-green-500 bg-green-50">
         <CheckCircle className="w-5 h-5 text-green-500 mr-2" />
         <span className="text-sm font-medium text-green-800">
-          Εγγεγραμμένος χρήστης
+          Εγγεγραμμένος χρήστης - {profileData?.fullName || user.fullName}
         </span>
       </div>
 
@@ -213,24 +180,35 @@ export default function HomePage() {
       </Tabs>
 
       {/* Vote Modal */}
-      <VoteModal
-        pollId={voteModalPoll?.toString() || ""}
-        open={!!voteModalPoll}
-        onOpenChange={(open) => {
-          if (!open) setVoteModalPoll(null);
-        }}
-        onVoteSuccess={() => {
-          if (voteModalPoll) {
-            setVotedMap((m) => ({ ...m, [voteModalPoll]: true }));
-          }
-          setVoteModalPoll(null);
-        }}
-      />
+      {voteModalPoll !== null && (
+        <VoteModal
+          open={true}
+          pollId={String(voteModalPoll)}
+          onOpenChange={(open) => {
+            if (!open) {
+              setVoteModalPoll(null);
+            }
+          }}
+          onVoteSuccess={() => {
+            const justVotedId = voteModalPoll;
+            setVoteModalPoll(null);
+            if (!justVotedId) return;
+            // Refresh voted status
+            fetch(`/api/vote/status?electionId=${justVotedId}`, {
+              credentials: "include",
+            })
+              .then((r) => r.json())
+              .then(({ hasVoted }) =>
+                setVotedMap((m) => ({ ...m, [justVotedId]: hasVoted }))
+              );
+          }}
+        />
+      )}
 
-      {/* Results Panel */}
-      {resultsPoll && (
+      {/* Results Modal */}
+      {resultsPoll !== null && (
         <PollResultsTabs
-          pollId={resultsPoll.toString()}
+          pollId={String(resultsPoll)}
           onClose={() => setResultsPoll(null)}
         />
       )}

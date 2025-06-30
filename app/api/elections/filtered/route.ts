@@ -4,6 +4,8 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   const session = await auth();
   if (!session.userId) return NextResponse.json([], { status: 401 });
@@ -15,17 +17,9 @@ export async function GET() {
   });
   if (!dbUser) return NextResponse.json([], { status: 200 });
 
-  // φέρε ποιες έχει ήδη ψηφίσει
-  const voted = await prisma.vote.findMany({
-    where: { userId: dbUser.id },
-    select: { electionId: true },
-  });
-  const votedIds = voted.map((v) => v.electionId);
-
   // **ΑΦΑΙΡΕΙ ΤΟ φίλτρο end_date > τώρα**
   const elections = await prisma.election.findMany({
     where: {
-      id: { notIn: votedIds },
       AND: [
         { OR: [{ target_gender: dbUser.gender }, { target_gender: null }, { target_gender: "all" }] },
         { OR: [{ target_occupation: dbUser.occupation }, { target_occupation: null }, { target_occupation: "all" }] },

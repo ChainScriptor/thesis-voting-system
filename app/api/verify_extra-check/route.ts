@@ -1,6 +1,6 @@
 // app/api/verify_extra-check/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { createConnection } from "@/lib/db";
+import { prisma } from "@/lib/prisma";
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
@@ -11,18 +11,21 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const conn = await createConnection();
-    const [rows] = await conn.execute(
-      `SELECT gender, birthdate, occupation, location FROM users WHERE clerkId = ? LIMIT 1`,
-      [clerkId]
-    );
-    const data = Array.isArray(rows) ? rows[0] : null;
+    const user = await prisma.user.findUnique({
+        where: { clerkId: clerkId },
+        select: {
+            gender: true,
+            birthdate: true,
+            occupation: true,
+            location: true,
+        }
+    });
 
-    if (!data) {
+    if (!user) {
       return NextResponse.json({ success: false, message: "User not found" }, { status: 404 });
     }
 
-    return NextResponse.json({ success: true, data });
+    return NextResponse.json({ success: true, data: user });
   } catch (error) {
     console.error("DB check error:", error);
     return NextResponse.json({ success: false, message: "Database error" }, { status: 500 });

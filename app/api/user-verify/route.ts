@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
       { status: 200 }
     );
   } catch (err) {
-    console.error("❌ Error in /api/verify:", err);
+    console.error("❌ Error in /api/user-verify:", err);
     return NextResponse.json(
       {
         success: false,

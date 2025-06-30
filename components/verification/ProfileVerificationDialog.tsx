@@ -33,6 +33,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useToast } from "@/hooks/use-toast";
 import { Separator } from "@/components/ui/seperator";
 import { useUser } from "@clerk/nextjs";
+import { useProfileSync } from "@/hooks/useProfileSync";
 
 import greekCities from "@/data/greekCities.json";
 import occupations from "@/data/occupations.json";
@@ -57,6 +58,7 @@ const ProfileVerificationDialog = ({
 }: ProfileVerificationDialogProps) => {
   const { toast } = useToast();
   const { user } = useUser();
+  const { profileData, isLoading: isProfileLoading, refresh } = useProfileSync();
   const [open, setOpen] = useState(false);
 
   const form = useForm<FormValues>({
@@ -69,27 +71,18 @@ const ProfileVerificationDialog = ({
     },
   });
 
+  // Φόρτωση δεδομένων προφίλ όταν ανοίγει το dialog
   useEffect(() => {
-    if (open && user?.id) {
-      fetch(`/api/profile?clerkId=${user.id}`)
-        .then((res) => res.json())
-        .then((json) => {
-          if (json.success && json.data) {
-            const { gender, birthdate, occupation, location } = json.data;
-            form.reset({
-              gender,
-              // Αν birthdate είναι null, βάζουμε κενό string
-              birthdate: birthdate ? birthdate.slice(0, 10) : "",
-              occupation,
-              location,
-            });
-          }
-        })
-        .catch((err) => {
-          console.error("Error loading profile data:", err);
-        });
+    if (open && profileData?.profile) {
+      const { gender, birthdate, occupation, location } = profileData.profile;
+      form.reset({
+        gender: gender || "",
+        birthdate: birthdate ? birthdate.slice(0, 10) : "",
+        occupation: occupation || "",
+        location: location || "",
+      });
     }
-  }, [open, user, form]);
+  }, [open, profileData, form]);
 
   const onSubmit = async (data: FormValues) => {
     if (!user?.id) {
@@ -102,7 +95,7 @@ const ProfileVerificationDialog = ({
     }
 
     try {
-      const res = await fetch("/api/verify", {
+      const res = await fetch("/api/verify-profile", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ idNumber: user.id, ...data }),
@@ -115,6 +108,10 @@ const ProfileVerificationDialog = ({
           title: "Επιτυχία",
           description: "Τα στοιχεία σας αποθηκεύτηκαν επιτυχώς.",
         });
+        
+        // Refresh profile data to update UI
+        await refresh();
+        
         if (onSuccess) onSuccess();
       } else {
         toast({
@@ -143,6 +140,12 @@ const ProfileVerificationDialog = ({
         <DialogHeader>
           <DialogTitle>Επαλήθευση Προφίλ</DialogTitle>
         </DialogHeader>
+
+        {isProfileLoading && (
+          <div className="text-center py-4">
+            <p>Φόρτωση προφίλ...</p>
+          </div>
+        )}
 
         <Form {...form}>
           <form

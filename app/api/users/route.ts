@@ -1,53 +1,36 @@
 // app/api/users/route.ts
 
 import { NextResponse } from "next/server";
-import { createConnection } from "@/lib/db";
-import { RowDataPacket, ResultSetHeader } from "mysql2/promise";
+import { prisma } from "@/lib/prisma";
 import { clerkClient } from "@clerk/nextjs/server";
-
-interface UserRow extends RowDataPacket {
-  id: number;
-  clerkId: string;
-  fullName: string;
-  username: string;
-  email: string;
-  occupation: string | null;
-  location: string | null;
-  gender: string | null;
-}
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const search = url.searchParams.get("search");
 
   try {
-    const conn = await createConnection();
-    const baseCols = `
-      id,
-      clerkId,
-      fullName,
-      username,
-      email,
-      occupation,
-      location,
-      gender
-    `;
-    const query = search
-      ? `
-        SELECT ${baseCols}
-        FROM \`user\`
-        WHERE fullName LIKE ? OR email LIKE ? OR occupation LIKE ?
-      `
-      : `
-        SELECT ${baseCols}
-        FROM \`user\`
-      `;
-    const values = search
-      ? [`%${search}%`, `%${search}%`, `%${search}%`]
-      : [];
-
-    const [rows] = await conn.execute<UserRow[]>(query, values);
-    return NextResponse.json(rows);
+    const users = await prisma.user.findMany({
+      where: search
+        ? {
+            OR: [
+              { fullName: { contains: search, mode: "insensitive" } },
+              { email: { contains: search, mode: "insensitive" } },
+              { occupation: { contains: search, mode: "insensitive" } },
+            ],
+          }
+        : undefined,
+      select: {
+        id: true,
+        clerkId: true,
+        fullName: true,
+        username: true,
+        email: true,
+        occupation: true,
+        location: true,
+        gender: true,
+      },
+    });
+    return NextResponse.json(users);
   } catch (error) {
     console.error("❌ Error in /api/users [GET]:", error);
     return NextResponse.json({ error: "Database error" }, { status: 500 });
@@ -64,47 +47,54 @@ export async function POST(request: Request) {
   }
 
   try {
-    // ⚠️ ClerkClient is a function, so first await it:
-    const client = await clerkClient();
-    // then use its .users API:
-    const u = await client.users.getUser(clerkId);
+    const u = await clerkClient.users.getUser(clerkId);
 
-    const fullName = `${u.firstName ?? ""} ${u.lastName ?? ""}`.trim() || u.username;
+    const fullName = `${u.firstName ?? ""} ${u.lastName ?? ""}`.trim() || u.username || "Unknown User";
     const username = u.username ?? u.primaryEmailAddress?.emailAddress ?? "";
-    const email = username;
-    const gender = u.publicMetadata.gender ?? null;
-    const birthdate = u.publicMetadata.birthdate ?? null;
-    const occupation = u.publicMetadata.occupation ?? null;
-    const location = u.publicMetadata.location ?? null;
+    const email = u.primaryEmailAddress?.emailAddress;
 
-    const conn = await createConnection();
-    const sql = `
-      INSERT INTO \`user\`
-        (clerkId, fullName, username, email, gender, birthdate, occupation, location)
-      VALUES
-        (?, ?, ?, ?, ?, ?, ?, ?)
-      ON DUPLICATE KEY UPDATE
-        fullName   = VALUES(fullName),
-        username   = VALUES(username),
-        email      = VALUES(email),
-        gender     = VALUES(gender),
-        birthdate  = VALUES(birthdate),
-        occupation = VALUES(occupation),
-        location   = VALUES(location)
-    `;
-    const vals = [
-      clerkId,
-      fullName,
-      username,
-      email,
-      gender,
-      birthdate,
-      occupation,
-      location,
-    ];
-    const [result] = await conn.execute<ResultSetHeader>(sql, vals);
+    if (!email) {
+       return NextResponse.json(
+        { success: false, message: "User has no primary email address." },
+        { status: 400 }
+      );
+    }
+    
+    // Custom metadata from Clerk
+    const gender = (u.publicMetadata.gender as string) ?? null;
+    const birthdateStr = (u.publicMetadata.birthdate as string) ?? null;
+    const occupation = (u.publicMetadata.occupation as string) ?? null;
+    const location = (u.publicMetadata.location as string) ?? null;
+    const birthdate = birthdateStr ? new Date(birthdateStr) : null;
 
-    return NextResponse.json({ success: true, insertId: result.insertId });
+
+    const user = await prisma.user.upsert({
+        where: { clerkId: clerkId },
+        update: {
+            fullName,
+            username,
+            email,
+            gender,
+            birthdate,
+            occupation,
+            location,
+        },
+        create: {
+            clerkId,
+            fullName,
+            username,
+            email,
+            gender,
+            birthdate,
+            occupation,
+            location,
+            // Add default required fields that are not coming from clerk
+            password: "", // Assuming password is not synced from Clerk, add a placeholder
+            isAdmin: false, // Default value
+        }
+    });
+
+    return NextResponse.json({ success: true, user: user });
   } catch (error) {
     console.error("❌ Error in /api/users [POST]:", error);
     return NextResponse.json(

@@ -59,6 +59,11 @@ const demographicsSchema = z.object({
   income: z.string().optional(),
 });
 
+const verificationSchema = z.object({
+  idNumber: z.string().min(1, "Απαιτείται αριθμός ταυτότητας"),
+  taxId: z.string().min(1, "Απαιτείται ΑΦΜ"),
+});
+
 interface VerificationDialogProps {
   isOpen: boolean;
   onClose: () => void;

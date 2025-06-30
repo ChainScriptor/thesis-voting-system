@@ -1,7 +1,6 @@
 // app/api/poll-candidates/[id]/route.ts
 import { NextResponse } from "next/server";
-import { createConnection } from "@/lib/db";
-import type { ResultSetHeader } from "mysql2/promise";
+import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
@@ -10,10 +9,8 @@ export const dynamic = "force-dynamic";
  */
 export async function DELETE(
   request: Request,
-  context: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
-  const params = await context.params;
-  console.log("params:", params);
   const pcId = parseInt(params.id, 10);
   if (isNaN(pcId)) {
     return NextResponse.json(
@@ -23,23 +20,22 @@ export async function DELETE(
   }
 
   try {
-    const conn = await createConnection();
-    const [result] = await conn.execute<ResultSetHeader>(
-      `DELETE FROM poll_candidates WHERE id = ?`,
-      [pcId]
-    );
-    if (result.affectedRows === 0) {
-      return NextResponse.json(
+    await prisma.poll_candidates.delete({
+      where: { id: pcId },
+    });
+    // 204 No Content (χωρίς σώμα)
+    return new NextResponse(null, { status: 204 });
+  } catch (err) {
+     // Prisma throws an error if the record to delete is not found, P2025 is the code for that.
+    if (err instanceof Error && 'code' in err && err.code === 'P2025') {
+       return NextResponse.json(
         { error: "Not found" },
         { status: 404 }
       );
     }
-    // 204 No Content (χωρίς σώμα)
-    return new NextResponse(null, { status: 204 });
-  } catch (err) {
     console.error(`DELETE /api/poll-candidates/${pcId} error:`, err);
     return NextResponse.json(
-      { error: "DB error" },
+      { error: "Database error" },
       { status: 500 }
     );
   }

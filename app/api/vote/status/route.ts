@@ -3,8 +3,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
-import { createConnection } from "@/lib/db";
-import type { RowDataPacket } from "mysql2";
 
 export async function GET(request: Request) {
   try {
@@ -17,7 +15,7 @@ export async function GET(request: Request) {
       );
     }
 
-    // 2) Βρίσκουμε τον χρήστη στη βάση (Prisma) για να έχουμε το πραγματικό user.id
+    // 2) Βρίσκουμε τον χρήστη στη βάση (Prisma)
     const user = await prisma.user.findUnique({
       where: { clerkId },
     });
@@ -45,14 +43,17 @@ export async function GET(request: Request) {
       );
     }
 
-    // 4) Εκτελούμε raw query στον πίνακα Vote με mysql2
-    const conn = await createConnection();
-    const [rows] = await conn.execute<RowDataPacket[]>(
-      "SELECT id FROM `Vote` WHERE userId = ? AND electionId = ?",
-      [user.id, electionId]
-    );
+    // 4) Ελέγχουμε αν έχει ψηφίσει με Prisma
+    const vote = await prisma.vote.findUnique({
+      where: {
+        userId_electionId: {
+          userId: user.id,
+          electionId: electionId,
+        },
+      },
+    });
 
-    const hasVoted = Array.isArray(rows) && rows.length > 0;
+    const hasVoted = !!vote;
     return NextResponse.json({ hasVoted });
   } catch (error) {
     console.error("GET /api/vote/status error:", error);
