@@ -1,288 +1,233 @@
-// app/admin/polls/page.tsx
 "use client";
 
-import React, { useEffect, useState, FormEvent, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { format } from "date-fns";
-import { Badge } from "@/components/ui/badge";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useForm, useFieldArray } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { useToast } from "@/components/ui/use-toast";
+
 import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import {
-  Table,
-  TableHeader,
-  TableRow,
-  TableHead,
-  TableBody,
-  TableCell,
-} from "@/components/ui/table";
-import { Plus, Users, Trash2 } from "lucide-react";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
+import { CalendarIcon, PlusCircle, Trash2 } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
-import cities from "@/data/greekCities.json";
-import occupations from "@/data/occupations.json";
+const pollSchema = z.object({
+  title: z.string().min(5, "Ο τίτλος πρέπει να έχει τουλάχιστον 5 χαρακτήρες."),
+  description: z.string().optional(),
+  dateRange: z.object({
+    from: z.date({ required_error: "Η ημερομηνία έναρξης είναι υποχρεωτική." }),
+    to: z.date({ required_error: "Η ημερομηνία λήξης είναι υποχρεωτική." }),
+  }),
+  options: z.array(
+    z.object({
+      value: z.string().min(1, "Η επιλογή δεν μπορεί να είναι κενή."),
+    })
+  ).min(2, "Πρέπει να υπάρχουν τουλάχιστον 2 επιλογές."),
+});
 
-interface Poll {
-  id: string;
-  title: string;
-  description: string;
-  dateRange: { startDate: string; endDate: string };
-  targeting: { roles: string[]; locations: string[] };
-  candidates: { id: number; name: string }[];
-  createdAt: string;
-}
+type PollFormValues = z.infer<typeof pollSchema>;
 
-// ✅ Wrapper για ασφαλή χρήση useSearchParams
-function SearchParamsWrapper({ onReady }: { onReady: (createFlag: boolean) => void }) {
-  const searchParams = useSearchParams();
-  const createFlag = searchParams.get("create") === "true";
-  React.useEffect(() => {
-    onReady(createFlag);
-  }, [createFlag, onReady]);
-  return null;
-}
-
-export default function PollsPage() {
+export default function CreatePollPage() {
   const router = useRouter();
-  const [polls, setPolls] = useState<Poll[]>([]);
-  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
 
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [form, setForm] = useState({
-    title: "",
-    description: "",
-    start_date: "",
-    end_date: "",
-    target_occupation: "",
-    target_location: "",
-    birthdate_min: "",
-    birthdate_max: "",
-    target_gender: "",
+  const form = useForm<PollFormValues>({
+    resolver: zodResolver(pollSchema),
+    defaultValues: {
+      title: "",
+      description: "",
+      options: [{ value: "" }, { value: "" }],
+    },
   });
-  const [creating, setCreating] = useState(false);
 
-  const onChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) =>
-    setForm((f) => ({
-      ...f,
-      [e.target.name]: e.target.value,
-    }));
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "options",
+  });
 
-  const handleCreate = async (e: FormEvent) => {
-    e.preventDefault();
-    setCreating(true);
+  async function onSubmit(data: PollFormValues) {
+    setIsLoading(true);
     try {
-      const res = await fetch("/api/elections", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, is_active: true }),
+      const response = await fetch('/api/elections', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: data.title,
+          description: data.description,
+          start_date: data.dateRange.from.toISOString(),
+          end_date: data.dateRange.to.toISOString(),
+          options: data.options.map(o => o.value), // Στέλνουμε μόνο τις τιμές
+        }),
       });
-      if (!res.ok) throw new Error();
-      const r2 = await fetch("/api/elections");
-      const data: Poll[] = await r2.json();
-      setPolls(data);
-      setIsDialogOpen(false);
-      setForm({
-        title: "",
-        description: "",
-        start_date: "",
-        end_date: "",
-        target_occupation: "",
-        target_location: "",
-        birthdate_min: "",
-        birthdate_max: "",
-        target_gender: "",
+
+      if (!response.ok) {
+        throw new Error('Η δημιουργία της ψηφοφορίας απέτυχε.');
+      }
+
+      toast({
+        title: "Επιτυχία!",
+        description: "Η ψηφοφορία δημιουργήθηκε.",
       });
-    } catch {
-      alert("Σφάλμα κατά τη δημιουργία ψηφοφορίας.");
+      router.push("/admin/polls");
+
+    } catch (error) {
+        const err = error instanceof Error ? error.message : "Άγνωστο σφάλμα";
+        toast({
+            title: "Σφάλμα",
+            description: err,
+            variant: "destructive",
+        });
     } finally {
-      setCreating(false);
+        setIsLoading(false);
     }
-  };
-
-  useEffect(() => {
-    fetch("/api/elections")
-      .then((r) => r.json())
-      .then((data: Poll[]) => setPolls(data))
-      .catch(console.error);
-  }, []);
-
-  const onOpenChange = (open: boolean) => {
-    setIsDialogOpen(open);
-    if (!open) {
-      router.replace("/admin/polls", { scroll: false });
-    }
-  };
-
-  const handleDelete = async (id: string) => {
-    if (!confirm("Είστε σίγουροι ότι θέλετε να διαγράψετε αυτή την ψηφοφορία;"))
-      return;
-    setLoading(true);
-    try {
-      const res = await fetch(`/api/elections/${id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error();
-      setPolls((prev) => prev.filter((p) => p.id !== id));
-    } catch {
-      alert("Αποτυχία διαγραφής ψηφοφορίας.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  }
 
   return (
-    <>
-      <Suspense fallback={null}>
-        <SearchParamsWrapper onReady={(flag) => setIsDialogOpen(flag)} />
-      </Suspense>
+    <div className="container mx-auto p-4 md:p-8">
+      <h1 className="text-2xl md:text-3xl font-bold mb-6">Δημιουργία Νέας Ψηφοφορίας</h1>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          
+          <FormField
+            control={form.control}
+            name="title"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Τίτλος</FormLabel>
+                <FormControl>
+                  <Input placeholder="π.χ. Εκλογή Προέδρου Συλλόγου" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-      <div className="p-6 space-y-6">
-        <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold">Ψηφοφορίες</h1>
-          <Dialog open={isDialogOpen} onOpenChange={onOpenChange}>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="mr-2 h-4 w-4" />
-                Δημιουργία Ψηφοφορίας
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Περιγραφή (Προαιρετικά)</FormLabel>
+                <FormControl>
+                  <Textarea
+                    placeholder="Δώστε μερικές λεπτομέρειες για τη ψηφοφορία..."
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          <FormField
+            control={form.control}
+            name="dateRange"
+            render={({ field }) => (
+              <FormItem className="flex flex-col">
+                <FormLabel>Ημερομηνίες Διεξαγωγής</FormLabel>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant={"outline"}
+                        className={cn(
+                          "w-[300px] justify-start text-left font-normal",
+                          !field.value?.from && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {field.value?.from ? (
+                          field.value.to ? (
+                            <>
+                              {format(field.value.from, "LLL dd, y")} -{" "}
+                              {format(field.value.to, "LLL dd, y")}
+                            </>
+                          ) : (
+                            format(field.value.from, "LLL dd, y")
+                          )
+                        ) : (
+                          <span>Επιλέξτε εύρος</span>
+                        )}
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      initialFocus
+                      mode="range"
+                      defaultMonth={field.value?.from}
+                      selected={{from: field.value?.from, to: field.value?.to}}
+                      onSelect={field.onChange}
+                      numberOfMonths={2}
+                    />
+                  </PopoverContent>
+                </Popover>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <div>
+            <FormLabel>Επιλογές Ψηφοφορίας</FormLabel>
+            <div className="space-y-4 mt-2">
+              {fields.map((field, index) => (
+                <FormField
+                  key={field.id}
+                  control={form.control}
+                  name={`options.${index}.value`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="flex items-center space-x-2">
+                        <FormControl>
+                           <Input {...field} placeholder={`Επιλογή #${index + 1}`} />
+                        </FormControl>
+                        {fields.length > 2 && (
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="icon"
+                            onClick={() => remove(index)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              ))}
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => append({ value: "" })}
+              >
+                <PlusCircle className="mr-2 h-4 w-4"/>
+                Προσθήκη Επιλογής
               </Button>
-            </DialogTrigger>
-
-            <DialogContent className="max-w-lg">
-              <DialogHeader>
-                <DialogTitle>Δημιουργία Νέας Ψηφοφορίας</DialogTitle>
-                <DialogDescription>
-                  Συμπλήρωσε τα πεδία και πάτησε “Δημιουργία”
-                </DialogDescription>
-              </DialogHeader>
-
-              <form onSubmit={handleCreate} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium">Τίτλος</label>
-                  <Input name="title" value={form.title} onChange={onChange} required />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium">Περιγραφή</label>
-                  <Textarea name="description" value={form.description} onChange={onChange} required />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium">Έναρξη</label>
-                    <Input type="date" name="start_date" value={form.start_date} onChange={onChange} required />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium">Λήξη</label>
-                    <Input type="date" name="end_date" value={form.end_date} onChange={onChange} required />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium">Επάγγελμα Στόχευσης</label>
-                  <select name="target_occupation" value={form.target_occupation} onChange={onChange} className="w-full border rounded px-3 py-2">
-                    <option value="" disabled>-- Επιλέξτε Επάγγελμα --</option>
-                    {occupations.map((opt) => (
-                      <option key={opt.value} value={opt.value}>{opt.label}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium">Τοποθεσία Στόχευσης</label>
-                  <select name="target_location" value={form.target_location} onChange={onChange} className="w-full border rounded px-3 py-2">
-                    <option value="" disabled>-- Επιλέξτε Τοποθεσία --</option>
-                    {cities.map((opt) => (
-                      <option key={opt.value} value={opt.value}>{opt.label}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium">Ελάχιστη Ηλικία</label>
-                    <Input type="date" name="birthdate_min" value={form.birthdate_min} onChange={onChange} />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium">Μέγιστη Ηλικία</label>
-                    <Input type="date" name="birthdate_max" value={form.birthdate_max} onChange={onChange} />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium">Φύλο</label>
-                  <Input name="target_gender" value={form.target_gender} onChange={onChange} placeholder="male / female / all" />
-                </div>
-                <DialogFooter className="flex justify-end space-x-2">
-                  <Button variant="outline" onClick={() => onOpenChange(false)}>Άκυρο</Button>
-                  <Button type="submit" disabled={creating}>{creating ? "Δημιουργία..." : "Δημιουργία Ψηφοφορίας"}</Button>
-                </DialogFooter>
-              </form>
-            </DialogContent>
-          </Dialog>
-        </div>
-
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Τίτλος</TableHead>
-              <TableHead>Κατάσταση</TableHead>
-              <TableHead>Διάστημα</TableHead>
-              <TableHead>Στόχευση</TableHead>
-              <TableHead>Υποψήφιοι</TableHead>
-              <TableHead>Δημιουργήθηκε</TableHead>
-              <TableHead className="text-right">Ενέργειες</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {polls.map((poll) => (
-              <TableRow key={poll.id}>
-                <TableCell>
-                  <div className="font-medium">{poll.title}</div>
-                  <div className="text-sm text-gray-500 truncate max-w-[250px]">{poll.description}</div>
-                </TableCell>
-                <TableCell>
-                  {new Date() < new Date(poll.dateRange.startDate) ? (
-                    <Badge variant="secondary">Προγραμματίστηκε</Badge>
-                  ) : new Date() > new Date(poll.dateRange.endDate) ? (
-                    <Badge variant="outline">Τέλειωσε</Badge>
-                  ) : (
-                    <Badge className="bg-green-500">Ενεργή</Badge>
-                  )}
-                </TableCell>
-                <TableCell>
-                  {format(new Date(poll.dateRange.startDate), "MMM d, yyyy")} έως{" "}
-                  {format(new Date(poll.dateRange.endDate), "MMM d, yyyy")}
-                </TableCell>
-                <TableCell>
-                  {poll.targeting.roles.length ? (
-                    poll.targeting.roles.map((r) => (
-                      <Badge key={r} variant="outline" className="mr-1">
-                        {r}
-                      </Badge>
-                    ))
-                  ) : (
-                    <Badge variant="outline">All</Badge>
-                  )}
-                </TableCell>
-                <TableCell>{poll.candidates.length}</TableCell>
-                <TableCell>{format(new Date(poll.createdAt), "MMM d, yyyy")}</TableCell>
-                <TableCell className="text-right">
-                  <div className="flex justify-end space-x-2">
-                    <Button variant="ghost" size="sm" onClick={() => router.push(`/admin/poll-candidates/${poll.id}`)}>
-                      <Users className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="sm" onClick={() => handleDelete(poll.id)} className="text-red-500 hover:bg-red-50" disabled={loading}>
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
-    </>
+            </div>
+          </div>
+          
+          <Button type="submit" disabled={isLoading}>
+            {isLoading ? "Αποθήκευση..." : "Δημιουργία Ψηφοφορίας"}
+          </Button>
+        </form>
+      </Form>
+    </div>
   );
 }
