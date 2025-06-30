@@ -1,0 +1,102 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model candidate {
+  id          Int     @id @default(autoincrement())
+  name        String
+  description String?
+  image       String?
+  is_person   Boolean
+  clerkId     String? @unique
+
+  user     user?      @relation(fields: [clerkId], references: [clerkId])
+  takepart takepart[]
+  votes    Vote[]
+}
+
+model election {
+  id                Int       @id @default(autoincrement())
+  title             String
+  description       String?
+  start_date        DateTime
+  end_date          DateTime
+  is_active         Boolean
+  target_occupation String?
+  target_location   String?
+  birthdate_min     DateTime?
+  birthdate_max     DateTime?
+  target_gender     String?
+  userId            Int
+
+  user            user              @relation(fields: [userId], references: [id])
+  poll_candidates poll_candidates[]
+  takepart        takepart[]
+  votes           Vote[]
+
+  @@index([userId])
+}
+
+model poll_candidates {
+  id         Int      @id @default(autoincrement())
+  poll_id    Int
+  user_id    Int
+  invited_at DateTime @default(now())
+
+  election election @relation(fields: [poll_id], references: [id], onDelete: Cascade)
+  user     user     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([poll_id])
+  @@index([user_id])
+}
+
+model takepart {
+  electionId    Int
+  candidateId   Int
+  numberOfVotes Int
+
+  candidate candidate @relation(fields: [candidateId], references: [id])
+  election  election  @relation(fields: [electionId], references: [id])
+
+  @@id([electionId, candidateId])
+  @@index([candidateId])
+}
+
+model user {
+  id         Int       @id @default(autoincrement())
+  clerkId    String    @unique
+  fullName   String
+  username   String    @unique
+  password   String
+  isAdmin    Boolean
+  gender     String?
+  email      String    @unique
+  birthdate  DateTime?
+  occupation String?
+  location   String?
+
+  candidates      candidate[]
+  election        election[]
+  poll_candidates poll_candidates[]
+  votes           Vote[]
+}
+
+model Vote {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  electionId  Int
+  candidateId Int
+  votedAt     DateTime @default(now())
+
+  user      user      @relation(fields: [userId], references: [id])
+  election  election  @relation(fields: [electionId], references: [id])
+  candidate candidate @relation(fields: [candidateId], references: [id])
+
+  @@unique([userId, electionId])
+}

@@ -114,9 +114,9 @@ export const ProjectShowcase = ({
     ...(isMobileView && mobile.spacing ? mobile.spacing : {})
   };
 
-  const handleNext = () => {
+  const handleNext = useCallback(() => {
     setActive((prev) => (prev + 1) % testimonials.length);
-  };
+  }, [testimonials.length]);
 
   const handlePrev = () => {
     setActive((prev) => (prev - 1 + testimonials.length) % testimonials.length);
@@ -131,7 +131,7 @@ export const ProjectShowcase = ({
       const interval = setInterval(handleNext, 5000);
       return () => clearInterval(interval);
     }
-  }, [autoplay]);
+  }, [autoplay, handleNext]);
 
   const handleResize = useCallback(() => {
     if (componentRef.current) {
@@ -144,13 +144,14 @@ export const ProjectShowcase = ({
 
   useEffect(() => {
     const resizeObserver = new ResizeObserver(handleResize);
-    if (componentRef.current) {
-      resizeObserver.observe(componentRef.current);
+    const currentRef = componentRef.current;
+    if (currentRef) {
+      resizeObserver.observe(currentRef);
     }
     handleResize(); // Initial check
     return () => {
-      if (componentRef.current) {
-        resizeObserver.unobserve(componentRef.current);
+      if (currentRef) {
+        resizeObserver.unobserve(currentRef);
       }
     };
   }, [handleResize]);

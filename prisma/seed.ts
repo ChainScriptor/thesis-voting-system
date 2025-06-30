@@ -62,7 +62,7 @@ async function main() {
   }
 
   // 4. Συσχέτιση υποψηφίου με πρώτη εκλογή
-  await prisma.takePart.upsert({
+  await prisma.takepart.upsert({
     where: {
       electionId_candidateId: {
         electionId: election1.id,
@@ -100,7 +100,7 @@ async function main() {
   }
 
   // 6. Συσχέτιση υποψηφίου με δεύτερη εκλογή
-  await prisma.takePart.upsert({
+  await prisma.takepart.upsert({
     where: {
       electionId_candidateId: {
         electionId: election2.id,
