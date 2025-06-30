@@ -36,6 +36,7 @@ import {
 } from "@/components/ui/table";
 import { useToast } from "@/components/ui/use-toast";
 import pollService from "@/services/pollService";
+import type { Poll} from "@/types/poll";
 import {
   ArrowLeft,
   Plus,
@@ -51,19 +52,7 @@ import {
 // Αν έχεις types στο "@/types/poll", προτίμησε να τα importάρεις:
 // import { Poll, Candidate } from "@/types/poll";
 
-interface Poll {
-  id: string;
-  title: string;
-  candidates: Array<{
-    id: string;
-    name: string;
-    email?: string;
-    position?: string;
-    imageUrl?: string;
-  }>;
-}
-
-interface User {
+interface PageUser {
   id: number;
   fullName: string;
   email: string;
@@ -84,12 +73,12 @@ export default function PollCandidates() {
   const { toast } = useToast();
 
   const [poll, setPoll] = useState<Poll | null>(null);
-  const [users, setUsers] = useState<User[]>([]);
-  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<PageUser[]>([]);
+  const [filteredUsers, setFilteredUsers] = useState<PageUser[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [invitationSent, setInvitationSent] = useState<Record<string, boolean>>({});
+  const [invitationSent, setInvitationSent] = useState<Record<number, boolean>>({});
 
   const form = useForm<z.infer<typeof candidateSchema>>({
     resolver: zodResolver(candidateSchema),
@@ -107,7 +96,7 @@ export default function PollCandidates() {
           router.push("/admin/candidates");
           return;
         }
-        setPoll(p as Poll);
+        setPoll(p);
       } catch {
         toast({ title: "Σφάλμα", description: "Αποτυχία φόρτωσης", variant: "destructive" });
         router.push("/admin/candidates");
@@ -122,7 +111,7 @@ export default function PollCandidates() {
     (async () => {
       try {
         const res = await fetch("/api/users");
-        const data: User[] = await res.json();
+        const data: PageUser[] = await res.json();
         setUsers(data);
         setFilteredUsers(data);
       } catch {
@@ -149,7 +138,7 @@ export default function PollCandidates() {
   };
 
   // 4) Προσθήκη υπάρχοντος χρήστη
-  const handleAddExistingUser = (u: User) => {
+  const handleAddExistingUser = (u: PageUser) => {
     // Γεμίζουμε τη φόρμα
     form.setValue("name", u.fullName);
     form.setValue("email", u.email);
@@ -165,18 +154,16 @@ export default function PollCandidates() {
   };
 
   // 5) Υποβολή νέου υποψηφίου
-  const onSubmit = async (data: z.infer<typeof candidateSchema>) => {
+   // 5) Υποβολή νέου υποψηφίου
+   const onSubmit = async (data: z.infer<typeof candidateSchema>) => {
     if (!poll) return;
     try {
-      // Η type‐assertion «as any» χρησιμεύει ώστε να μην μας πετάει error 
-      // ότι το payload δεν ταιριάζει 100% με την υπογραφή του addCandidate.
-      type CandidateInput = z.infer<typeof candidateSchema>;
-
-      const newC = await pollService.addCandidate(pollId, data as CandidateInput);
+      // Αφαιρέθηκε η περιττή λογική τύπων
+      const newC = await pollService.addCandidate(pollId, data);
 
       setPoll({
         ...poll,
-        candidates: [...poll.candidates, newC!], // non-null assertion
+        candidates: [...poll.candidates, newC],
       });
       toast({ title: "Επιτυχία", description: "Υποψήφιος προστέθηκε" });
       form.reset();
@@ -187,7 +174,7 @@ export default function PollCandidates() {
   };
 
   // 6) Διαγραφή υποψηφίου
-  const handleRemoveCandidate = async (cid: string) => {
+  const handleRemoveCandidate = async (cid: number) => {
     if (!poll || !confirm("Είστε σίγουροι;")) return;
     try {
       await pollService.removeCandidate(pollId, cid);
@@ -202,7 +189,7 @@ export default function PollCandidates() {
   };
 
   // 7) Αποστολή πρόσκλησης
-  const sendInvitation = (cid: string) => {
+  const sendInvitation = (cid: number) => {
     setInvitationSent(prev => ({ ...prev, [cid]: true }));
     toast({ title: "Πρόσκληση", description: "Η πρόσκληση στάλθηκε" });
   };

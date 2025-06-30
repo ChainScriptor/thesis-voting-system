@@ -37,7 +37,7 @@ interface Election {
 }
 
 interface Candidate {
-  id: number;       // poll_candidates.id
+  id: number;
   poll_id: number;
   user_id: number;
   invited_at: string;

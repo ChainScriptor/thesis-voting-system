@@ -36,16 +36,23 @@ export async function getCandidates(pollId: string): Promise<Candidate[]> {
 }
 
 /**
- * Προσθέτει υποψήφιο στη βάση μέσω /api/poll-candidates
+ * Προσθέτει υποψήφιο στη βάση μέσω /api/candidates
  */
+type CandidateData = {
+  name: string;
+  email: string;
+  position?: string;
+  imageUrl?: string;
+};
+
 export async function addCandidate(
   pollId: string,
-  userId: number
+  candidateData: CandidateData
 ): Promise<Candidate> {
-  const res = await fetch("/api/poll-candidates", {
+  const res = await fetch("/api/candidates", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ pollId, userId }),
+    body: JSON.stringify({ ...candidateData, pollId }),
   });
   if (!res.ok) {
     throw new Error(`Failed to add candidate: ${res.status}`);

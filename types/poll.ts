@@ -1,11 +1,11 @@
 // types/poll.ts
 
 export interface Poll {
-  id: string;
+  id: number;
   title: string;
   description: string;
   options: PollOption[];
-  candidates: Candidate[];   // <- εδώ θα βλέπει πλέον email & occupation
+  candidates: Candidate[];  // <- εδώ θα βλέπει πλέον email & occupation
   targeting: Targeting;
   dateRange: {
     startDate: Date;
