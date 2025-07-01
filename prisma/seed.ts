@@ -99,7 +99,7 @@ async function main() {
     })
   }
 
-  // 6. Συσχέτιση υποψηφίου με δεύτερη εκλογή
+  // 6. Συσχέτιση υποψηφίου με δεύτερη εκλογήnpm
   await prisma.takepart.upsert({
     where: {
       electionId_candidateId: {
