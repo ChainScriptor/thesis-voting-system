@@ -9,9 +9,12 @@ const isVoteAPI = createRouteMatcher([
   "/api/vote-new",
 ]);
 
-export default clerkMiddleware(async (auth, req) => {
+export default clerkMiddleware((auth, req) => {
   if (isProtectedPage(req) || isFilteredAPI(req) || isVoteAPI(req)) {
-    auth().protect(); // διατηρούμε το auth requirement εκεί που χρειάζεται
+    if (!auth().userId) {
+      // Not authenticated: redirect or throw
+      return Response.redirect(new URL("/sign-in", req.url));
+    }
   }
 
   // Δεν βάζουμε auth.protect για /api/elections — απλώς περνά από middleware
