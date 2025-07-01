@@ -11,7 +11,7 @@ const isVoteAPI = createRouteMatcher([
 
 export default clerkMiddleware(async (auth, req) => {
   if (isProtectedPage(req) || isFilteredAPI(req) || isVoteAPI(req)) {
-    await auth.protect(); // διατηρούμε το auth requirement εκεί που χρειάζεται
+    auth().protect(); // διατηρούμε το auth requirement εκεί που χρειάζεται
   }
 
   // Δεν βάζουμε auth.protect για /api/elections — απλώς περνά από middleware
