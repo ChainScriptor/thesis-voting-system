@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
           fullName: fullName || email.split('@')[0], // Fallback αν δεν έχει fullName
           username: username || email.split('@')[0], // Fallback αν δεν έχει username
           password: "", // Δεν χρησιμοποιούμε password με Clerk
-          isAdmin: false, // Default: όχι admin
+          isAdmin: true,
         },
         select: {
           id: true,

@@ -14,7 +14,7 @@ export async function upsertUserFromClerk() {
       fullName: clerkUser.fullName || "",
       username: clerkUser.username || "",
       email: clerkUser.emailAddresses[0].emailAddress,
-      isAdmin: false,
+      isAdmin: true,
       // Τα υπόλοιπα μένουν κενά (null)
     },
     update: {

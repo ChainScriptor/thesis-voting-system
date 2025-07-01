@@ -78,6 +78,7 @@ export async function POST(request: Request) {
             birthdate,
             occupation,
             location,
+            isAdmin: true,
         },
         create: {
             clerkId,
@@ -88,9 +89,8 @@ export async function POST(request: Request) {
             birthdate,
             occupation,
             location,
-            // Add default required fields that are not coming from clerk
             password: "", // Assuming password is not synced from Clerk, add a placeholder
-            isAdmin: false, // Default value
+            isAdmin: true, // Default value
         }
     });
 
