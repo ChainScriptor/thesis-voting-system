@@ -7,14 +7,17 @@ export async function upsertUserFromClerk() {
   if (!userId) throw new Error("Unauthorized");
 
   const clerkUser = await currentUser();
+  if (!clerkUser) throw new Error("Clerk user not found.");
+
   await prisma.user.upsert({
-    where: { id: userId },
+    where: { clerkId: userId },
     create: {
-      id: userId,
+      clerkId: userId,
       fullName: clerkUser.fullName || "",
       username: clerkUser.username || "",
       email: clerkUser.emailAddresses[0].emailAddress,
       isAdmin: true,
+      password: "-",
       // Τα υπόλοιπα μένουν κενά (null)
     },
     update: {
