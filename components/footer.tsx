@@ -31,7 +31,7 @@ function Footerdemo() {
           <div className="relative">
             <h2 className="mb-4 text-3xl font-bold tracking-tight">Μείνετε Συνδεδεμένοι</h2>
             <p className="mb-6 text-muted-foreground">
-              Εγγραφείτε στο ενημερωτικό μας δελτίο για τα τελευταία νέα και αποκλειστικές προσφορές.
+              Εγγραφείτε στο ενημερωτικό μας δελτίο για τα τελευταία νέα.
             </p>
             <form className="relative">
               <Input
@@ -61,9 +61,6 @@ function Footerdemo() {
               </a>
               <a href="#" className="block transition-colors hover:text-primary">
                 Υπηρεσίες
-              </a>
-              <a href="#" className="block transition-colors hover:text-primary">
-                Προϊόντα
               </a>
               <a href="#" className="block transition-colors hover:text-primary">
                 Επικοινωνία

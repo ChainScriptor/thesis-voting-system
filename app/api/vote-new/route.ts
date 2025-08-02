@@ -1,6 +1,6 @@
 import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
-import { getAuth } from "@clerk/nextjs/server";
+import { auth } from "@clerk/nextjs/server";
 
 interface VoteBody {
   electionId: number;
@@ -10,7 +10,8 @@ interface VoteBody {
 export async function POST(request: Request) {
   try {
     // 1) Ελέγχουμε αν ο χρήστης είναι authenticated και βρίσκουμε το real User ID
-    const { userId: clerkId } = await getAuth();
+    const authData = await auth();
+    const clerkId = authData.userId;
     if (!clerkId) {
       return NextResponse.json(
         { error: "Not authenticated" },

@@ -7,17 +7,24 @@ import { auth } from "@clerk/nextjs/server";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const session = await auth();
-  if (!session.userId) return NextResponse.json([], { status: 401 });
+  // ✅ Πρώτα περιμένουμε το auth και μετά παίρνουμε userId
+  const authData = await auth();
+  const userId = authData.userId;
+
+  if (!userId) {
+    return NextResponse.json([], { status: 401 });
+  }
 
   // φέρε user
   const dbUser = await prisma.user.findUnique({ 
-    where: { clerkId: session.userId },
+    where: { clerkId: userId },
     select: { id: true, gender: true, occupation: true, location: true, birthdate: true }
   });
-  if (!dbUser) return NextResponse.json([], { status: 200 });
 
-  // **ΑΦΑΙΡΕΙ ΤΟ φίλτρο end_date > τώρα**
+  if (!dbUser) {
+    return NextResponse.json([], { status: 200 });
+  }
+
   const elections = await prisma.election.findMany({
     where: {
       AND: [

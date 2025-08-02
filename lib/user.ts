@@ -3,7 +3,8 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 
 export async function upsertUserFromClerk() {
-  const { userId } = auth();
+  const authData = await auth();
+  const userId = authData.userId;
   if (!userId) throw new Error("Unauthorized");
 
   const clerkUser = await currentUser();

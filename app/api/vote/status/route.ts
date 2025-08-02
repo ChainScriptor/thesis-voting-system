@@ -1,5 +1,3 @@
-// app/api/vote/status/route.ts
-
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
@@ -7,7 +5,9 @@ import { prisma } from "@/lib/prisma";
 export async function GET(request: Request) {
   try {
     // 1) Παίρνουμε το clerkId από τη session
-    const { userId: clerkId } = await auth();
+    const authData = await auth();
+    const clerkId = authData.userId;
+
     if (!clerkId) {
       return NextResponse.json(
         { error: "Not authenticated" },
@@ -15,7 +15,7 @@ export async function GET(request: Request) {
       );
     }
 
-    // 2) Βρίσκουμε τον χρήστη στη βάση (Prisma)
+    // 2) Βρίσκουμε τον χρήστη στη βάση
     const user = await prisma.user.findUnique({
       where: { clerkId },
     });
@@ -43,7 +43,7 @@ export async function GET(request: Request) {
       );
     }
 
-    // 4) Ελέγχουμε αν έχει ψηφίσει με Prisma
+    // 4) Ελέγχουμε αν έχει ψηφίσει
     const vote = await prisma.vote.findUnique({
       where: {
         userId_electionId: {
@@ -53,8 +53,7 @@ export async function GET(request: Request) {
       },
     });
 
-    const hasVoted = !!vote;
-    return NextResponse.json({ hasVoted });
+    return NextResponse.json({ hasVoted: !!vote });
   } catch (error) {
     console.error("GET /api/vote/status error:", error);
     return NextResponse.json(

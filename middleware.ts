@@ -6,13 +6,15 @@ const isFilteredAPI = createRouteMatcher(["/api/elections/filtered"]);
 const isVoteAPI = createRouteMatcher([
   "/api/vote",
   "/api/vote/status",
-  "/api/vote-new",
 ]);
 
-export default clerkMiddleware((auth, req) => {
+export default clerkMiddleware(async (auth, req) => {
+  // ✅ Περιμένουμε πρώτα το auth() και μετά παίρνουμε το userId
+  const authData = await auth();
+  const userId = authData.userId;
+
   if (isProtectedPage(req) || isFilteredAPI(req) || isVoteAPI(req)) {
-    if (!auth().userId) {
-      // Not authenticated: redirect or throw
+    if (!userId) {
       return Response.redirect(new URL("/sign-in", req.url));
     }
   }
@@ -22,13 +24,12 @@ export default clerkMiddleware((auth, req) => {
 
 export const config = {
   matcher: [
-    "/admin/:path*",                // ✅ προστασία admin UI
-    "/api/elections",               // ✅ GET/POST ψηφοφοριών
-    "/api/elections/:path*",        // ✅ προστέθηκε για dynamic routes (/api/elections/[id])
-    "/api/elections/filtered",      // ✅ filtered API
-    "/api/vote",                    // ✅ ψήφος
-    "/api/vote/status",             // ✅ status ψήφου
-    "/api/vote-new",                // ✅ νέο vote endpoint
-    // "/api/verify",                  // ✅ verification API - temporarily removed for testing
+    "/admin/:path*",
+    "/api/elections",
+    "/api/elections/:path*",
+    "/api/elections/filtered",
+    "/api/vote",
+    "/api/vote/status",
+    "/api/vote/submit",
   ],
 };

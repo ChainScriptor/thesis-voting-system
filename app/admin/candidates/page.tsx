@@ -73,9 +73,15 @@ export default function CandidatesPage() {
   useEffect(() => {
     fetch("/api/users")
       .then((r) => r.json())
-      .then((data: User[]) => {
-        setUsers(data);
-        setFilteredUsers(data);
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setUsers(data);
+          setFilteredUsers(data);
+        } else {
+          setUsers([]);
+          setFilteredUsers([]);
+          toast({ title: "Σφάλμα", description: data.error || "Αποτυχία φόρτωσης χρηστών", variant: "destructive" });
+        }
       })
       .catch(() =>
         toast({ title: "Σφάλμα", description: "Αποτυχία φόρτωσης χρηστών", variant: "destructive" })
