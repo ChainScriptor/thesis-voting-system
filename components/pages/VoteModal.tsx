@@ -125,7 +125,7 @@ export default function VoteModal({
     }
     setLoading(true);
     try {
-      const voteRes = await fetch("/api/vote/submit", {
+      const voteRes = await fetch("/api/vote", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
