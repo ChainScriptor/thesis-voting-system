@@ -15,7 +15,7 @@
   "dependencies": {
     "@clerk/clerk-sdk-node": "^4.13.23",
     "@clerk/localizations": "^3.16.5",
-    "@clerk/nextjs": "^5.2.4",
+    "@clerk/nextjs": "^6.28.1",
     "@hookform/resolvers": "^5.0.1",
     "@prisma/client": "^6.10.1",
     "@radix-ui/react-avatar": "^1.1.10",
