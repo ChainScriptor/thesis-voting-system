@@ -35,21 +35,41 @@ export async function GET(request: Request) {
             fullName: true,
             email: true,
             occupation: true,
+            clerkId: true,
           },
         },
       },
     });
 
-    // Flatten the result to match the original structure
-    const flattenedCandidates = candidates.map((c) => ({
-      id: c.id,
-      poll_id: c.poll_id,
-      user_id: c.user_id,
-      invited_at: c.invited_at,
-      fullName: c.user.fullName,
-      email: c.user.email,
-      occupation: c.user.occupation,
-    }));
+    const allClerkIds = candidates.map((c) => c.user.clerkId);
+
+    const relatedCandidates = await prisma.candidate.findMany({
+      where: {
+        clerkId: {
+          in: allClerkIds,
+        },
+      },
+      select: {
+        id: true,
+        clerkId: true,
+      },
+    });
+
+    const flattenedCandidates = candidates.map((c) => {
+      const matched = relatedCandidates.find(
+        (cand) => cand.clerkId === c.user.clerkId
+      );
+      return {
+        id: c.id,
+        poll_id: c.poll_id,
+        user_id: c.user_id,
+        invited_at: c.invited_at,
+        fullName: c.user.fullName,
+        email: c.user.email,
+        occupation: c.user.occupation,
+        candidateId: matched?.id ?? null,
+      };
+    });
 
     return NextResponse.json(flattenedCandidates);
   } catch (err) {
@@ -96,13 +116,23 @@ export async function POST(request: Request) {
             fullName: true,
             email: true,
             occupation: true,
+            clerkId: true,
           },
         },
       },
     });
-    
-    // Flatten the result
-     const flattenedCandidate = {
+
+    // Αναζήτηση του αντίστοιχου candidateId
+    const candidate = await prisma.candidate.findUnique({
+      where: {
+        clerkId: newCandidate.user.clerkId,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    const flattenedCandidate = {
       id: newCandidate.id,
       poll_id: newCandidate.poll_id,
       user_id: newCandidate.user_id,
@@ -110,8 +140,8 @@ export async function POST(request: Request) {
       fullName: newCandidate.user.fullName,
       email: newCandidate.user.email,
       occupation: newCandidate.user.occupation,
+      candidateId: candidate?.id ?? null,
     };
-
 
     return NextResponse.json(flattenedCandidate, { status: 201 });
   } catch (err) {

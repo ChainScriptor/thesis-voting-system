@@ -138,7 +138,7 @@ const ViewPolls = () => {
               </CardContent>
               <CardFooter>
                 <Button onClick={() => handleVoteClick(poll)} disabled={!poll.isActive || votedPolls.includes(poll.id)}>
-                  {votedPolls.includes(poll.id) ? 'Ψηφίσατε' : 'Ψήφισε'}
+                  {votedPolls.includes(poll.id) ? 'Έχετε ήδη ψηφίσει' : 'Ψήφισε τώρα'}
                 </Button>
               </CardFooter>
             </Card>
