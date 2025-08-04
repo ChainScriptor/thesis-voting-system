@@ -11,14 +11,13 @@ import { Switch } from "@/components/ui/switch";
 
 export default function Header() {
   const { user } = useUser();
-  const isAdmin = user?.publicMetadata?.role === "voting_admin";
+  const isAdmin = user?.publicMetadata?.role === "voting_admin"; // παραμένει, αλλά δεν τον χρησιμοποιούμε πια για το admin link
   const [profileComplete, setProfileComplete] = useState(false);
 
   // dark mode state
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   useEffect(() => {
-    // load saved theme on mount
     const stored = localStorage.getItem("theme");
     if (stored === "dark") {
       document.documentElement.classList.add("dark");
@@ -40,10 +39,9 @@ export default function Header() {
 
   useEffect(() => {
     if (!user?.id) return;
-    // check profile completeness
     fetch(`/api/profile?clerkId=${user.id}`)
-      .then(r => r.json())
-      .then(json => {
+      .then((r) => r.json())
+      .then((json) => {
         const complete =
           json.success &&
           json.data?.gender &&
@@ -110,8 +108,8 @@ export default function Header() {
             />
           </div>
 
-          {/* Admin link */}
-          {user && isAdmin && (
+          {/* Admin link — τώρα εμφανίζεται σε όλους τους συνδεδεμένους χρήστες */}
+          {user && (
             <Link
               href="/admin"
               className="flex items-center space-x-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"

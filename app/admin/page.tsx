@@ -1,15 +1,10 @@
 // app/admin/page.tsx
 
-import { checkRole } from "@/utils/roles";
-import { redirect } from "next/navigation";
 import { Box, Settings, Lock, Sparkles, Search } from "lucide-react";
 import { GlowingEffect } from "@/components/ui/glowing-effect";
 import { cn } from "@/lib/utils";
 
-export default async function AdminDashboard() {
-  const isAdmin = await checkRole("voting_admin");
-  if (!isAdmin) redirect("/");
-
+export default function AdminDashboard() {
   return (
     <ul className="grid grid-cols-1 grid-rows-none gap-4 md:grid-cols-12 md:grid-rows-3 lg:gap-4 xl:max-h-[34rem] xl:grid-rows-2">
       <GridItem
@@ -34,13 +29,13 @@ export default async function AdminDashboard() {
         area="md:[grid-area:2/7/3/13] xl:[grid-area:1/8/2/13]"
         icon={<Sparkles className="h-4 w-4" />}
         title="Χρονοδιάγραμμα ψηφοφορίας"
-        description="Δείτε τις ενεργές ψηφοφορίες και το χρονοδιάγραμμα τους."
+        description="Δείτε τις ενεργές ψηφοφορίες και το χρονοδιάγραμμά τους."
       />
       <GridItem
         area="md:[grid-area:3/1/4/13] xl:[grid-area:2/8/3/13]"
         icon={<Search className="h-4 w-4" />}
         title="Ηλεκτρονική ψηφοφορία"
-        description="Περιηγηθείτε στην αρχική σελίδα για να μπορέσετε να συμμετέχετε στις ψηφοφορίας που αφορούν το προφίλ σας."
+        description="Περιηγηθείτε στην αρχική σελίδα για να συμμετέχετε στις ψηφοφορίες που αφορούν το προφίλ σας."
       />
     </ul>
   );
@@ -74,7 +69,7 @@ const GridItem = ({ area, icon, title, description }: GridItemProps) => {
               <h3 className="pt-0.5 text-xl leading-[1.375rem] font-semibold font-sans tracking-[-0.04em] md:text-2xl md:leading-[1.875rem] text-balance">
                 {title}
               </h3>
-              <h2 className="text-sm leading-[1.125rem] md:text-base md:leading-[1.375rem] text-muted-foreground font-sans [&_b]:md:font-semibold [&_strong]:md:font-semibold">
+              <h2 className="text-sm leading-[1.125rem] md:text-base md:leading-[1.375rem] text-muted-foreground font-sans">
                 {description}
               </h2>
             </div>
