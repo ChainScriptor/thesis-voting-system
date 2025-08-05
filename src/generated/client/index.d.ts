@@ -14,11 +14,6 @@ export type PrismaPromise<T> = $Public.PrismaPromise<T>
 
 
 /**
- * Model candidate
- * 
- */
-export type candidate = $Result.DefaultSelection<Prisma.$candidatePayload>
-/**
  * Model election
  * 
  */
@@ -51,8 +46,8 @@ export type Vote = $Result.DefaultSelection<Prisma.$VotePayload>
  * @example
  * ```
  * const prisma = new PrismaClient()
- * // Fetch zero or more Candidates
- * const candidates = await prisma.candidate.findMany()
+ * // Fetch zero or more Elections
+ * const elections = await prisma.election.findMany()
  * ```
  *
  *
@@ -72,8 +67,8 @@ export class PrismaClient<
    * @example
    * ```
    * const prisma = new PrismaClient()
-   * // Fetch zero or more Candidates
-   * const candidates = await prisma.candidate.findMany()
+   * // Fetch zero or more Elections
+   * const elections = await prisma.election.findMany()
    * ```
    *
    *
@@ -170,16 +165,6 @@ export class PrismaClient<
   }>>
 
       /**
-   * `prisma.candidate`: Exposes CRUD operations for the **candidate** model.
-    * Example usage:
-    * ```ts
-    * // Fetch zero or more Candidates
-    * const candidates = await prisma.candidate.findMany()
-    * ```
-    */
-  get candidate(): Prisma.candidateDelegate<ExtArgs, ClientOptions>;
-
-  /**
    * `prisma.election`: Exposes CRUD operations for the **election** model.
     * Example usage:
     * ```ts
@@ -668,7 +653,6 @@ export namespace Prisma {
 
 
   export const ModelName: {
-    candidate: 'candidate',
     election: 'election',
     poll_candidates: 'poll_candidates',
     takepart: 'takepart',
@@ -692,84 +676,10 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "candidate" | "election" | "poll_candidates" | "takepart" | "user" | "vote"
+      modelProps: "election" | "poll_candidates" | "takepart" | "user" | "vote"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
-      candidate: {
-        payload: Prisma.$candidatePayload<ExtArgs>
-        fields: Prisma.candidateFieldRefs
-        operations: {
-          findUnique: {
-            args: Prisma.candidateFindUniqueArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$candidatePayload> | null
-          }
-          findUniqueOrThrow: {
-            args: Prisma.candidateFindUniqueOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$candidatePayload>
-          }
-          findFirst: {
-            args: Prisma.candidateFindFirstArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$candidatePayload> | null
-          }
-          findFirstOrThrow: {
-            args: Prisma.candidateFindFirstOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$candidatePayload>
-          }
-          findMany: {
-            args: Prisma.candidateFindManyArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$candidatePayload>[]
-          }
-          create: {
-            args: Prisma.candidateCreateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$candidatePayload>
-          }
-          createMany: {
-            args: Prisma.candidateCreateManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          createManyAndReturn: {
-            args: Prisma.candidateCreateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$candidatePayload>[]
-          }
-          delete: {
-            args: Prisma.candidateDeleteArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$candidatePayload>
-          }
-          update: {
-            args: Prisma.candidateUpdateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$candidatePayload>
-          }
-          deleteMany: {
-            args: Prisma.candidateDeleteManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          updateMany: {
-            args: Prisma.candidateUpdateManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          updateManyAndReturn: {
-            args: Prisma.candidateUpdateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$candidatePayload>[]
-          }
-          upsert: {
-            args: Prisma.candidateUpsertArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$candidatePayload>
-          }
-          aggregate: {
-            args: Prisma.CandidateAggregateArgs<ExtArgs>
-            result: $Utils.Optional<AggregateCandidate>
-          }
-          groupBy: {
-            args: Prisma.candidateGroupByArgs<ExtArgs>
-            result: $Utils.Optional<CandidateGroupByOutputType>[]
-          }
-          count: {
-            args: Prisma.candidateCountArgs<ExtArgs>
-            result: $Utils.Optional<CandidateCountAggregateOutputType> | number
-          }
-        }
-      }
       election: {
         payload: Prisma.$electionPayload<ExtArgs>
         fields: Prisma.electionFieldRefs
@@ -1232,7 +1142,6 @@ export namespace Prisma {
     omit?: Prisma.GlobalOmitConfig
   }
   export type GlobalOmitConfig = {
-    candidate?: candidateOmit
     election?: electionOmit
     poll_candidates?: poll_candidatesOmit
     takepart?: takepartOmit
@@ -1333,46 +1242,6 @@ export namespace Prisma {
 
 
   /**
-   * Count Type CandidateCountOutputType
-   */
-
-  export type CandidateCountOutputType = {
-    takepart: number
-    votes: number
-  }
-
-  export type CandidateCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    takepart?: boolean | CandidateCountOutputTypeCountTakepartArgs
-    votes?: boolean | CandidateCountOutputTypeCountVotesArgs
-  }
-
-  // Custom InputTypes
-  /**
-   * CandidateCountOutputType without action
-   */
-  export type CandidateCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the CandidateCountOutputType
-     */
-    select?: CandidateCountOutputTypeSelect<ExtArgs> | null
-  }
-
-  /**
-   * CandidateCountOutputType without action
-   */
-  export type CandidateCountOutputTypeCountTakepartArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: takepartWhereInput
-  }
-
-  /**
-   * CandidateCountOutputType without action
-   */
-  export type CandidateCountOutputTypeCountVotesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: VoteWhereInput
-  }
-
-
-  /**
    * Count Type ElectionCountOutputType
    */
 
@@ -1426,17 +1295,19 @@ export namespace Prisma {
    */
 
   export type UserCountOutputType = {
-    candidates: number
     election: number
     poll_candidates: number
+    takepart: number
     votes: number
+    candidateVotes: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    candidates?: boolean | UserCountOutputTypeCountCandidatesArgs
     election?: boolean | UserCountOutputTypeCountElectionArgs
     poll_candidates?: boolean | UserCountOutputTypeCountPoll_candidatesArgs
+    takepart?: boolean | UserCountOutputTypeCountTakepartArgs
     votes?: boolean | UserCountOutputTypeCountVotesArgs
+    candidateVotes?: boolean | UserCountOutputTypeCountCandidateVotesArgs
   }
 
   // Custom InputTypes
@@ -1448,13 +1319,6 @@ export namespace Prisma {
      * Select specific fields to fetch from the UserCountOutputType
      */
     select?: UserCountOutputTypeSelect<ExtArgs> | null
-  }
-
-  /**
-   * UserCountOutputType without action
-   */
-  export type UserCountOutputTypeCountCandidatesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: candidateWhereInput
   }
 
   /**
@@ -1474,7 +1338,21 @@ export namespace Prisma {
   /**
    * UserCountOutputType without action
    */
+  export type UserCountOutputTypeCountTakepartArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: takepartWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
   export type UserCountOutputTypeCountVotesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: VoteWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountCandidateVotesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: VoteWhereInput
   }
 
@@ -1482,1188 +1360,6 @@ export namespace Prisma {
   /**
    * Models
    */
-
-  /**
-   * Model candidate
-   */
-
-  export type AggregateCandidate = {
-    _count: CandidateCountAggregateOutputType | null
-    _avg: CandidateAvgAggregateOutputType | null
-    _sum: CandidateSumAggregateOutputType | null
-    _min: CandidateMinAggregateOutputType | null
-    _max: CandidateMaxAggregateOutputType | null
-  }
-
-  export type CandidateAvgAggregateOutputType = {
-    id: number | null
-  }
-
-  export type CandidateSumAggregateOutputType = {
-    id: number | null
-  }
-
-  export type CandidateMinAggregateOutputType = {
-    id: number | null
-    name: string | null
-    description: string | null
-    image: string | null
-    is_person: boolean | null
-    clerkId: string | null
-  }
-
-  export type CandidateMaxAggregateOutputType = {
-    id: number | null
-    name: string | null
-    description: string | null
-    image: string | null
-    is_person: boolean | null
-    clerkId: string | null
-  }
-
-  export type CandidateCountAggregateOutputType = {
-    id: number
-    name: number
-    description: number
-    image: number
-    is_person: number
-    clerkId: number
-    _all: number
-  }
-
-
-  export type CandidateAvgAggregateInputType = {
-    id?: true
-  }
-
-  export type CandidateSumAggregateInputType = {
-    id?: true
-  }
-
-  export type CandidateMinAggregateInputType = {
-    id?: true
-    name?: true
-    description?: true
-    image?: true
-    is_person?: true
-    clerkId?: true
-  }
-
-  export type CandidateMaxAggregateInputType = {
-    id?: true
-    name?: true
-    description?: true
-    image?: true
-    is_person?: true
-    clerkId?: true
-  }
-
-  export type CandidateCountAggregateInputType = {
-    id?: true
-    name?: true
-    description?: true
-    image?: true
-    is_person?: true
-    clerkId?: true
-    _all?: true
-  }
-
-  export type CandidateAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Filter which candidate to aggregate.
-     */
-    where?: candidateWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of candidates to fetch.
-     */
-    orderBy?: candidateOrderByWithRelationInput | candidateOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the start position
-     */
-    cursor?: candidateWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` candidates from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` candidates.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Count returned candidates
-    **/
-    _count?: true | CandidateCountAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to average
-    **/
-    _avg?: CandidateAvgAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to sum
-    **/
-    _sum?: CandidateSumAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to find the minimum value
-    **/
-    _min?: CandidateMinAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to find the maximum value
-    **/
-    _max?: CandidateMaxAggregateInputType
-  }
-
-  export type GetCandidateAggregateType<T extends CandidateAggregateArgs> = {
-        [P in keyof T & keyof AggregateCandidate]: P extends '_count' | 'count'
-      ? T[P] extends true
-        ? number
-        : GetScalarType<T[P], AggregateCandidate[P]>
-      : GetScalarType<T[P], AggregateCandidate[P]>
-  }
-
-
-
-
-  export type candidateGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: candidateWhereInput
-    orderBy?: candidateOrderByWithAggregationInput | candidateOrderByWithAggregationInput[]
-    by: CandidateScalarFieldEnum[] | CandidateScalarFieldEnum
-    having?: candidateScalarWhereWithAggregatesInput
-    take?: number
-    skip?: number
-    _count?: CandidateCountAggregateInputType | true
-    _avg?: CandidateAvgAggregateInputType
-    _sum?: CandidateSumAggregateInputType
-    _min?: CandidateMinAggregateInputType
-    _max?: CandidateMaxAggregateInputType
-  }
-
-  export type CandidateGroupByOutputType = {
-    id: number
-    name: string
-    description: string | null
-    image: string | null
-    is_person: boolean
-    clerkId: string | null
-    _count: CandidateCountAggregateOutputType | null
-    _avg: CandidateAvgAggregateOutputType | null
-    _sum: CandidateSumAggregateOutputType | null
-    _min: CandidateMinAggregateOutputType | null
-    _max: CandidateMaxAggregateOutputType | null
-  }
-
-  type GetCandidateGroupByPayload<T extends candidateGroupByArgs> = Prisma.PrismaPromise<
-    Array<
-      PickEnumerable<CandidateGroupByOutputType, T['by']> &
-        {
-          [P in ((keyof T) & (keyof CandidateGroupByOutputType))]: P extends '_count'
-            ? T[P] extends boolean
-              ? number
-              : GetScalarType<T[P], CandidateGroupByOutputType[P]>
-            : GetScalarType<T[P], CandidateGroupByOutputType[P]>
-        }
-      >
-    >
-
-
-  export type candidateSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    name?: boolean
-    description?: boolean
-    image?: boolean
-    is_person?: boolean
-    clerkId?: boolean
-    user?: boolean | candidate$userArgs<ExtArgs>
-    takepart?: boolean | candidate$takepartArgs<ExtArgs>
-    votes?: boolean | candidate$votesArgs<ExtArgs>
-    _count?: boolean | CandidateCountOutputTypeDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["candidate"]>
-
-  export type candidateSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    name?: boolean
-    description?: boolean
-    image?: boolean
-    is_person?: boolean
-    clerkId?: boolean
-    user?: boolean | candidate$userArgs<ExtArgs>
-  }, ExtArgs["result"]["candidate"]>
-
-  export type candidateSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    name?: boolean
-    description?: boolean
-    image?: boolean
-    is_person?: boolean
-    clerkId?: boolean
-    user?: boolean | candidate$userArgs<ExtArgs>
-  }, ExtArgs["result"]["candidate"]>
-
-  export type candidateSelectScalar = {
-    id?: boolean
-    name?: boolean
-    description?: boolean
-    image?: boolean
-    is_person?: boolean
-    clerkId?: boolean
-  }
-
-  export type candidateOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "description" | "image" | "is_person" | "clerkId", ExtArgs["result"]["candidate"]>
-  export type candidateInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    user?: boolean | candidate$userArgs<ExtArgs>
-    takepart?: boolean | candidate$takepartArgs<ExtArgs>
-    votes?: boolean | candidate$votesArgs<ExtArgs>
-    _count?: boolean | CandidateCountOutputTypeDefaultArgs<ExtArgs>
-  }
-  export type candidateIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    user?: boolean | candidate$userArgs<ExtArgs>
-  }
-  export type candidateIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    user?: boolean | candidate$userArgs<ExtArgs>
-  }
-
-  export type $candidatePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    name: "candidate"
-    objects: {
-      user: Prisma.$userPayload<ExtArgs> | null
-      takepart: Prisma.$takepartPayload<ExtArgs>[]
-      votes: Prisma.$VotePayload<ExtArgs>[]
-    }
-    scalars: $Extensions.GetPayloadResult<{
-      id: number
-      name: string
-      description: string | null
-      image: string | null
-      is_person: boolean
-      clerkId: string | null
-    }, ExtArgs["result"]["candidate"]>
-    composites: {}
-  }
-
-  type candidateGetPayload<S extends boolean | null | undefined | candidateDefaultArgs> = $Result.GetResult<Prisma.$candidatePayload, S>
-
-  type candidateCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
-    Omit<candidateFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
-      select?: CandidateCountAggregateInputType | true
-    }
-
-  export interface candidateDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
-    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['candidate'], meta: { name: 'candidate' } }
-    /**
-     * Find zero or one Candidate that matches the filter.
-     * @param {candidateFindUniqueArgs} args - Arguments to find a Candidate
-     * @example
-     * // Get one Candidate
-     * const candidate = await prisma.candidate.findUnique({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findUnique<T extends candidateFindUniqueArgs>(args: SelectSubset<T, candidateFindUniqueArgs<ExtArgs>>): Prisma__candidateClient<$Result.GetResult<Prisma.$candidatePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find one Candidate that matches the filter or throw an error with `error.code='P2025'`
-     * if no matches were found.
-     * @param {candidateFindUniqueOrThrowArgs} args - Arguments to find a Candidate
-     * @example
-     * // Get one Candidate
-     * const candidate = await prisma.candidate.findUniqueOrThrow({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findUniqueOrThrow<T extends candidateFindUniqueOrThrowArgs>(args: SelectSubset<T, candidateFindUniqueOrThrowArgs<ExtArgs>>): Prisma__candidateClient<$Result.GetResult<Prisma.$candidatePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find the first Candidate that matches the filter.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {candidateFindFirstArgs} args - Arguments to find a Candidate
-     * @example
-     * // Get one Candidate
-     * const candidate = await prisma.candidate.findFirst({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findFirst<T extends candidateFindFirstArgs>(args?: SelectSubset<T, candidateFindFirstArgs<ExtArgs>>): Prisma__candidateClient<$Result.GetResult<Prisma.$candidatePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find the first Candidate that matches the filter or
-     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {candidateFindFirstOrThrowArgs} args - Arguments to find a Candidate
-     * @example
-     * // Get one Candidate
-     * const candidate = await prisma.candidate.findFirstOrThrow({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findFirstOrThrow<T extends candidateFindFirstOrThrowArgs>(args?: SelectSubset<T, candidateFindFirstOrThrowArgs<ExtArgs>>): Prisma__candidateClient<$Result.GetResult<Prisma.$candidatePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find zero or more Candidates that matches the filter.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {candidateFindManyArgs} args - Arguments to filter and select certain fields only.
-     * @example
-     * // Get all Candidates
-     * const candidates = await prisma.candidate.findMany()
-     * 
-     * // Get first 10 Candidates
-     * const candidates = await prisma.candidate.findMany({ take: 10 })
-     * 
-     * // Only select the `id`
-     * const candidateWithIdOnly = await prisma.candidate.findMany({ select: { id: true } })
-     * 
-     */
-    findMany<T extends candidateFindManyArgs>(args?: SelectSubset<T, candidateFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$candidatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
-
-    /**
-     * Create a Candidate.
-     * @param {candidateCreateArgs} args - Arguments to create a Candidate.
-     * @example
-     * // Create one Candidate
-     * const Candidate = await prisma.candidate.create({
-     *   data: {
-     *     // ... data to create a Candidate
-     *   }
-     * })
-     * 
-     */
-    create<T extends candidateCreateArgs>(args: SelectSubset<T, candidateCreateArgs<ExtArgs>>): Prisma__candidateClient<$Result.GetResult<Prisma.$candidatePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Create many Candidates.
-     * @param {candidateCreateManyArgs} args - Arguments to create many Candidates.
-     * @example
-     * // Create many Candidates
-     * const candidate = await prisma.candidate.createMany({
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     *     
-     */
-    createMany<T extends candidateCreateManyArgs>(args?: SelectSubset<T, candidateCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Create many Candidates and returns the data saved in the database.
-     * @param {candidateCreateManyAndReturnArgs} args - Arguments to create many Candidates.
-     * @example
-     * // Create many Candidates
-     * const candidate = await prisma.candidate.createManyAndReturn({
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * 
-     * // Create many Candidates and only return the `id`
-     * const candidateWithIdOnly = await prisma.candidate.createManyAndReturn({
-     *   select: { id: true },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * 
-     */
-    createManyAndReturn<T extends candidateCreateManyAndReturnArgs>(args?: SelectSubset<T, candidateCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$candidatePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
-
-    /**
-     * Delete a Candidate.
-     * @param {candidateDeleteArgs} args - Arguments to delete one Candidate.
-     * @example
-     * // Delete one Candidate
-     * const Candidate = await prisma.candidate.delete({
-     *   where: {
-     *     // ... filter to delete one Candidate
-     *   }
-     * })
-     * 
-     */
-    delete<T extends candidateDeleteArgs>(args: SelectSubset<T, candidateDeleteArgs<ExtArgs>>): Prisma__candidateClient<$Result.GetResult<Prisma.$candidatePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Update one Candidate.
-     * @param {candidateUpdateArgs} args - Arguments to update one Candidate.
-     * @example
-     * // Update one Candidate
-     * const candidate = await prisma.candidate.update({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: {
-     *     // ... provide data here
-     *   }
-     * })
-     * 
-     */
-    update<T extends candidateUpdateArgs>(args: SelectSubset<T, candidateUpdateArgs<ExtArgs>>): Prisma__candidateClient<$Result.GetResult<Prisma.$candidatePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Delete zero or more Candidates.
-     * @param {candidateDeleteManyArgs} args - Arguments to filter Candidates to delete.
-     * @example
-     * // Delete a few Candidates
-     * const { count } = await prisma.candidate.deleteMany({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     * 
-     */
-    deleteMany<T extends candidateDeleteManyArgs>(args?: SelectSubset<T, candidateDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Update zero or more Candidates.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {candidateUpdateManyArgs} args - Arguments to update one or more rows.
-     * @example
-     * // Update many Candidates
-     * const candidate = await prisma.candidate.updateMany({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: {
-     *     // ... provide data here
-     *   }
-     * })
-     * 
-     */
-    updateMany<T extends candidateUpdateManyArgs>(args: SelectSubset<T, candidateUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Update zero or more Candidates and returns the data updated in the database.
-     * @param {candidateUpdateManyAndReturnArgs} args - Arguments to update many Candidates.
-     * @example
-     * // Update many Candidates
-     * const candidate = await prisma.candidate.updateManyAndReturn({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * 
-     * // Update zero or more Candidates and only return the `id`
-     * const candidateWithIdOnly = await prisma.candidate.updateManyAndReturn({
-     *   select: { id: true },
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * 
-     */
-    updateManyAndReturn<T extends candidateUpdateManyAndReturnArgs>(args: SelectSubset<T, candidateUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$candidatePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
-
-    /**
-     * Create or update one Candidate.
-     * @param {candidateUpsertArgs} args - Arguments to update or create a Candidate.
-     * @example
-     * // Update or create a Candidate
-     * const candidate = await prisma.candidate.upsert({
-     *   create: {
-     *     // ... data to create a Candidate
-     *   },
-     *   update: {
-     *     // ... in case it already exists, update
-     *   },
-     *   where: {
-     *     // ... the filter for the Candidate we want to update
-     *   }
-     * })
-     */
-    upsert<T extends candidateUpsertArgs>(args: SelectSubset<T, candidateUpsertArgs<ExtArgs>>): Prisma__candidateClient<$Result.GetResult<Prisma.$candidatePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-
-    /**
-     * Count the number of Candidates.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {candidateCountArgs} args - Arguments to filter Candidates to count.
-     * @example
-     * // Count the number of Candidates
-     * const count = await prisma.candidate.count({
-     *   where: {
-     *     // ... the filter for the Candidates we want to count
-     *   }
-     * })
-    **/
-    count<T extends candidateCountArgs>(
-      args?: Subset<T, candidateCountArgs>,
-    ): Prisma.PrismaPromise<
-      T extends $Utils.Record<'select', any>
-        ? T['select'] extends true
-          ? number
-          : GetScalarType<T['select'], CandidateCountAggregateOutputType>
-        : number
-    >
-
-    /**
-     * Allows you to perform aggregations operations on a Candidate.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {CandidateAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
-     * @example
-     * // Ordered by age ascending
-     * // Where email contains prisma.io
-     * // Limited to the 10 users
-     * const aggregations = await prisma.user.aggregate({
-     *   _avg: {
-     *     age: true,
-     *   },
-     *   where: {
-     *     email: {
-     *       contains: "prisma.io",
-     *     },
-     *   },
-     *   orderBy: {
-     *     age: "asc",
-     *   },
-     *   take: 10,
-     * })
-    **/
-    aggregate<T extends CandidateAggregateArgs>(args: Subset<T, CandidateAggregateArgs>): Prisma.PrismaPromise<GetCandidateAggregateType<T>>
-
-    /**
-     * Group by Candidate.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {candidateGroupByArgs} args - Group by arguments.
-     * @example
-     * // Group by city, order by createdAt, get count
-     * const result = await prisma.user.groupBy({
-     *   by: ['city', 'createdAt'],
-     *   orderBy: {
-     *     createdAt: true
-     *   },
-     *   _count: {
-     *     _all: true
-     *   },
-     * })
-     * 
-    **/
-    groupBy<
-      T extends candidateGroupByArgs,
-      HasSelectOrTake extends Or<
-        Extends<'skip', Keys<T>>,
-        Extends<'take', Keys<T>>
-      >,
-      OrderByArg extends True extends HasSelectOrTake
-        ? { orderBy: candidateGroupByArgs['orderBy'] }
-        : { orderBy?: candidateGroupByArgs['orderBy'] },
-      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
-      ByFields extends MaybeTupleToUnion<T['by']>,
-      ByValid extends Has<ByFields, OrderFields>,
-      HavingFields extends GetHavingFields<T['having']>,
-      HavingValid extends Has<ByFields, HavingFields>,
-      ByEmpty extends T['by'] extends never[] ? True : False,
-      InputErrors extends ByEmpty extends True
-      ? `Error: "by" must not be empty.`
-      : HavingValid extends False
-      ? {
-          [P in HavingFields]: P extends ByFields
-            ? never
-            : P extends string
-            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
-            : [
-                Error,
-                'Field ',
-                P,
-                ` in "having" needs to be provided in "by"`,
-              ]
-        }[HavingFields]
-      : 'take' extends Keys<T>
-      ? 'orderBy' extends Keys<T>
-        ? ByValid extends True
-          ? {}
-          : {
-              [P in OrderFields]: P extends ByFields
-                ? never
-                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-            }[OrderFields]
-        : 'Error: If you provide "take", you also need to provide "orderBy"'
-      : 'skip' extends Keys<T>
-      ? 'orderBy' extends Keys<T>
-        ? ByValid extends True
-          ? {}
-          : {
-              [P in OrderFields]: P extends ByFields
-                ? never
-                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-            }[OrderFields]
-        : 'Error: If you provide "skip", you also need to provide "orderBy"'
-      : ByValid extends True
-      ? {}
-      : {
-          [P in OrderFields]: P extends ByFields
-            ? never
-            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-        }[OrderFields]
-    >(args: SubsetIntersection<T, candidateGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetCandidateGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
-  /**
-   * Fields of the candidate model
-   */
-  readonly fields: candidateFieldRefs;
-  }
-
-  /**
-   * The delegate class that acts as a "Promise-like" for candidate.
-   * Why is this prefixed with `Prisma__`?
-   * Because we want to prevent naming conflicts as mentioned in
-   * https://github.com/prisma/prisma-client-js/issues/707
-   */
-  export interface Prisma__candidateClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
-    readonly [Symbol.toStringTag]: "PrismaPromise"
-    user<T extends candidate$userArgs<ExtArgs> = {}>(args?: Subset<T, candidate$userArgs<ExtArgs>>): Prisma__userClient<$Result.GetResult<Prisma.$userPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-    takepart<T extends candidate$takepartArgs<ExtArgs> = {}>(args?: Subset<T, candidate$takepartArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$takepartPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-    votes<T extends candidate$votesArgs<ExtArgs> = {}>(args?: Subset<T, candidate$votesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$VotePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-    /**
-     * Attaches callbacks for the resolution and/or rejection of the Promise.
-     * @param onfulfilled The callback to execute when the Promise is resolved.
-     * @param onrejected The callback to execute when the Promise is rejected.
-     * @returns A Promise for the completion of which ever callback is executed.
-     */
-    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
-    /**
-     * Attaches a callback for only the rejection of the Promise.
-     * @param onrejected The callback to execute when the Promise is rejected.
-     * @returns A Promise for the completion of the callback.
-     */
-    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
-    /**
-     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
-     * resolved value cannot be modified from the callback.
-     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
-     * @returns A Promise for the completion of the callback.
-     */
-    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
-  }
-
-
-
-
-  /**
-   * Fields of the candidate model
-   */
-  interface candidateFieldRefs {
-    readonly id: FieldRef<"candidate", 'Int'>
-    readonly name: FieldRef<"candidate", 'String'>
-    readonly description: FieldRef<"candidate", 'String'>
-    readonly image: FieldRef<"candidate", 'String'>
-    readonly is_person: FieldRef<"candidate", 'Boolean'>
-    readonly clerkId: FieldRef<"candidate", 'String'>
-  }
-    
-
-  // Custom InputTypes
-  /**
-   * candidate findUnique
-   */
-  export type candidateFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the candidate
-     */
-    select?: candidateSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the candidate
-     */
-    omit?: candidateOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: candidateInclude<ExtArgs> | null
-    /**
-     * Filter, which candidate to fetch.
-     */
-    where: candidateWhereUniqueInput
-  }
-
-  /**
-   * candidate findUniqueOrThrow
-   */
-  export type candidateFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the candidate
-     */
-    select?: candidateSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the candidate
-     */
-    omit?: candidateOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: candidateInclude<ExtArgs> | null
-    /**
-     * Filter, which candidate to fetch.
-     */
-    where: candidateWhereUniqueInput
-  }
-
-  /**
-   * candidate findFirst
-   */
-  export type candidateFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the candidate
-     */
-    select?: candidateSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the candidate
-     */
-    omit?: candidateOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: candidateInclude<ExtArgs> | null
-    /**
-     * Filter, which candidate to fetch.
-     */
-    where?: candidateWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of candidates to fetch.
-     */
-    orderBy?: candidateOrderByWithRelationInput | candidateOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for searching for candidates.
-     */
-    cursor?: candidateWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` candidates from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` candidates.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
-     * Filter by unique combinations of candidates.
-     */
-    distinct?: CandidateScalarFieldEnum | CandidateScalarFieldEnum[]
-  }
-
-  /**
-   * candidate findFirstOrThrow
-   */
-  export type candidateFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the candidate
-     */
-    select?: candidateSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the candidate
-     */
-    omit?: candidateOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: candidateInclude<ExtArgs> | null
-    /**
-     * Filter, which candidate to fetch.
-     */
-    where?: candidateWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of candidates to fetch.
-     */
-    orderBy?: candidateOrderByWithRelationInput | candidateOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for searching for candidates.
-     */
-    cursor?: candidateWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` candidates from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` candidates.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
-     * Filter by unique combinations of candidates.
-     */
-    distinct?: CandidateScalarFieldEnum | CandidateScalarFieldEnum[]
-  }
-
-  /**
-   * candidate findMany
-   */
-  export type candidateFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the candidate
-     */
-    select?: candidateSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the candidate
-     */
-    omit?: candidateOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: candidateInclude<ExtArgs> | null
-    /**
-     * Filter, which candidates to fetch.
-     */
-    where?: candidateWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of candidates to fetch.
-     */
-    orderBy?: candidateOrderByWithRelationInput | candidateOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for listing candidates.
-     */
-    cursor?: candidateWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` candidates from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` candidates.
-     */
-    skip?: number
-    distinct?: CandidateScalarFieldEnum | CandidateScalarFieldEnum[]
-  }
-
-  /**
-   * candidate create
-   */
-  export type candidateCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the candidate
-     */
-    select?: candidateSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the candidate
-     */
-    omit?: candidateOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: candidateInclude<ExtArgs> | null
-    /**
-     * The data needed to create a candidate.
-     */
-    data: XOR<candidateCreateInput, candidateUncheckedCreateInput>
-  }
-
-  /**
-   * candidate createMany
-   */
-  export type candidateCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * The data used to create many candidates.
-     */
-    data: candidateCreateManyInput | candidateCreateManyInput[]
-    skipDuplicates?: boolean
-  }
-
-  /**
-   * candidate createManyAndReturn
-   */
-  export type candidateCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the candidate
-     */
-    select?: candidateSelectCreateManyAndReturn<ExtArgs> | null
-    /**
-     * Omit specific fields from the candidate
-     */
-    omit?: candidateOmit<ExtArgs> | null
-    /**
-     * The data used to create many candidates.
-     */
-    data: candidateCreateManyInput | candidateCreateManyInput[]
-    skipDuplicates?: boolean
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: candidateIncludeCreateManyAndReturn<ExtArgs> | null
-  }
-
-  /**
-   * candidate update
-   */
-  export type candidateUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the candidate
-     */
-    select?: candidateSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the candidate
-     */
-    omit?: candidateOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: candidateInclude<ExtArgs> | null
-    /**
-     * The data needed to update a candidate.
-     */
-    data: XOR<candidateUpdateInput, candidateUncheckedUpdateInput>
-    /**
-     * Choose, which candidate to update.
-     */
-    where: candidateWhereUniqueInput
-  }
-
-  /**
-   * candidate updateMany
-   */
-  export type candidateUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * The data used to update candidates.
-     */
-    data: XOR<candidateUpdateManyMutationInput, candidateUncheckedUpdateManyInput>
-    /**
-     * Filter which candidates to update
-     */
-    where?: candidateWhereInput
-    /**
-     * Limit how many candidates to update.
-     */
-    limit?: number
-  }
-
-  /**
-   * candidate updateManyAndReturn
-   */
-  export type candidateUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the candidate
-     */
-    select?: candidateSelectUpdateManyAndReturn<ExtArgs> | null
-    /**
-     * Omit specific fields from the candidate
-     */
-    omit?: candidateOmit<ExtArgs> | null
-    /**
-     * The data used to update candidates.
-     */
-    data: XOR<candidateUpdateManyMutationInput, candidateUncheckedUpdateManyInput>
-    /**
-     * Filter which candidates to update
-     */
-    where?: candidateWhereInput
-    /**
-     * Limit how many candidates to update.
-     */
-    limit?: number
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: candidateIncludeUpdateManyAndReturn<ExtArgs> | null
-  }
-
-  /**
-   * candidate upsert
-   */
-  export type candidateUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the candidate
-     */
-    select?: candidateSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the candidate
-     */
-    omit?: candidateOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: candidateInclude<ExtArgs> | null
-    /**
-     * The filter to search for the candidate to update in case it exists.
-     */
-    where: candidateWhereUniqueInput
-    /**
-     * In case the candidate found by the `where` argument doesn't exist, create a new candidate with this data.
-     */
-    create: XOR<candidateCreateInput, candidateUncheckedCreateInput>
-    /**
-     * In case the candidate was found with the provided `where` argument, update it with this data.
-     */
-    update: XOR<candidateUpdateInput, candidateUncheckedUpdateInput>
-  }
-
-  /**
-   * candidate delete
-   */
-  export type candidateDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the candidate
-     */
-    select?: candidateSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the candidate
-     */
-    omit?: candidateOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: candidateInclude<ExtArgs> | null
-    /**
-     * Filter which candidate to delete.
-     */
-    where: candidateWhereUniqueInput
-  }
-
-  /**
-   * candidate deleteMany
-   */
-  export type candidateDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Filter which candidates to delete
-     */
-    where?: candidateWhereInput
-    /**
-     * Limit how many candidates to delete.
-     */
-    limit?: number
-  }
-
-  /**
-   * candidate.user
-   */
-  export type candidate$userArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the user
-     */
-    select?: userSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the user
-     */
-    omit?: userOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: userInclude<ExtArgs> | null
-    where?: userWhereInput
-  }
-
-  /**
-   * candidate.takepart
-   */
-  export type candidate$takepartArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the takepart
-     */
-    select?: takepartSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the takepart
-     */
-    omit?: takepartOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: takepartInclude<ExtArgs> | null
-    where?: takepartWhereInput
-    orderBy?: takepartOrderByWithRelationInput | takepartOrderByWithRelationInput[]
-    cursor?: takepartWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: TakepartScalarFieldEnum | TakepartScalarFieldEnum[]
-  }
-
-  /**
-   * candidate.votes
-   */
-  export type candidate$votesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Vote
-     */
-    select?: VoteSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Vote
-     */
-    omit?: VoteOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: VoteInclude<ExtArgs> | null
-    where?: VoteWhereInput
-    orderBy?: VoteOrderByWithRelationInput | VoteOrderByWithRelationInput[]
-    cursor?: VoteWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: VoteScalarFieldEnum | VoteScalarFieldEnum[]
-  }
-
-  /**
-   * candidate without action
-   */
-  export type candidateDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the candidate
-     */
-    select?: candidateSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the candidate
-     */
-    omit?: candidateOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: candidateInclude<ExtArgs> | null
-  }
-
 
   /**
    * Model election
@@ -5223,7 +3919,7 @@ export namespace Prisma {
     electionId?: boolean
     candidateId?: boolean
     numberOfVotes?: boolean
-    candidate?: boolean | candidateDefaultArgs<ExtArgs>
+    user?: boolean | userDefaultArgs<ExtArgs>
     election?: boolean | electionDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["takepart"]>
 
@@ -5231,7 +3927,7 @@ export namespace Prisma {
     electionId?: boolean
     candidateId?: boolean
     numberOfVotes?: boolean
-    candidate?: boolean | candidateDefaultArgs<ExtArgs>
+    user?: boolean | userDefaultArgs<ExtArgs>
     election?: boolean | electionDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["takepart"]>
 
@@ -5239,7 +3935,7 @@ export namespace Prisma {
     electionId?: boolean
     candidateId?: boolean
     numberOfVotes?: boolean
-    candidate?: boolean | candidateDefaultArgs<ExtArgs>
+    user?: boolean | userDefaultArgs<ExtArgs>
     election?: boolean | electionDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["takepart"]>
 
@@ -5251,22 +3947,22 @@ export namespace Prisma {
 
   export type takepartOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"electionId" | "candidateId" | "numberOfVotes", ExtArgs["result"]["takepart"]>
   export type takepartInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    candidate?: boolean | candidateDefaultArgs<ExtArgs>
+    user?: boolean | userDefaultArgs<ExtArgs>
     election?: boolean | electionDefaultArgs<ExtArgs>
   }
   export type takepartIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    candidate?: boolean | candidateDefaultArgs<ExtArgs>
+    user?: boolean | userDefaultArgs<ExtArgs>
     election?: boolean | electionDefaultArgs<ExtArgs>
   }
   export type takepartIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    candidate?: boolean | candidateDefaultArgs<ExtArgs>
+    user?: boolean | userDefaultArgs<ExtArgs>
     election?: boolean | electionDefaultArgs<ExtArgs>
   }
 
   export type $takepartPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "takepart"
     objects: {
-      candidate: Prisma.$candidatePayload<ExtArgs>
+      user: Prisma.$userPayload<ExtArgs>
       election: Prisma.$electionPayload<ExtArgs>
     }
     scalars: $Extensions.GetPayloadResult<{
@@ -5667,7 +4363,7 @@ export namespace Prisma {
    */
   export interface Prisma__takepartClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    candidate<T extends candidateDefaultArgs<ExtArgs> = {}>(args?: Subset<T, candidateDefaultArgs<ExtArgs>>): Prisma__candidateClient<$Result.GetResult<Prisma.$candidatePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    user<T extends userDefaultArgs<ExtArgs> = {}>(args?: Subset<T, userDefaultArgs<ExtArgs>>): Prisma__userClient<$Result.GetResult<Prisma.$userPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     election<T extends electionDefaultArgs<ExtArgs> = {}>(args?: Subset<T, electionDefaultArgs<ExtArgs>>): Prisma__electionClient<$Result.GetResult<Prisma.$electionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -6361,10 +5057,11 @@ export namespace Prisma {
     birthdate?: boolean
     occupation?: boolean
     location?: boolean
-    candidates?: boolean | user$candidatesArgs<ExtArgs>
     election?: boolean | user$electionArgs<ExtArgs>
     poll_candidates?: boolean | user$poll_candidatesArgs<ExtArgs>
+    takepart?: boolean | user$takepartArgs<ExtArgs>
     votes?: boolean | user$votesArgs<ExtArgs>
+    candidateVotes?: boolean | user$candidateVotesArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -6412,10 +5109,11 @@ export namespace Prisma {
 
   export type userOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "clerkId" | "fullName" | "username" | "password" | "isAdmin" | "gender" | "email" | "birthdate" | "occupation" | "location", ExtArgs["result"]["user"]>
   export type userInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    candidates?: boolean | user$candidatesArgs<ExtArgs>
     election?: boolean | user$electionArgs<ExtArgs>
     poll_candidates?: boolean | user$poll_candidatesArgs<ExtArgs>
+    takepart?: boolean | user$takepartArgs<ExtArgs>
     votes?: boolean | user$votesArgs<ExtArgs>
+    candidateVotes?: boolean | user$candidateVotesArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type userIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -6424,10 +5122,11 @@ export namespace Prisma {
   export type $userPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "user"
     objects: {
-      candidates: Prisma.$candidatePayload<ExtArgs>[]
       election: Prisma.$electionPayload<ExtArgs>[]
       poll_candidates: Prisma.$poll_candidatesPayload<ExtArgs>[]
+      takepart: Prisma.$takepartPayload<ExtArgs>[]
       votes: Prisma.$VotePayload<ExtArgs>[]
+      candidateVotes: Prisma.$VotePayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: number
@@ -6835,10 +5534,11 @@ export namespace Prisma {
    */
   export interface Prisma__userClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    candidates<T extends user$candidatesArgs<ExtArgs> = {}>(args?: Subset<T, user$candidatesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$candidatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     election<T extends user$electionArgs<ExtArgs> = {}>(args?: Subset<T, user$electionArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$electionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     poll_candidates<T extends user$poll_candidatesArgs<ExtArgs> = {}>(args?: Subset<T, user$poll_candidatesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$poll_candidatesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    takepart<T extends user$takepartArgs<ExtArgs> = {}>(args?: Subset<T, user$takepartArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$takepartPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     votes<T extends user$votesArgs<ExtArgs> = {}>(args?: Subset<T, user$votesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$VotePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    candidateVotes<T extends user$candidateVotesArgs<ExtArgs> = {}>(args?: Subset<T, user$candidateVotesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$VotePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -7267,30 +5967,6 @@ export namespace Prisma {
   }
 
   /**
-   * user.candidates
-   */
-  export type user$candidatesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the candidate
-     */
-    select?: candidateSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the candidate
-     */
-    omit?: candidateOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: candidateInclude<ExtArgs> | null
-    where?: candidateWhereInput
-    orderBy?: candidateOrderByWithRelationInput | candidateOrderByWithRelationInput[]
-    cursor?: candidateWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: CandidateScalarFieldEnum | CandidateScalarFieldEnum[]
-  }
-
-  /**
    * user.election
    */
   export type user$electionArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -7339,9 +6015,57 @@ export namespace Prisma {
   }
 
   /**
+   * user.takepart
+   */
+  export type user$takepartArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the takepart
+     */
+    select?: takepartSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the takepart
+     */
+    omit?: takepartOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: takepartInclude<ExtArgs> | null
+    where?: takepartWhereInput
+    orderBy?: takepartOrderByWithRelationInput | takepartOrderByWithRelationInput[]
+    cursor?: takepartWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: TakepartScalarFieldEnum | TakepartScalarFieldEnum[]
+  }
+
+  /**
    * user.votes
    */
   export type user$votesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Vote
+     */
+    select?: VoteSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Vote
+     */
+    omit?: VoteOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: VoteInclude<ExtArgs> | null
+    where?: VoteWhereInput
+    orderBy?: VoteOrderByWithRelationInput | VoteOrderByWithRelationInput[]
+    cursor?: VoteWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: VoteScalarFieldEnum | VoteScalarFieldEnum[]
+  }
+
+  /**
+   * user.candidateVotes
+   */
+  export type user$candidateVotesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Vote
      */
@@ -7593,7 +6317,7 @@ export namespace Prisma {
     votedAt?: boolean
     user?: boolean | userDefaultArgs<ExtArgs>
     election?: boolean | electionDefaultArgs<ExtArgs>
-    candidate?: boolean | candidateDefaultArgs<ExtArgs>
+    candidate?: boolean | userDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["vote"]>
 
   export type VoteSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -7604,7 +6328,7 @@ export namespace Prisma {
     votedAt?: boolean
     user?: boolean | userDefaultArgs<ExtArgs>
     election?: boolean | electionDefaultArgs<ExtArgs>
-    candidate?: boolean | candidateDefaultArgs<ExtArgs>
+    candidate?: boolean | userDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["vote"]>
 
   export type VoteSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -7615,7 +6339,7 @@ export namespace Prisma {
     votedAt?: boolean
     user?: boolean | userDefaultArgs<ExtArgs>
     election?: boolean | electionDefaultArgs<ExtArgs>
-    candidate?: boolean | candidateDefaultArgs<ExtArgs>
+    candidate?: boolean | userDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["vote"]>
 
   export type VoteSelectScalar = {
@@ -7630,17 +6354,17 @@ export namespace Prisma {
   export type VoteInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | userDefaultArgs<ExtArgs>
     election?: boolean | electionDefaultArgs<ExtArgs>
-    candidate?: boolean | candidateDefaultArgs<ExtArgs>
+    candidate?: boolean | userDefaultArgs<ExtArgs>
   }
   export type VoteIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | userDefaultArgs<ExtArgs>
     election?: boolean | electionDefaultArgs<ExtArgs>
-    candidate?: boolean | candidateDefaultArgs<ExtArgs>
+    candidate?: boolean | userDefaultArgs<ExtArgs>
   }
   export type VoteIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | userDefaultArgs<ExtArgs>
     election?: boolean | electionDefaultArgs<ExtArgs>
-    candidate?: boolean | candidateDefaultArgs<ExtArgs>
+    candidate?: boolean | userDefaultArgs<ExtArgs>
   }
 
   export type $VotePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -7648,7 +6372,7 @@ export namespace Prisma {
     objects: {
       user: Prisma.$userPayload<ExtArgs>
       election: Prisma.$electionPayload<ExtArgs>
-      candidate: Prisma.$candidatePayload<ExtArgs>
+      candidate: Prisma.$userPayload<ExtArgs>
     }
     scalars: $Extensions.GetPayloadResult<{
       id: number
@@ -8052,7 +6776,7 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     user<T extends userDefaultArgs<ExtArgs> = {}>(args?: Subset<T, userDefaultArgs<ExtArgs>>): Prisma__userClient<$Result.GetResult<Prisma.$userPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     election<T extends electionDefaultArgs<ExtArgs> = {}>(args?: Subset<T, electionDefaultArgs<ExtArgs>>): Prisma__electionClient<$Result.GetResult<Prisma.$electionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-    candidate<T extends candidateDefaultArgs<ExtArgs> = {}>(args?: Subset<T, candidateDefaultArgs<ExtArgs>>): Prisma__candidateClient<$Result.GetResult<Prisma.$candidatePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    candidate<T extends userDefaultArgs<ExtArgs> = {}>(args?: Subset<T, userDefaultArgs<ExtArgs>>): Prisma__userClient<$Result.GetResult<Prisma.$userPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -8515,18 +7239,6 @@ export namespace Prisma {
   export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
 
 
-  export const CandidateScalarFieldEnum: {
-    id: 'id',
-    name: 'name',
-    description: 'description',
-    image: 'image',
-    is_person: 'is_person',
-    clerkId: 'clerkId'
-  };
-
-  export type CandidateScalarFieldEnum = (typeof CandidateScalarFieldEnum)[keyof typeof CandidateScalarFieldEnum]
-
-
   export const ElectionScalarFieldEnum: {
     id: 'id',
     title: 'title',
@@ -8650,13 +7362,6 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'Boolean'
-   */
-  export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
-    
-
-
-  /**
    * Reference to a field of type 'DateTime'
    */
   export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
@@ -8667,6 +7372,13 @@ export namespace Prisma {
    * Reference to a field of type 'DateTime[]'
    */
   export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'Boolean'
+   */
+  export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
     
 
 
@@ -8686,74 +7398,6 @@ export namespace Prisma {
    * Deep Input Types
    */
 
-
-  export type candidateWhereInput = {
-    AND?: candidateWhereInput | candidateWhereInput[]
-    OR?: candidateWhereInput[]
-    NOT?: candidateWhereInput | candidateWhereInput[]
-    id?: IntFilter<"candidate"> | number
-    name?: StringFilter<"candidate"> | string
-    description?: StringNullableFilter<"candidate"> | string | null
-    image?: StringNullableFilter<"candidate"> | string | null
-    is_person?: BoolFilter<"candidate"> | boolean
-    clerkId?: StringNullableFilter<"candidate"> | string | null
-    user?: XOR<UserNullableScalarRelationFilter, userWhereInput> | null
-    takepart?: TakepartListRelationFilter
-    votes?: VoteListRelationFilter
-  }
-
-  export type candidateOrderByWithRelationInput = {
-    id?: SortOrder
-    name?: SortOrder
-    description?: SortOrderInput | SortOrder
-    image?: SortOrderInput | SortOrder
-    is_person?: SortOrder
-    clerkId?: SortOrderInput | SortOrder
-    user?: userOrderByWithRelationInput
-    takepart?: takepartOrderByRelationAggregateInput
-    votes?: VoteOrderByRelationAggregateInput
-  }
-
-  export type candidateWhereUniqueInput = Prisma.AtLeast<{
-    id?: number
-    clerkId?: string
-    AND?: candidateWhereInput | candidateWhereInput[]
-    OR?: candidateWhereInput[]
-    NOT?: candidateWhereInput | candidateWhereInput[]
-    name?: StringFilter<"candidate"> | string
-    description?: StringNullableFilter<"candidate"> | string | null
-    image?: StringNullableFilter<"candidate"> | string | null
-    is_person?: BoolFilter<"candidate"> | boolean
-    user?: XOR<UserNullableScalarRelationFilter, userWhereInput> | null
-    takepart?: TakepartListRelationFilter
-    votes?: VoteListRelationFilter
-  }, "id" | "clerkId">
-
-  export type candidateOrderByWithAggregationInput = {
-    id?: SortOrder
-    name?: SortOrder
-    description?: SortOrderInput | SortOrder
-    image?: SortOrderInput | SortOrder
-    is_person?: SortOrder
-    clerkId?: SortOrderInput | SortOrder
-    _count?: candidateCountOrderByAggregateInput
-    _avg?: candidateAvgOrderByAggregateInput
-    _max?: candidateMaxOrderByAggregateInput
-    _min?: candidateMinOrderByAggregateInput
-    _sum?: candidateSumOrderByAggregateInput
-  }
-
-  export type candidateScalarWhereWithAggregatesInput = {
-    AND?: candidateScalarWhereWithAggregatesInput | candidateScalarWhereWithAggregatesInput[]
-    OR?: candidateScalarWhereWithAggregatesInput[]
-    NOT?: candidateScalarWhereWithAggregatesInput | candidateScalarWhereWithAggregatesInput[]
-    id?: IntWithAggregatesFilter<"candidate"> | number
-    name?: StringWithAggregatesFilter<"candidate"> | string
-    description?: StringNullableWithAggregatesFilter<"candidate"> | string | null
-    image?: StringNullableWithAggregatesFilter<"candidate"> | string | null
-    is_person?: BoolWithAggregatesFilter<"candidate"> | boolean
-    clerkId?: StringNullableWithAggregatesFilter<"candidate"> | string | null
-  }
 
   export type electionWhereInput = {
     AND?: electionWhereInput | electionWhereInput[]
@@ -8918,7 +7562,7 @@ export namespace Prisma {
     electionId?: IntFilter<"takepart"> | number
     candidateId?: IntFilter<"takepart"> | number
     numberOfVotes?: IntFilter<"takepart"> | number
-    candidate?: XOR<CandidateScalarRelationFilter, candidateWhereInput>
+    user?: XOR<UserScalarRelationFilter, userWhereInput>
     election?: XOR<ElectionScalarRelationFilter, electionWhereInput>
   }
 
@@ -8926,7 +7570,7 @@ export namespace Prisma {
     electionId?: SortOrder
     candidateId?: SortOrder
     numberOfVotes?: SortOrder
-    candidate?: candidateOrderByWithRelationInput
+    user?: userOrderByWithRelationInput
     election?: electionOrderByWithRelationInput
   }
 
@@ -8938,7 +7582,7 @@ export namespace Prisma {
     electionId?: IntFilter<"takepart"> | number
     candidateId?: IntFilter<"takepart"> | number
     numberOfVotes?: IntFilter<"takepart"> | number
-    candidate?: XOR<CandidateScalarRelationFilter, candidateWhereInput>
+    user?: XOR<UserScalarRelationFilter, userWhereInput>
     election?: XOR<ElectionScalarRelationFilter, electionWhereInput>
   }, "electionId_candidateId">
 
@@ -8977,10 +7621,11 @@ export namespace Prisma {
     birthdate?: DateTimeNullableFilter<"user"> | Date | string | null
     occupation?: StringNullableFilter<"user"> | string | null
     location?: StringNullableFilter<"user"> | string | null
-    candidates?: CandidateListRelationFilter
     election?: ElectionListRelationFilter
     poll_candidates?: Poll_candidatesListRelationFilter
+    takepart?: TakepartListRelationFilter
     votes?: VoteListRelationFilter
+    candidateVotes?: VoteListRelationFilter
   }
 
   export type userOrderByWithRelationInput = {
@@ -8995,10 +7640,11 @@ export namespace Prisma {
     birthdate?: SortOrderInput | SortOrder
     occupation?: SortOrderInput | SortOrder
     location?: SortOrderInput | SortOrder
-    candidates?: candidateOrderByRelationAggregateInput
     election?: electionOrderByRelationAggregateInput
     poll_candidates?: poll_candidatesOrderByRelationAggregateInput
+    takepart?: takepartOrderByRelationAggregateInput
     votes?: VoteOrderByRelationAggregateInput
+    candidateVotes?: VoteOrderByRelationAggregateInput
   }
 
   export type userWhereUniqueInput = Prisma.AtLeast<{
@@ -9016,10 +7662,11 @@ export namespace Prisma {
     birthdate?: DateTimeNullableFilter<"user"> | Date | string | null
     occupation?: StringNullableFilter<"user"> | string | null
     location?: StringNullableFilter<"user"> | string | null
-    candidates?: CandidateListRelationFilter
     election?: ElectionListRelationFilter
     poll_candidates?: Poll_candidatesListRelationFilter
+    takepart?: TakepartListRelationFilter
     votes?: VoteListRelationFilter
+    candidateVotes?: VoteListRelationFilter
   }, "id" | "clerkId" | "username" | "email">
 
   export type userOrderByWithAggregationInput = {
@@ -9069,7 +7716,7 @@ export namespace Prisma {
     votedAt?: DateTimeFilter<"Vote"> | Date | string
     user?: XOR<UserScalarRelationFilter, userWhereInput>
     election?: XOR<ElectionScalarRelationFilter, electionWhereInput>
-    candidate?: XOR<CandidateScalarRelationFilter, candidateWhereInput>
+    candidate?: XOR<UserScalarRelationFilter, userWhereInput>
   }
 
   export type VoteOrderByWithRelationInput = {
@@ -9080,7 +7727,7 @@ export namespace Prisma {
     votedAt?: SortOrder
     user?: userOrderByWithRelationInput
     election?: electionOrderByWithRelationInput
-    candidate?: candidateOrderByWithRelationInput
+    candidate?: userOrderByWithRelationInput
   }
 
   export type VoteWhereUniqueInput = Prisma.AtLeast<{
@@ -9095,7 +7742,7 @@ export namespace Prisma {
     votedAt?: DateTimeFilter<"Vote"> | Date | string
     user?: XOR<UserScalarRelationFilter, userWhereInput>
     election?: XOR<ElectionScalarRelationFilter, electionWhereInput>
-    candidate?: XOR<CandidateScalarRelationFilter, candidateWhereInput>
+    candidate?: XOR<UserScalarRelationFilter, userWhereInput>
   }, "id" | "userId_electionId">
 
   export type VoteOrderByWithAggregationInput = {
@@ -9120,73 +7767,6 @@ export namespace Prisma {
     electionId?: IntWithAggregatesFilter<"Vote"> | number
     candidateId?: IntWithAggregatesFilter<"Vote"> | number
     votedAt?: DateTimeWithAggregatesFilter<"Vote"> | Date | string
-  }
-
-  export type candidateCreateInput = {
-    name: string
-    description?: string | null
-    image?: string | null
-    is_person: boolean
-    user?: userCreateNestedOneWithoutCandidatesInput
-    takepart?: takepartCreateNestedManyWithoutCandidateInput
-    votes?: VoteCreateNestedManyWithoutCandidateInput
-  }
-
-  export type candidateUncheckedCreateInput = {
-    id?: number
-    name: string
-    description?: string | null
-    image?: string | null
-    is_person: boolean
-    clerkId?: string | null
-    takepart?: takepartUncheckedCreateNestedManyWithoutCandidateInput
-    votes?: VoteUncheckedCreateNestedManyWithoutCandidateInput
-  }
-
-  export type candidateUpdateInput = {
-    name?: StringFieldUpdateOperationsInput | string
-    description?: NullableStringFieldUpdateOperationsInput | string | null
-    image?: NullableStringFieldUpdateOperationsInput | string | null
-    is_person?: BoolFieldUpdateOperationsInput | boolean
-    user?: userUpdateOneWithoutCandidatesNestedInput
-    takepart?: takepartUpdateManyWithoutCandidateNestedInput
-    votes?: VoteUpdateManyWithoutCandidateNestedInput
-  }
-
-  export type candidateUncheckedUpdateInput = {
-    id?: IntFieldUpdateOperationsInput | number
-    name?: StringFieldUpdateOperationsInput | string
-    description?: NullableStringFieldUpdateOperationsInput | string | null
-    image?: NullableStringFieldUpdateOperationsInput | string | null
-    is_person?: BoolFieldUpdateOperationsInput | boolean
-    clerkId?: NullableStringFieldUpdateOperationsInput | string | null
-    takepart?: takepartUncheckedUpdateManyWithoutCandidateNestedInput
-    votes?: VoteUncheckedUpdateManyWithoutCandidateNestedInput
-  }
-
-  export type candidateCreateManyInput = {
-    id?: number
-    name: string
-    description?: string | null
-    image?: string | null
-    is_person: boolean
-    clerkId?: string | null
-  }
-
-  export type candidateUpdateManyMutationInput = {
-    name?: StringFieldUpdateOperationsInput | string
-    description?: NullableStringFieldUpdateOperationsInput | string | null
-    image?: NullableStringFieldUpdateOperationsInput | string | null
-    is_person?: BoolFieldUpdateOperationsInput | boolean
-  }
-
-  export type candidateUncheckedUpdateManyInput = {
-    id?: IntFieldUpdateOperationsInput | number
-    name?: StringFieldUpdateOperationsInput | string
-    description?: NullableStringFieldUpdateOperationsInput | string | null
-    image?: NullableStringFieldUpdateOperationsInput | string | null
-    is_person?: BoolFieldUpdateOperationsInput | boolean
-    clerkId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type electionCreateInput = {
@@ -9348,7 +7928,7 @@ export namespace Prisma {
 
   export type takepartCreateInput = {
     numberOfVotes: number
-    candidate: candidateCreateNestedOneWithoutTakepartInput
+    user: userCreateNestedOneWithoutTakepartInput
     election: electionCreateNestedOneWithoutTakepartInput
   }
 
@@ -9360,7 +7940,7 @@ export namespace Prisma {
 
   export type takepartUpdateInput = {
     numberOfVotes?: IntFieldUpdateOperationsInput | number
-    candidate?: candidateUpdateOneRequiredWithoutTakepartNestedInput
+    user?: userUpdateOneRequiredWithoutTakepartNestedInput
     election?: electionUpdateOneRequiredWithoutTakepartNestedInput
   }
 
@@ -9397,10 +7977,11 @@ export namespace Prisma {
     birthdate?: Date | string | null
     occupation?: string | null
     location?: string | null
-    candidates?: candidateCreateNestedManyWithoutUserInput
     election?: electionCreateNestedManyWithoutUserInput
     poll_candidates?: poll_candidatesCreateNestedManyWithoutUserInput
+    takepart?: takepartCreateNestedManyWithoutUserInput
     votes?: VoteCreateNestedManyWithoutUserInput
+    candidateVotes?: VoteCreateNestedManyWithoutCandidateInput
   }
 
   export type userUncheckedCreateInput = {
@@ -9415,10 +7996,11 @@ export namespace Prisma {
     birthdate?: Date | string | null
     occupation?: string | null
     location?: string | null
-    candidates?: candidateUncheckedCreateNestedManyWithoutUserInput
     election?: electionUncheckedCreateNestedManyWithoutUserInput
     poll_candidates?: poll_candidatesUncheckedCreateNestedManyWithoutUserInput
+    takepart?: takepartUncheckedCreateNestedManyWithoutUserInput
     votes?: VoteUncheckedCreateNestedManyWithoutUserInput
+    candidateVotes?: VoteUncheckedCreateNestedManyWithoutCandidateInput
   }
 
   export type userUpdateInput = {
@@ -9432,10 +8014,11 @@ export namespace Prisma {
     birthdate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     occupation?: NullableStringFieldUpdateOperationsInput | string | null
     location?: NullableStringFieldUpdateOperationsInput | string | null
-    candidates?: candidateUpdateManyWithoutUserNestedInput
     election?: electionUpdateManyWithoutUserNestedInput
     poll_candidates?: poll_candidatesUpdateManyWithoutUserNestedInput
+    takepart?: takepartUpdateManyWithoutUserNestedInput
     votes?: VoteUpdateManyWithoutUserNestedInput
+    candidateVotes?: VoteUpdateManyWithoutCandidateNestedInput
   }
 
   export type userUncheckedUpdateInput = {
@@ -9450,10 +8033,11 @@ export namespace Prisma {
     birthdate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     occupation?: NullableStringFieldUpdateOperationsInput | string | null
     location?: NullableStringFieldUpdateOperationsInput | string | null
-    candidates?: candidateUncheckedUpdateManyWithoutUserNestedInput
     election?: electionUncheckedUpdateManyWithoutUserNestedInput
     poll_candidates?: poll_candidatesUncheckedUpdateManyWithoutUserNestedInput
+    takepart?: takepartUncheckedUpdateManyWithoutUserNestedInput
     votes?: VoteUncheckedUpdateManyWithoutUserNestedInput
+    candidateVotes?: VoteUncheckedUpdateManyWithoutCandidateNestedInput
   }
 
   export type userCreateManyInput = {
@@ -9501,7 +8085,7 @@ export namespace Prisma {
     votedAt?: Date | string
     user: userCreateNestedOneWithoutVotesInput
     election: electionCreateNestedOneWithoutVotesInput
-    candidate: candidateCreateNestedOneWithoutVotesInput
+    candidate: userCreateNestedOneWithoutCandidateVotesInput
   }
 
   export type VoteUncheckedCreateInput = {
@@ -9516,7 +8100,7 @@ export namespace Prisma {
     votedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: userUpdateOneRequiredWithoutVotesNestedInput
     election?: electionUpdateOneRequiredWithoutVotesNestedInput
-    candidate?: candidateUpdateOneRequiredWithoutVotesNestedInput
+    candidate?: userUpdateOneRequiredWithoutCandidateVotesNestedInput
   }
 
   export type VoteUncheckedUpdateInput = {
@@ -9588,136 +8172,6 @@ export namespace Prisma {
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
-  export type BoolFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolFilter<$PrismaModel> | boolean
-  }
-
-  export type UserNullableScalarRelationFilter = {
-    is?: userWhereInput | null
-    isNot?: userWhereInput | null
-  }
-
-  export type TakepartListRelationFilter = {
-    every?: takepartWhereInput
-    some?: takepartWhereInput
-    none?: takepartWhereInput
-  }
-
-  export type VoteListRelationFilter = {
-    every?: VoteWhereInput
-    some?: VoteWhereInput
-    none?: VoteWhereInput
-  }
-
-  export type SortOrderInput = {
-    sort: SortOrder
-    nulls?: NullsOrder
-  }
-
-  export type takepartOrderByRelationAggregateInput = {
-    _count?: SortOrder
-  }
-
-  export type VoteOrderByRelationAggregateInput = {
-    _count?: SortOrder
-  }
-
-  export type candidateCountOrderByAggregateInput = {
-    id?: SortOrder
-    name?: SortOrder
-    description?: SortOrder
-    image?: SortOrder
-    is_person?: SortOrder
-    clerkId?: SortOrder
-  }
-
-  export type candidateAvgOrderByAggregateInput = {
-    id?: SortOrder
-  }
-
-  export type candidateMaxOrderByAggregateInput = {
-    id?: SortOrder
-    name?: SortOrder
-    description?: SortOrder
-    image?: SortOrder
-    is_person?: SortOrder
-    clerkId?: SortOrder
-  }
-
-  export type candidateMinOrderByAggregateInput = {
-    id?: SortOrder
-    name?: SortOrder
-    description?: SortOrder
-    image?: SortOrder
-    is_person?: SortOrder
-    clerkId?: SortOrder
-  }
-
-  export type candidateSumOrderByAggregateInput = {
-    id?: SortOrder
-  }
-
-  export type IntWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[] | ListIntFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
-    _count?: NestedIntFilter<$PrismaModel>
-    _avg?: NestedFloatFilter<$PrismaModel>
-    _sum?: NestedIntFilter<$PrismaModel>
-    _min?: NestedIntFilter<$PrismaModel>
-    _max?: NestedIntFilter<$PrismaModel>
-  }
-
-  export type StringWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel>
-    in?: string[] | ListStringFieldRefInput<$PrismaModel>
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel>
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    mode?: QueryMode
-    not?: NestedStringWithAggregatesFilter<$PrismaModel> | string
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedStringFilter<$PrismaModel>
-    _max?: NestedStringFilter<$PrismaModel>
-  }
-
-  export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    mode?: QueryMode
-    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedStringNullableFilter<$PrismaModel>
-    _max?: NestedStringNullableFilter<$PrismaModel>
-  }
-
-  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedBoolFilter<$PrismaModel>
-    _max?: NestedBoolFilter<$PrismaModel>
-  }
-
   export type DateTimeFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
@@ -9727,6 +8181,11 @@ export namespace Prisma {
     gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     not?: NestedDateTimeFilter<$PrismaModel> | Date | string
+  }
+
+  export type BoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
   }
 
   export type DateTimeNullableFilter<$PrismaModel = never> = {
@@ -9751,7 +8210,32 @@ export namespace Prisma {
     none?: poll_candidatesWhereInput
   }
 
+  export type TakepartListRelationFilter = {
+    every?: takepartWhereInput
+    some?: takepartWhereInput
+    none?: takepartWhereInput
+  }
+
+  export type VoteListRelationFilter = {
+    every?: VoteWhereInput
+    some?: VoteWhereInput
+    none?: VoteWhereInput
+  }
+
+  export type SortOrderInput = {
+    sort: SortOrder
+    nulls?: NullsOrder
+  }
+
   export type poll_candidatesOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type takepartOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type VoteOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -9810,6 +8294,58 @@ export namespace Prisma {
     userId?: SortOrder
   }
 
+  export type IntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedIntFilter<$PrismaModel>
+    _min?: NestedIntFilter<$PrismaModel>
+    _max?: NestedIntFilter<$PrismaModel>
+  }
+
+  export type StringWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel>
+    in?: string[] | ListStringFieldRefInput<$PrismaModel>
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel>
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedStringWithAggregatesFilter<$PrismaModel> | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedStringFilter<$PrismaModel>
+    _max?: NestedStringFilter<$PrismaModel>
+  }
+
+  export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
+  }
+
   export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
@@ -9822,6 +8358,14 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedDateTimeFilter<$PrismaModel>
     _max?: NestedDateTimeFilter<$PrismaModel>
+  }
+
+  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
   }
 
   export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -9876,11 +8420,6 @@ export namespace Prisma {
     user_id?: SortOrder
   }
 
-  export type CandidateScalarRelationFilter = {
-    is?: candidateWhereInput
-    isNot?: candidateWhereInput
-  }
-
   export type takepartElectionIdCandidateIdCompoundUniqueInput = {
     electionId: number
     candidateId: number
@@ -9916,20 +8455,10 @@ export namespace Prisma {
     numberOfVotes?: SortOrder
   }
 
-  export type CandidateListRelationFilter = {
-    every?: candidateWhereInput
-    some?: candidateWhereInput
-    none?: candidateWhereInput
-  }
-
   export type ElectionListRelationFilter = {
     every?: electionWhereInput
     some?: electionWhereInput
     none?: electionWhereInput
-  }
-
-  export type candidateOrderByRelationAggregateInput = {
-    _count?: SortOrder
   }
 
   export type electionOrderByRelationAggregateInput = {
@@ -10029,126 +8558,6 @@ export namespace Prisma {
     candidateId?: SortOrder
   }
 
-  export type userCreateNestedOneWithoutCandidatesInput = {
-    create?: XOR<userCreateWithoutCandidatesInput, userUncheckedCreateWithoutCandidatesInput>
-    connectOrCreate?: userCreateOrConnectWithoutCandidatesInput
-    connect?: userWhereUniqueInput
-  }
-
-  export type takepartCreateNestedManyWithoutCandidateInput = {
-    create?: XOR<takepartCreateWithoutCandidateInput, takepartUncheckedCreateWithoutCandidateInput> | takepartCreateWithoutCandidateInput[] | takepartUncheckedCreateWithoutCandidateInput[]
-    connectOrCreate?: takepartCreateOrConnectWithoutCandidateInput | takepartCreateOrConnectWithoutCandidateInput[]
-    createMany?: takepartCreateManyCandidateInputEnvelope
-    connect?: takepartWhereUniqueInput | takepartWhereUniqueInput[]
-  }
-
-  export type VoteCreateNestedManyWithoutCandidateInput = {
-    create?: XOR<VoteCreateWithoutCandidateInput, VoteUncheckedCreateWithoutCandidateInput> | VoteCreateWithoutCandidateInput[] | VoteUncheckedCreateWithoutCandidateInput[]
-    connectOrCreate?: VoteCreateOrConnectWithoutCandidateInput | VoteCreateOrConnectWithoutCandidateInput[]
-    createMany?: VoteCreateManyCandidateInputEnvelope
-    connect?: VoteWhereUniqueInput | VoteWhereUniqueInput[]
-  }
-
-  export type takepartUncheckedCreateNestedManyWithoutCandidateInput = {
-    create?: XOR<takepartCreateWithoutCandidateInput, takepartUncheckedCreateWithoutCandidateInput> | takepartCreateWithoutCandidateInput[] | takepartUncheckedCreateWithoutCandidateInput[]
-    connectOrCreate?: takepartCreateOrConnectWithoutCandidateInput | takepartCreateOrConnectWithoutCandidateInput[]
-    createMany?: takepartCreateManyCandidateInputEnvelope
-    connect?: takepartWhereUniqueInput | takepartWhereUniqueInput[]
-  }
-
-  export type VoteUncheckedCreateNestedManyWithoutCandidateInput = {
-    create?: XOR<VoteCreateWithoutCandidateInput, VoteUncheckedCreateWithoutCandidateInput> | VoteCreateWithoutCandidateInput[] | VoteUncheckedCreateWithoutCandidateInput[]
-    connectOrCreate?: VoteCreateOrConnectWithoutCandidateInput | VoteCreateOrConnectWithoutCandidateInput[]
-    createMany?: VoteCreateManyCandidateInputEnvelope
-    connect?: VoteWhereUniqueInput | VoteWhereUniqueInput[]
-  }
-
-  export type StringFieldUpdateOperationsInput = {
-    set?: string
-  }
-
-  export type NullableStringFieldUpdateOperationsInput = {
-    set?: string | null
-  }
-
-  export type BoolFieldUpdateOperationsInput = {
-    set?: boolean
-  }
-
-  export type userUpdateOneWithoutCandidatesNestedInput = {
-    create?: XOR<userCreateWithoutCandidatesInput, userUncheckedCreateWithoutCandidatesInput>
-    connectOrCreate?: userCreateOrConnectWithoutCandidatesInput
-    upsert?: userUpsertWithoutCandidatesInput
-    disconnect?: userWhereInput | boolean
-    delete?: userWhereInput | boolean
-    connect?: userWhereUniqueInput
-    update?: XOR<XOR<userUpdateToOneWithWhereWithoutCandidatesInput, userUpdateWithoutCandidatesInput>, userUncheckedUpdateWithoutCandidatesInput>
-  }
-
-  export type takepartUpdateManyWithoutCandidateNestedInput = {
-    create?: XOR<takepartCreateWithoutCandidateInput, takepartUncheckedCreateWithoutCandidateInput> | takepartCreateWithoutCandidateInput[] | takepartUncheckedCreateWithoutCandidateInput[]
-    connectOrCreate?: takepartCreateOrConnectWithoutCandidateInput | takepartCreateOrConnectWithoutCandidateInput[]
-    upsert?: takepartUpsertWithWhereUniqueWithoutCandidateInput | takepartUpsertWithWhereUniqueWithoutCandidateInput[]
-    createMany?: takepartCreateManyCandidateInputEnvelope
-    set?: takepartWhereUniqueInput | takepartWhereUniqueInput[]
-    disconnect?: takepartWhereUniqueInput | takepartWhereUniqueInput[]
-    delete?: takepartWhereUniqueInput | takepartWhereUniqueInput[]
-    connect?: takepartWhereUniqueInput | takepartWhereUniqueInput[]
-    update?: takepartUpdateWithWhereUniqueWithoutCandidateInput | takepartUpdateWithWhereUniqueWithoutCandidateInput[]
-    updateMany?: takepartUpdateManyWithWhereWithoutCandidateInput | takepartUpdateManyWithWhereWithoutCandidateInput[]
-    deleteMany?: takepartScalarWhereInput | takepartScalarWhereInput[]
-  }
-
-  export type VoteUpdateManyWithoutCandidateNestedInput = {
-    create?: XOR<VoteCreateWithoutCandidateInput, VoteUncheckedCreateWithoutCandidateInput> | VoteCreateWithoutCandidateInput[] | VoteUncheckedCreateWithoutCandidateInput[]
-    connectOrCreate?: VoteCreateOrConnectWithoutCandidateInput | VoteCreateOrConnectWithoutCandidateInput[]
-    upsert?: VoteUpsertWithWhereUniqueWithoutCandidateInput | VoteUpsertWithWhereUniqueWithoutCandidateInput[]
-    createMany?: VoteCreateManyCandidateInputEnvelope
-    set?: VoteWhereUniqueInput | VoteWhereUniqueInput[]
-    disconnect?: VoteWhereUniqueInput | VoteWhereUniqueInput[]
-    delete?: VoteWhereUniqueInput | VoteWhereUniqueInput[]
-    connect?: VoteWhereUniqueInput | VoteWhereUniqueInput[]
-    update?: VoteUpdateWithWhereUniqueWithoutCandidateInput | VoteUpdateWithWhereUniqueWithoutCandidateInput[]
-    updateMany?: VoteUpdateManyWithWhereWithoutCandidateInput | VoteUpdateManyWithWhereWithoutCandidateInput[]
-    deleteMany?: VoteScalarWhereInput | VoteScalarWhereInput[]
-  }
-
-  export type IntFieldUpdateOperationsInput = {
-    set?: number
-    increment?: number
-    decrement?: number
-    multiply?: number
-    divide?: number
-  }
-
-  export type takepartUncheckedUpdateManyWithoutCandidateNestedInput = {
-    create?: XOR<takepartCreateWithoutCandidateInput, takepartUncheckedCreateWithoutCandidateInput> | takepartCreateWithoutCandidateInput[] | takepartUncheckedCreateWithoutCandidateInput[]
-    connectOrCreate?: takepartCreateOrConnectWithoutCandidateInput | takepartCreateOrConnectWithoutCandidateInput[]
-    upsert?: takepartUpsertWithWhereUniqueWithoutCandidateInput | takepartUpsertWithWhereUniqueWithoutCandidateInput[]
-    createMany?: takepartCreateManyCandidateInputEnvelope
-    set?: takepartWhereUniqueInput | takepartWhereUniqueInput[]
-    disconnect?: takepartWhereUniqueInput | takepartWhereUniqueInput[]
-    delete?: takepartWhereUniqueInput | takepartWhereUniqueInput[]
-    connect?: takepartWhereUniqueInput | takepartWhereUniqueInput[]
-    update?: takepartUpdateWithWhereUniqueWithoutCandidateInput | takepartUpdateWithWhereUniqueWithoutCandidateInput[]
-    updateMany?: takepartUpdateManyWithWhereWithoutCandidateInput | takepartUpdateManyWithWhereWithoutCandidateInput[]
-    deleteMany?: takepartScalarWhereInput | takepartScalarWhereInput[]
-  }
-
-  export type VoteUncheckedUpdateManyWithoutCandidateNestedInput = {
-    create?: XOR<VoteCreateWithoutCandidateInput, VoteUncheckedCreateWithoutCandidateInput> | VoteCreateWithoutCandidateInput[] | VoteUncheckedCreateWithoutCandidateInput[]
-    connectOrCreate?: VoteCreateOrConnectWithoutCandidateInput | VoteCreateOrConnectWithoutCandidateInput[]
-    upsert?: VoteUpsertWithWhereUniqueWithoutCandidateInput | VoteUpsertWithWhereUniqueWithoutCandidateInput[]
-    createMany?: VoteCreateManyCandidateInputEnvelope
-    set?: VoteWhereUniqueInput | VoteWhereUniqueInput[]
-    disconnect?: VoteWhereUniqueInput | VoteWhereUniqueInput[]
-    delete?: VoteWhereUniqueInput | VoteWhereUniqueInput[]
-    connect?: VoteWhereUniqueInput | VoteWhereUniqueInput[]
-    update?: VoteUpdateWithWhereUniqueWithoutCandidateInput | VoteUpdateWithWhereUniqueWithoutCandidateInput[]
-    updateMany?: VoteUpdateManyWithWhereWithoutCandidateInput | VoteUpdateManyWithWhereWithoutCandidateInput[]
-    deleteMany?: VoteScalarWhereInput | VoteScalarWhereInput[]
-  }
-
   export type userCreateNestedOneWithoutElectionInput = {
     create?: XOR<userCreateWithoutElectionInput, userUncheckedCreateWithoutElectionInput>
     connectOrCreate?: userCreateOrConnectWithoutElectionInput
@@ -10197,8 +8606,20 @@ export namespace Prisma {
     connect?: VoteWhereUniqueInput | VoteWhereUniqueInput[]
   }
 
+  export type StringFieldUpdateOperationsInput = {
+    set?: string
+  }
+
+  export type NullableStringFieldUpdateOperationsInput = {
+    set?: string | null
+  }
+
   export type DateTimeFieldUpdateOperationsInput = {
     set?: Date | string
+  }
+
+  export type BoolFieldUpdateOperationsInput = {
+    set?: boolean
   }
 
   export type NullableDateTimeFieldUpdateOperationsInput = {
@@ -10253,6 +8674,14 @@ export namespace Prisma {
     update?: VoteUpdateWithWhereUniqueWithoutElectionInput | VoteUpdateWithWhereUniqueWithoutElectionInput[]
     updateMany?: VoteUpdateManyWithWhereWithoutElectionInput | VoteUpdateManyWithWhereWithoutElectionInput[]
     deleteMany?: VoteScalarWhereInput | VoteScalarWhereInput[]
+  }
+
+  export type IntFieldUpdateOperationsInput = {
+    set?: number
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
   }
 
   export type poll_candidatesUncheckedUpdateManyWithoutElectionNestedInput = {
@@ -10325,10 +8754,10 @@ export namespace Prisma {
     update?: XOR<XOR<userUpdateToOneWithWhereWithoutPoll_candidatesInput, userUpdateWithoutPoll_candidatesInput>, userUncheckedUpdateWithoutPoll_candidatesInput>
   }
 
-  export type candidateCreateNestedOneWithoutTakepartInput = {
-    create?: XOR<candidateCreateWithoutTakepartInput, candidateUncheckedCreateWithoutTakepartInput>
-    connectOrCreate?: candidateCreateOrConnectWithoutTakepartInput
-    connect?: candidateWhereUniqueInput
+  export type userCreateNestedOneWithoutTakepartInput = {
+    create?: XOR<userCreateWithoutTakepartInput, userUncheckedCreateWithoutTakepartInput>
+    connectOrCreate?: userCreateOrConnectWithoutTakepartInput
+    connect?: userWhereUniqueInput
   }
 
   export type electionCreateNestedOneWithoutTakepartInput = {
@@ -10337,12 +8766,12 @@ export namespace Prisma {
     connect?: electionWhereUniqueInput
   }
 
-  export type candidateUpdateOneRequiredWithoutTakepartNestedInput = {
-    create?: XOR<candidateCreateWithoutTakepartInput, candidateUncheckedCreateWithoutTakepartInput>
-    connectOrCreate?: candidateCreateOrConnectWithoutTakepartInput
-    upsert?: candidateUpsertWithoutTakepartInput
-    connect?: candidateWhereUniqueInput
-    update?: XOR<XOR<candidateUpdateToOneWithWhereWithoutTakepartInput, candidateUpdateWithoutTakepartInput>, candidateUncheckedUpdateWithoutTakepartInput>
+  export type userUpdateOneRequiredWithoutTakepartNestedInput = {
+    create?: XOR<userCreateWithoutTakepartInput, userUncheckedCreateWithoutTakepartInput>
+    connectOrCreate?: userCreateOrConnectWithoutTakepartInput
+    upsert?: userUpsertWithoutTakepartInput
+    connect?: userWhereUniqueInput
+    update?: XOR<XOR<userUpdateToOneWithWhereWithoutTakepartInput, userUpdateWithoutTakepartInput>, userUncheckedUpdateWithoutTakepartInput>
   }
 
   export type electionUpdateOneRequiredWithoutTakepartNestedInput = {
@@ -10351,13 +8780,6 @@ export namespace Prisma {
     upsert?: electionUpsertWithoutTakepartInput
     connect?: electionWhereUniqueInput
     update?: XOR<XOR<electionUpdateToOneWithWhereWithoutTakepartInput, electionUpdateWithoutTakepartInput>, electionUncheckedUpdateWithoutTakepartInput>
-  }
-
-  export type candidateCreateNestedManyWithoutUserInput = {
-    create?: XOR<candidateCreateWithoutUserInput, candidateUncheckedCreateWithoutUserInput> | candidateCreateWithoutUserInput[] | candidateUncheckedCreateWithoutUserInput[]
-    connectOrCreate?: candidateCreateOrConnectWithoutUserInput | candidateCreateOrConnectWithoutUserInput[]
-    createMany?: candidateCreateManyUserInputEnvelope
-    connect?: candidateWhereUniqueInput | candidateWhereUniqueInput[]
   }
 
   export type electionCreateNestedManyWithoutUserInput = {
@@ -10374,6 +8796,13 @@ export namespace Prisma {
     connect?: poll_candidatesWhereUniqueInput | poll_candidatesWhereUniqueInput[]
   }
 
+  export type takepartCreateNestedManyWithoutUserInput = {
+    create?: XOR<takepartCreateWithoutUserInput, takepartUncheckedCreateWithoutUserInput> | takepartCreateWithoutUserInput[] | takepartUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: takepartCreateOrConnectWithoutUserInput | takepartCreateOrConnectWithoutUserInput[]
+    createMany?: takepartCreateManyUserInputEnvelope
+    connect?: takepartWhereUniqueInput | takepartWhereUniqueInput[]
+  }
+
   export type VoteCreateNestedManyWithoutUserInput = {
     create?: XOR<VoteCreateWithoutUserInput, VoteUncheckedCreateWithoutUserInput> | VoteCreateWithoutUserInput[] | VoteUncheckedCreateWithoutUserInput[]
     connectOrCreate?: VoteCreateOrConnectWithoutUserInput | VoteCreateOrConnectWithoutUserInput[]
@@ -10381,11 +8810,11 @@ export namespace Prisma {
     connect?: VoteWhereUniqueInput | VoteWhereUniqueInput[]
   }
 
-  export type candidateUncheckedCreateNestedManyWithoutUserInput = {
-    create?: XOR<candidateCreateWithoutUserInput, candidateUncheckedCreateWithoutUserInput> | candidateCreateWithoutUserInput[] | candidateUncheckedCreateWithoutUserInput[]
-    connectOrCreate?: candidateCreateOrConnectWithoutUserInput | candidateCreateOrConnectWithoutUserInput[]
-    createMany?: candidateCreateManyUserInputEnvelope
-    connect?: candidateWhereUniqueInput | candidateWhereUniqueInput[]
+  export type VoteCreateNestedManyWithoutCandidateInput = {
+    create?: XOR<VoteCreateWithoutCandidateInput, VoteUncheckedCreateWithoutCandidateInput> | VoteCreateWithoutCandidateInput[] | VoteUncheckedCreateWithoutCandidateInput[]
+    connectOrCreate?: VoteCreateOrConnectWithoutCandidateInput | VoteCreateOrConnectWithoutCandidateInput[]
+    createMany?: VoteCreateManyCandidateInputEnvelope
+    connect?: VoteWhereUniqueInput | VoteWhereUniqueInput[]
   }
 
   export type electionUncheckedCreateNestedManyWithoutUserInput = {
@@ -10402,6 +8831,13 @@ export namespace Prisma {
     connect?: poll_candidatesWhereUniqueInput | poll_candidatesWhereUniqueInput[]
   }
 
+  export type takepartUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<takepartCreateWithoutUserInput, takepartUncheckedCreateWithoutUserInput> | takepartCreateWithoutUserInput[] | takepartUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: takepartCreateOrConnectWithoutUserInput | takepartCreateOrConnectWithoutUserInput[]
+    createMany?: takepartCreateManyUserInputEnvelope
+    connect?: takepartWhereUniqueInput | takepartWhereUniqueInput[]
+  }
+
   export type VoteUncheckedCreateNestedManyWithoutUserInput = {
     create?: XOR<VoteCreateWithoutUserInput, VoteUncheckedCreateWithoutUserInput> | VoteCreateWithoutUserInput[] | VoteUncheckedCreateWithoutUserInput[]
     connectOrCreate?: VoteCreateOrConnectWithoutUserInput | VoteCreateOrConnectWithoutUserInput[]
@@ -10409,18 +8845,11 @@ export namespace Prisma {
     connect?: VoteWhereUniqueInput | VoteWhereUniqueInput[]
   }
 
-  export type candidateUpdateManyWithoutUserNestedInput = {
-    create?: XOR<candidateCreateWithoutUserInput, candidateUncheckedCreateWithoutUserInput> | candidateCreateWithoutUserInput[] | candidateUncheckedCreateWithoutUserInput[]
-    connectOrCreate?: candidateCreateOrConnectWithoutUserInput | candidateCreateOrConnectWithoutUserInput[]
-    upsert?: candidateUpsertWithWhereUniqueWithoutUserInput | candidateUpsertWithWhereUniqueWithoutUserInput[]
-    createMany?: candidateCreateManyUserInputEnvelope
-    set?: candidateWhereUniqueInput | candidateWhereUniqueInput[]
-    disconnect?: candidateWhereUniqueInput | candidateWhereUniqueInput[]
-    delete?: candidateWhereUniqueInput | candidateWhereUniqueInput[]
-    connect?: candidateWhereUniqueInput | candidateWhereUniqueInput[]
-    update?: candidateUpdateWithWhereUniqueWithoutUserInput | candidateUpdateWithWhereUniqueWithoutUserInput[]
-    updateMany?: candidateUpdateManyWithWhereWithoutUserInput | candidateUpdateManyWithWhereWithoutUserInput[]
-    deleteMany?: candidateScalarWhereInput | candidateScalarWhereInput[]
+  export type VoteUncheckedCreateNestedManyWithoutCandidateInput = {
+    create?: XOR<VoteCreateWithoutCandidateInput, VoteUncheckedCreateWithoutCandidateInput> | VoteCreateWithoutCandidateInput[] | VoteUncheckedCreateWithoutCandidateInput[]
+    connectOrCreate?: VoteCreateOrConnectWithoutCandidateInput | VoteCreateOrConnectWithoutCandidateInput[]
+    createMany?: VoteCreateManyCandidateInputEnvelope
+    connect?: VoteWhereUniqueInput | VoteWhereUniqueInput[]
   }
 
   export type electionUpdateManyWithoutUserNestedInput = {
@@ -10451,6 +8880,20 @@ export namespace Prisma {
     deleteMany?: poll_candidatesScalarWhereInput | poll_candidatesScalarWhereInput[]
   }
 
+  export type takepartUpdateManyWithoutUserNestedInput = {
+    create?: XOR<takepartCreateWithoutUserInput, takepartUncheckedCreateWithoutUserInput> | takepartCreateWithoutUserInput[] | takepartUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: takepartCreateOrConnectWithoutUserInput | takepartCreateOrConnectWithoutUserInput[]
+    upsert?: takepartUpsertWithWhereUniqueWithoutUserInput | takepartUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: takepartCreateManyUserInputEnvelope
+    set?: takepartWhereUniqueInput | takepartWhereUniqueInput[]
+    disconnect?: takepartWhereUniqueInput | takepartWhereUniqueInput[]
+    delete?: takepartWhereUniqueInput | takepartWhereUniqueInput[]
+    connect?: takepartWhereUniqueInput | takepartWhereUniqueInput[]
+    update?: takepartUpdateWithWhereUniqueWithoutUserInput | takepartUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: takepartUpdateManyWithWhereWithoutUserInput | takepartUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: takepartScalarWhereInput | takepartScalarWhereInput[]
+  }
+
   export type VoteUpdateManyWithoutUserNestedInput = {
     create?: XOR<VoteCreateWithoutUserInput, VoteUncheckedCreateWithoutUserInput> | VoteCreateWithoutUserInput[] | VoteUncheckedCreateWithoutUserInput[]
     connectOrCreate?: VoteCreateOrConnectWithoutUserInput | VoteCreateOrConnectWithoutUserInput[]
@@ -10465,18 +8908,18 @@ export namespace Prisma {
     deleteMany?: VoteScalarWhereInput | VoteScalarWhereInput[]
   }
 
-  export type candidateUncheckedUpdateManyWithoutUserNestedInput = {
-    create?: XOR<candidateCreateWithoutUserInput, candidateUncheckedCreateWithoutUserInput> | candidateCreateWithoutUserInput[] | candidateUncheckedCreateWithoutUserInput[]
-    connectOrCreate?: candidateCreateOrConnectWithoutUserInput | candidateCreateOrConnectWithoutUserInput[]
-    upsert?: candidateUpsertWithWhereUniqueWithoutUserInput | candidateUpsertWithWhereUniqueWithoutUserInput[]
-    createMany?: candidateCreateManyUserInputEnvelope
-    set?: candidateWhereUniqueInput | candidateWhereUniqueInput[]
-    disconnect?: candidateWhereUniqueInput | candidateWhereUniqueInput[]
-    delete?: candidateWhereUniqueInput | candidateWhereUniqueInput[]
-    connect?: candidateWhereUniqueInput | candidateWhereUniqueInput[]
-    update?: candidateUpdateWithWhereUniqueWithoutUserInput | candidateUpdateWithWhereUniqueWithoutUserInput[]
-    updateMany?: candidateUpdateManyWithWhereWithoutUserInput | candidateUpdateManyWithWhereWithoutUserInput[]
-    deleteMany?: candidateScalarWhereInput | candidateScalarWhereInput[]
+  export type VoteUpdateManyWithoutCandidateNestedInput = {
+    create?: XOR<VoteCreateWithoutCandidateInput, VoteUncheckedCreateWithoutCandidateInput> | VoteCreateWithoutCandidateInput[] | VoteUncheckedCreateWithoutCandidateInput[]
+    connectOrCreate?: VoteCreateOrConnectWithoutCandidateInput | VoteCreateOrConnectWithoutCandidateInput[]
+    upsert?: VoteUpsertWithWhereUniqueWithoutCandidateInput | VoteUpsertWithWhereUniqueWithoutCandidateInput[]
+    createMany?: VoteCreateManyCandidateInputEnvelope
+    set?: VoteWhereUniqueInput | VoteWhereUniqueInput[]
+    disconnect?: VoteWhereUniqueInput | VoteWhereUniqueInput[]
+    delete?: VoteWhereUniqueInput | VoteWhereUniqueInput[]
+    connect?: VoteWhereUniqueInput | VoteWhereUniqueInput[]
+    update?: VoteUpdateWithWhereUniqueWithoutCandidateInput | VoteUpdateWithWhereUniqueWithoutCandidateInput[]
+    updateMany?: VoteUpdateManyWithWhereWithoutCandidateInput | VoteUpdateManyWithWhereWithoutCandidateInput[]
+    deleteMany?: VoteScalarWhereInput | VoteScalarWhereInput[]
   }
 
   export type electionUncheckedUpdateManyWithoutUserNestedInput = {
@@ -10507,6 +8950,20 @@ export namespace Prisma {
     deleteMany?: poll_candidatesScalarWhereInput | poll_candidatesScalarWhereInput[]
   }
 
+  export type takepartUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<takepartCreateWithoutUserInput, takepartUncheckedCreateWithoutUserInput> | takepartCreateWithoutUserInput[] | takepartUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: takepartCreateOrConnectWithoutUserInput | takepartCreateOrConnectWithoutUserInput[]
+    upsert?: takepartUpsertWithWhereUniqueWithoutUserInput | takepartUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: takepartCreateManyUserInputEnvelope
+    set?: takepartWhereUniqueInput | takepartWhereUniqueInput[]
+    disconnect?: takepartWhereUniqueInput | takepartWhereUniqueInput[]
+    delete?: takepartWhereUniqueInput | takepartWhereUniqueInput[]
+    connect?: takepartWhereUniqueInput | takepartWhereUniqueInput[]
+    update?: takepartUpdateWithWhereUniqueWithoutUserInput | takepartUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: takepartUpdateManyWithWhereWithoutUserInput | takepartUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: takepartScalarWhereInput | takepartScalarWhereInput[]
+  }
+
   export type VoteUncheckedUpdateManyWithoutUserNestedInput = {
     create?: XOR<VoteCreateWithoutUserInput, VoteUncheckedCreateWithoutUserInput> | VoteCreateWithoutUserInput[] | VoteUncheckedCreateWithoutUserInput[]
     connectOrCreate?: VoteCreateOrConnectWithoutUserInput | VoteCreateOrConnectWithoutUserInput[]
@@ -10518,6 +8975,20 @@ export namespace Prisma {
     connect?: VoteWhereUniqueInput | VoteWhereUniqueInput[]
     update?: VoteUpdateWithWhereUniqueWithoutUserInput | VoteUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: VoteUpdateManyWithWhereWithoutUserInput | VoteUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: VoteScalarWhereInput | VoteScalarWhereInput[]
+  }
+
+  export type VoteUncheckedUpdateManyWithoutCandidateNestedInput = {
+    create?: XOR<VoteCreateWithoutCandidateInput, VoteUncheckedCreateWithoutCandidateInput> | VoteCreateWithoutCandidateInput[] | VoteUncheckedCreateWithoutCandidateInput[]
+    connectOrCreate?: VoteCreateOrConnectWithoutCandidateInput | VoteCreateOrConnectWithoutCandidateInput[]
+    upsert?: VoteUpsertWithWhereUniqueWithoutCandidateInput | VoteUpsertWithWhereUniqueWithoutCandidateInput[]
+    createMany?: VoteCreateManyCandidateInputEnvelope
+    set?: VoteWhereUniqueInput | VoteWhereUniqueInput[]
+    disconnect?: VoteWhereUniqueInput | VoteWhereUniqueInput[]
+    delete?: VoteWhereUniqueInput | VoteWhereUniqueInput[]
+    connect?: VoteWhereUniqueInput | VoteWhereUniqueInput[]
+    update?: VoteUpdateWithWhereUniqueWithoutCandidateInput | VoteUpdateWithWhereUniqueWithoutCandidateInput[]
+    updateMany?: VoteUpdateManyWithWhereWithoutCandidateInput | VoteUpdateManyWithWhereWithoutCandidateInput[]
     deleteMany?: VoteScalarWhereInput | VoteScalarWhereInput[]
   }
 
@@ -10533,10 +9004,10 @@ export namespace Prisma {
     connect?: electionWhereUniqueInput
   }
 
-  export type candidateCreateNestedOneWithoutVotesInput = {
-    create?: XOR<candidateCreateWithoutVotesInput, candidateUncheckedCreateWithoutVotesInput>
-    connectOrCreate?: candidateCreateOrConnectWithoutVotesInput
-    connect?: candidateWhereUniqueInput
+  export type userCreateNestedOneWithoutCandidateVotesInput = {
+    create?: XOR<userCreateWithoutCandidateVotesInput, userUncheckedCreateWithoutCandidateVotesInput>
+    connectOrCreate?: userCreateOrConnectWithoutCandidateVotesInput
+    connect?: userWhereUniqueInput
   }
 
   export type userUpdateOneRequiredWithoutVotesNestedInput = {
@@ -10555,12 +9026,12 @@ export namespace Prisma {
     update?: XOR<XOR<electionUpdateToOneWithWhereWithoutVotesInput, electionUpdateWithoutVotesInput>, electionUncheckedUpdateWithoutVotesInput>
   }
 
-  export type candidateUpdateOneRequiredWithoutVotesNestedInput = {
-    create?: XOR<candidateCreateWithoutVotesInput, candidateUncheckedCreateWithoutVotesInput>
-    connectOrCreate?: candidateCreateOrConnectWithoutVotesInput
-    upsert?: candidateUpsertWithoutVotesInput
-    connect?: candidateWhereUniqueInput
-    update?: XOR<XOR<candidateUpdateToOneWithWhereWithoutVotesInput, candidateUpdateWithoutVotesInput>, candidateUncheckedUpdateWithoutVotesInput>
+  export type userUpdateOneRequiredWithoutCandidateVotesNestedInput = {
+    create?: XOR<userCreateWithoutCandidateVotesInput, userUncheckedCreateWithoutCandidateVotesInput>
+    connectOrCreate?: userCreateOrConnectWithoutCandidateVotesInput
+    upsert?: userUpsertWithoutCandidateVotesInput
+    connect?: userWhereUniqueInput
+    update?: XOR<XOR<userUpdateToOneWithWhereWithoutCandidateVotesInput, userUpdateWithoutCandidateVotesInput>, userUncheckedUpdateWithoutCandidateVotesInput>
   }
 
   export type NestedIntFilter<$PrismaModel = never> = {
@@ -10602,9 +9073,31 @@ export namespace Prisma {
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
+  export type NestedDateTimeFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeFilter<$PrismaModel> | Date | string
+  }
+
   export type NestedBoolFilter<$PrismaModel = never> = {
     equals?: boolean | BooleanFieldRefInput<$PrismaModel>
     not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+
+  export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
   }
 
   export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
@@ -10679,36 +9172,6 @@ export namespace Prisma {
     not?: NestedIntNullableFilter<$PrismaModel> | number | null
   }
 
-  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedBoolFilter<$PrismaModel>
-    _max?: NestedBoolFilter<$PrismaModel>
-  }
-
-  export type NestedDateTimeFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeFilter<$PrismaModel> | Date | string
-  }
-
-  export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
-  }
-
   export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
@@ -10721,6 +9184,14 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedDateTimeFilter<$PrismaModel>
     _max?: NestedDateTimeFilter<$PrismaModel>
+  }
+
+  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
   }
 
   export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -10737,183 +9208,6 @@ export namespace Prisma {
     _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
-  export type userCreateWithoutCandidatesInput = {
-    clerkId: string
-    fullName: string
-    username: string
-    password: string
-    isAdmin: boolean
-    gender?: string | null
-    email: string
-    birthdate?: Date | string | null
-    occupation?: string | null
-    location?: string | null
-    election?: electionCreateNestedManyWithoutUserInput
-    poll_candidates?: poll_candidatesCreateNestedManyWithoutUserInput
-    votes?: VoteCreateNestedManyWithoutUserInput
-  }
-
-  export type userUncheckedCreateWithoutCandidatesInput = {
-    id?: number
-    clerkId: string
-    fullName: string
-    username: string
-    password: string
-    isAdmin: boolean
-    gender?: string | null
-    email: string
-    birthdate?: Date | string | null
-    occupation?: string | null
-    location?: string | null
-    election?: electionUncheckedCreateNestedManyWithoutUserInput
-    poll_candidates?: poll_candidatesUncheckedCreateNestedManyWithoutUserInput
-    votes?: VoteUncheckedCreateNestedManyWithoutUserInput
-  }
-
-  export type userCreateOrConnectWithoutCandidatesInput = {
-    where: userWhereUniqueInput
-    create: XOR<userCreateWithoutCandidatesInput, userUncheckedCreateWithoutCandidatesInput>
-  }
-
-  export type takepartCreateWithoutCandidateInput = {
-    numberOfVotes: number
-    election: electionCreateNestedOneWithoutTakepartInput
-  }
-
-  export type takepartUncheckedCreateWithoutCandidateInput = {
-    electionId: number
-    numberOfVotes: number
-  }
-
-  export type takepartCreateOrConnectWithoutCandidateInput = {
-    where: takepartWhereUniqueInput
-    create: XOR<takepartCreateWithoutCandidateInput, takepartUncheckedCreateWithoutCandidateInput>
-  }
-
-  export type takepartCreateManyCandidateInputEnvelope = {
-    data: takepartCreateManyCandidateInput | takepartCreateManyCandidateInput[]
-    skipDuplicates?: boolean
-  }
-
-  export type VoteCreateWithoutCandidateInput = {
-    votedAt?: Date | string
-    user: userCreateNestedOneWithoutVotesInput
-    election: electionCreateNestedOneWithoutVotesInput
-  }
-
-  export type VoteUncheckedCreateWithoutCandidateInput = {
-    id?: number
-    userId: number
-    electionId: number
-    votedAt?: Date | string
-  }
-
-  export type VoteCreateOrConnectWithoutCandidateInput = {
-    where: VoteWhereUniqueInput
-    create: XOR<VoteCreateWithoutCandidateInput, VoteUncheckedCreateWithoutCandidateInput>
-  }
-
-  export type VoteCreateManyCandidateInputEnvelope = {
-    data: VoteCreateManyCandidateInput | VoteCreateManyCandidateInput[]
-    skipDuplicates?: boolean
-  }
-
-  export type userUpsertWithoutCandidatesInput = {
-    update: XOR<userUpdateWithoutCandidatesInput, userUncheckedUpdateWithoutCandidatesInput>
-    create: XOR<userCreateWithoutCandidatesInput, userUncheckedCreateWithoutCandidatesInput>
-    where?: userWhereInput
-  }
-
-  export type userUpdateToOneWithWhereWithoutCandidatesInput = {
-    where?: userWhereInput
-    data: XOR<userUpdateWithoutCandidatesInput, userUncheckedUpdateWithoutCandidatesInput>
-  }
-
-  export type userUpdateWithoutCandidatesInput = {
-    clerkId?: StringFieldUpdateOperationsInput | string
-    fullName?: StringFieldUpdateOperationsInput | string
-    username?: StringFieldUpdateOperationsInput | string
-    password?: StringFieldUpdateOperationsInput | string
-    isAdmin?: BoolFieldUpdateOperationsInput | boolean
-    gender?: NullableStringFieldUpdateOperationsInput | string | null
-    email?: StringFieldUpdateOperationsInput | string
-    birthdate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    occupation?: NullableStringFieldUpdateOperationsInput | string | null
-    location?: NullableStringFieldUpdateOperationsInput | string | null
-    election?: electionUpdateManyWithoutUserNestedInput
-    poll_candidates?: poll_candidatesUpdateManyWithoutUserNestedInput
-    votes?: VoteUpdateManyWithoutUserNestedInput
-  }
-
-  export type userUncheckedUpdateWithoutCandidatesInput = {
-    id?: IntFieldUpdateOperationsInput | number
-    clerkId?: StringFieldUpdateOperationsInput | string
-    fullName?: StringFieldUpdateOperationsInput | string
-    username?: StringFieldUpdateOperationsInput | string
-    password?: StringFieldUpdateOperationsInput | string
-    isAdmin?: BoolFieldUpdateOperationsInput | boolean
-    gender?: NullableStringFieldUpdateOperationsInput | string | null
-    email?: StringFieldUpdateOperationsInput | string
-    birthdate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    occupation?: NullableStringFieldUpdateOperationsInput | string | null
-    location?: NullableStringFieldUpdateOperationsInput | string | null
-    election?: electionUncheckedUpdateManyWithoutUserNestedInput
-    poll_candidates?: poll_candidatesUncheckedUpdateManyWithoutUserNestedInput
-    votes?: VoteUncheckedUpdateManyWithoutUserNestedInput
-  }
-
-  export type takepartUpsertWithWhereUniqueWithoutCandidateInput = {
-    where: takepartWhereUniqueInput
-    update: XOR<takepartUpdateWithoutCandidateInput, takepartUncheckedUpdateWithoutCandidateInput>
-    create: XOR<takepartCreateWithoutCandidateInput, takepartUncheckedCreateWithoutCandidateInput>
-  }
-
-  export type takepartUpdateWithWhereUniqueWithoutCandidateInput = {
-    where: takepartWhereUniqueInput
-    data: XOR<takepartUpdateWithoutCandidateInput, takepartUncheckedUpdateWithoutCandidateInput>
-  }
-
-  export type takepartUpdateManyWithWhereWithoutCandidateInput = {
-    where: takepartScalarWhereInput
-    data: XOR<takepartUpdateManyMutationInput, takepartUncheckedUpdateManyWithoutCandidateInput>
-  }
-
-  export type takepartScalarWhereInput = {
-    AND?: takepartScalarWhereInput | takepartScalarWhereInput[]
-    OR?: takepartScalarWhereInput[]
-    NOT?: takepartScalarWhereInput | takepartScalarWhereInput[]
-    electionId?: IntFilter<"takepart"> | number
-    candidateId?: IntFilter<"takepart"> | number
-    numberOfVotes?: IntFilter<"takepart"> | number
-  }
-
-  export type VoteUpsertWithWhereUniqueWithoutCandidateInput = {
-    where: VoteWhereUniqueInput
-    update: XOR<VoteUpdateWithoutCandidateInput, VoteUncheckedUpdateWithoutCandidateInput>
-    create: XOR<VoteCreateWithoutCandidateInput, VoteUncheckedCreateWithoutCandidateInput>
-  }
-
-  export type VoteUpdateWithWhereUniqueWithoutCandidateInput = {
-    where: VoteWhereUniqueInput
-    data: XOR<VoteUpdateWithoutCandidateInput, VoteUncheckedUpdateWithoutCandidateInput>
-  }
-
-  export type VoteUpdateManyWithWhereWithoutCandidateInput = {
-    where: VoteScalarWhereInput
-    data: XOR<VoteUpdateManyMutationInput, VoteUncheckedUpdateManyWithoutCandidateInput>
-  }
-
-  export type VoteScalarWhereInput = {
-    AND?: VoteScalarWhereInput | VoteScalarWhereInput[]
-    OR?: VoteScalarWhereInput[]
-    NOT?: VoteScalarWhereInput | VoteScalarWhereInput[]
-    id?: IntFilter<"Vote"> | number
-    userId?: IntFilter<"Vote"> | number
-    electionId?: IntFilter<"Vote"> | number
-    candidateId?: IntFilter<"Vote"> | number
-    votedAt?: DateTimeFilter<"Vote"> | Date | string
-  }
-
   export type userCreateWithoutElectionInput = {
     clerkId: string
     fullName: string
@@ -10925,9 +9219,10 @@ export namespace Prisma {
     birthdate?: Date | string | null
     occupation?: string | null
     location?: string | null
-    candidates?: candidateCreateNestedManyWithoutUserInput
     poll_candidates?: poll_candidatesCreateNestedManyWithoutUserInput
+    takepart?: takepartCreateNestedManyWithoutUserInput
     votes?: VoteCreateNestedManyWithoutUserInput
+    candidateVotes?: VoteCreateNestedManyWithoutCandidateInput
   }
 
   export type userUncheckedCreateWithoutElectionInput = {
@@ -10942,9 +9237,10 @@ export namespace Prisma {
     birthdate?: Date | string | null
     occupation?: string | null
     location?: string | null
-    candidates?: candidateUncheckedCreateNestedManyWithoutUserInput
     poll_candidates?: poll_candidatesUncheckedCreateNestedManyWithoutUserInput
+    takepart?: takepartUncheckedCreateNestedManyWithoutUserInput
     votes?: VoteUncheckedCreateNestedManyWithoutUserInput
+    candidateVotes?: VoteUncheckedCreateNestedManyWithoutCandidateInput
   }
 
   export type userCreateOrConnectWithoutElectionInput = {
@@ -10975,7 +9271,7 @@ export namespace Prisma {
 
   export type takepartCreateWithoutElectionInput = {
     numberOfVotes: number
-    candidate: candidateCreateNestedOneWithoutTakepartInput
+    user: userCreateNestedOneWithoutTakepartInput
   }
 
   export type takepartUncheckedCreateWithoutElectionInput = {
@@ -10996,7 +9292,7 @@ export namespace Prisma {
   export type VoteCreateWithoutElectionInput = {
     votedAt?: Date | string
     user: userCreateNestedOneWithoutVotesInput
-    candidate: candidateCreateNestedOneWithoutVotesInput
+    candidate: userCreateNestedOneWithoutCandidateVotesInput
   }
 
   export type VoteUncheckedCreateWithoutElectionInput = {
@@ -11038,9 +9334,10 @@ export namespace Prisma {
     birthdate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     occupation?: NullableStringFieldUpdateOperationsInput | string | null
     location?: NullableStringFieldUpdateOperationsInput | string | null
-    candidates?: candidateUpdateManyWithoutUserNestedInput
     poll_candidates?: poll_candidatesUpdateManyWithoutUserNestedInput
+    takepart?: takepartUpdateManyWithoutUserNestedInput
     votes?: VoteUpdateManyWithoutUserNestedInput
+    candidateVotes?: VoteUpdateManyWithoutCandidateNestedInput
   }
 
   export type userUncheckedUpdateWithoutElectionInput = {
@@ -11055,9 +9352,10 @@ export namespace Prisma {
     birthdate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     occupation?: NullableStringFieldUpdateOperationsInput | string | null
     location?: NullableStringFieldUpdateOperationsInput | string | null
-    candidates?: candidateUncheckedUpdateManyWithoutUserNestedInput
     poll_candidates?: poll_candidatesUncheckedUpdateManyWithoutUserNestedInput
+    takepart?: takepartUncheckedUpdateManyWithoutUserNestedInput
     votes?: VoteUncheckedUpdateManyWithoutUserNestedInput
+    candidateVotes?: VoteUncheckedUpdateManyWithoutCandidateNestedInput
   }
 
   export type poll_candidatesUpsertWithWhereUniqueWithoutElectionInput = {
@@ -11102,6 +9400,15 @@ export namespace Prisma {
     data: XOR<takepartUpdateManyMutationInput, takepartUncheckedUpdateManyWithoutElectionInput>
   }
 
+  export type takepartScalarWhereInput = {
+    AND?: takepartScalarWhereInput | takepartScalarWhereInput[]
+    OR?: takepartScalarWhereInput[]
+    NOT?: takepartScalarWhereInput | takepartScalarWhereInput[]
+    electionId?: IntFilter<"takepart"> | number
+    candidateId?: IntFilter<"takepart"> | number
+    numberOfVotes?: IntFilter<"takepart"> | number
+  }
+
   export type VoteUpsertWithWhereUniqueWithoutElectionInput = {
     where: VoteWhereUniqueInput
     update: XOR<VoteUpdateWithoutElectionInput, VoteUncheckedUpdateWithoutElectionInput>
@@ -11116,6 +9423,17 @@ export namespace Prisma {
   export type VoteUpdateManyWithWhereWithoutElectionInput = {
     where: VoteScalarWhereInput
     data: XOR<VoteUpdateManyMutationInput, VoteUncheckedUpdateManyWithoutElectionInput>
+  }
+
+  export type VoteScalarWhereInput = {
+    AND?: VoteScalarWhereInput | VoteScalarWhereInput[]
+    OR?: VoteScalarWhereInput[]
+    NOT?: VoteScalarWhereInput | VoteScalarWhereInput[]
+    id?: IntFilter<"Vote"> | number
+    userId?: IntFilter<"Vote"> | number
+    electionId?: IntFilter<"Vote"> | number
+    candidateId?: IntFilter<"Vote"> | number
+    votedAt?: DateTimeFilter<"Vote"> | Date | string
   }
 
   export type electionCreateWithoutPoll_candidatesInput = {
@@ -11167,9 +9485,10 @@ export namespace Prisma {
     birthdate?: Date | string | null
     occupation?: string | null
     location?: string | null
-    candidates?: candidateCreateNestedManyWithoutUserInput
     election?: electionCreateNestedManyWithoutUserInput
+    takepart?: takepartCreateNestedManyWithoutUserInput
     votes?: VoteCreateNestedManyWithoutUserInput
+    candidateVotes?: VoteCreateNestedManyWithoutCandidateInput
   }
 
   export type userUncheckedCreateWithoutPoll_candidatesInput = {
@@ -11184,9 +9503,10 @@ export namespace Prisma {
     birthdate?: Date | string | null
     occupation?: string | null
     location?: string | null
-    candidates?: candidateUncheckedCreateNestedManyWithoutUserInput
     election?: electionUncheckedCreateNestedManyWithoutUserInput
+    takepart?: takepartUncheckedCreateNestedManyWithoutUserInput
     votes?: VoteUncheckedCreateNestedManyWithoutUserInput
+    candidateVotes?: VoteUncheckedCreateNestedManyWithoutCandidateInput
   }
 
   export type userCreateOrConnectWithoutPoll_candidatesInput = {
@@ -11260,9 +9580,10 @@ export namespace Prisma {
     birthdate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     occupation?: NullableStringFieldUpdateOperationsInput | string | null
     location?: NullableStringFieldUpdateOperationsInput | string | null
-    candidates?: candidateUpdateManyWithoutUserNestedInput
     election?: electionUpdateManyWithoutUserNestedInput
+    takepart?: takepartUpdateManyWithoutUserNestedInput
     votes?: VoteUpdateManyWithoutUserNestedInput
+    candidateVotes?: VoteUpdateManyWithoutCandidateNestedInput
   }
 
   export type userUncheckedUpdateWithoutPoll_candidatesInput = {
@@ -11277,33 +9598,50 @@ export namespace Prisma {
     birthdate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     occupation?: NullableStringFieldUpdateOperationsInput | string | null
     location?: NullableStringFieldUpdateOperationsInput | string | null
-    candidates?: candidateUncheckedUpdateManyWithoutUserNestedInput
     election?: electionUncheckedUpdateManyWithoutUserNestedInput
+    takepart?: takepartUncheckedUpdateManyWithoutUserNestedInput
     votes?: VoteUncheckedUpdateManyWithoutUserNestedInput
+    candidateVotes?: VoteUncheckedUpdateManyWithoutCandidateNestedInput
   }
 
-  export type candidateCreateWithoutTakepartInput = {
-    name: string
-    description?: string | null
-    image?: string | null
-    is_person: boolean
-    user?: userCreateNestedOneWithoutCandidatesInput
-    votes?: VoteCreateNestedManyWithoutCandidateInput
+  export type userCreateWithoutTakepartInput = {
+    clerkId: string
+    fullName: string
+    username: string
+    password: string
+    isAdmin: boolean
+    gender?: string | null
+    email: string
+    birthdate?: Date | string | null
+    occupation?: string | null
+    location?: string | null
+    election?: electionCreateNestedManyWithoutUserInput
+    poll_candidates?: poll_candidatesCreateNestedManyWithoutUserInput
+    votes?: VoteCreateNestedManyWithoutUserInput
+    candidateVotes?: VoteCreateNestedManyWithoutCandidateInput
   }
 
-  export type candidateUncheckedCreateWithoutTakepartInput = {
+  export type userUncheckedCreateWithoutTakepartInput = {
     id?: number
-    name: string
-    description?: string | null
-    image?: string | null
-    is_person: boolean
-    clerkId?: string | null
-    votes?: VoteUncheckedCreateNestedManyWithoutCandidateInput
+    clerkId: string
+    fullName: string
+    username: string
+    password: string
+    isAdmin: boolean
+    gender?: string | null
+    email: string
+    birthdate?: Date | string | null
+    occupation?: string | null
+    location?: string | null
+    election?: electionUncheckedCreateNestedManyWithoutUserInput
+    poll_candidates?: poll_candidatesUncheckedCreateNestedManyWithoutUserInput
+    votes?: VoteUncheckedCreateNestedManyWithoutUserInput
+    candidateVotes?: VoteUncheckedCreateNestedManyWithoutCandidateInput
   }
 
-  export type candidateCreateOrConnectWithoutTakepartInput = {
-    where: candidateWhereUniqueInput
-    create: XOR<candidateCreateWithoutTakepartInput, candidateUncheckedCreateWithoutTakepartInput>
+  export type userCreateOrConnectWithoutTakepartInput = {
+    where: userWhereUniqueInput
+    create: XOR<userCreateWithoutTakepartInput, userUncheckedCreateWithoutTakepartInput>
   }
 
   export type electionCreateWithoutTakepartInput = {
@@ -11344,34 +9682,50 @@ export namespace Prisma {
     create: XOR<electionCreateWithoutTakepartInput, electionUncheckedCreateWithoutTakepartInput>
   }
 
-  export type candidateUpsertWithoutTakepartInput = {
-    update: XOR<candidateUpdateWithoutTakepartInput, candidateUncheckedUpdateWithoutTakepartInput>
-    create: XOR<candidateCreateWithoutTakepartInput, candidateUncheckedCreateWithoutTakepartInput>
-    where?: candidateWhereInput
+  export type userUpsertWithoutTakepartInput = {
+    update: XOR<userUpdateWithoutTakepartInput, userUncheckedUpdateWithoutTakepartInput>
+    create: XOR<userCreateWithoutTakepartInput, userUncheckedCreateWithoutTakepartInput>
+    where?: userWhereInput
   }
 
-  export type candidateUpdateToOneWithWhereWithoutTakepartInput = {
-    where?: candidateWhereInput
-    data: XOR<candidateUpdateWithoutTakepartInput, candidateUncheckedUpdateWithoutTakepartInput>
+  export type userUpdateToOneWithWhereWithoutTakepartInput = {
+    where?: userWhereInput
+    data: XOR<userUpdateWithoutTakepartInput, userUncheckedUpdateWithoutTakepartInput>
   }
 
-  export type candidateUpdateWithoutTakepartInput = {
-    name?: StringFieldUpdateOperationsInput | string
-    description?: NullableStringFieldUpdateOperationsInput | string | null
-    image?: NullableStringFieldUpdateOperationsInput | string | null
-    is_person?: BoolFieldUpdateOperationsInput | boolean
-    user?: userUpdateOneWithoutCandidatesNestedInput
-    votes?: VoteUpdateManyWithoutCandidateNestedInput
+  export type userUpdateWithoutTakepartInput = {
+    clerkId?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
+    username?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    isAdmin?: BoolFieldUpdateOperationsInput | boolean
+    gender?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    birthdate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    occupation?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    election?: electionUpdateManyWithoutUserNestedInput
+    poll_candidates?: poll_candidatesUpdateManyWithoutUserNestedInput
+    votes?: VoteUpdateManyWithoutUserNestedInput
+    candidateVotes?: VoteUpdateManyWithoutCandidateNestedInput
   }
 
-  export type candidateUncheckedUpdateWithoutTakepartInput = {
+  export type userUncheckedUpdateWithoutTakepartInput = {
     id?: IntFieldUpdateOperationsInput | number
-    name?: StringFieldUpdateOperationsInput | string
-    description?: NullableStringFieldUpdateOperationsInput | string | null
-    image?: NullableStringFieldUpdateOperationsInput | string | null
-    is_person?: BoolFieldUpdateOperationsInput | boolean
-    clerkId?: NullableStringFieldUpdateOperationsInput | string | null
-    votes?: VoteUncheckedUpdateManyWithoutCandidateNestedInput
+    clerkId?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
+    username?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    isAdmin?: BoolFieldUpdateOperationsInput | boolean
+    gender?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    birthdate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    occupation?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    election?: electionUncheckedUpdateManyWithoutUserNestedInput
+    poll_candidates?: poll_candidatesUncheckedUpdateManyWithoutUserNestedInput
+    votes?: VoteUncheckedUpdateManyWithoutUserNestedInput
+    candidateVotes?: VoteUncheckedUpdateManyWithoutCandidateNestedInput
   }
 
   export type electionUpsertWithoutTakepartInput = {
@@ -11416,35 +9770,6 @@ export namespace Prisma {
     userId?: IntFieldUpdateOperationsInput | number
     poll_candidates?: poll_candidatesUncheckedUpdateManyWithoutElectionNestedInput
     votes?: VoteUncheckedUpdateManyWithoutElectionNestedInput
-  }
-
-  export type candidateCreateWithoutUserInput = {
-    name: string
-    description?: string | null
-    image?: string | null
-    is_person: boolean
-    takepart?: takepartCreateNestedManyWithoutCandidateInput
-    votes?: VoteCreateNestedManyWithoutCandidateInput
-  }
-
-  export type candidateUncheckedCreateWithoutUserInput = {
-    id?: number
-    name: string
-    description?: string | null
-    image?: string | null
-    is_person: boolean
-    takepart?: takepartUncheckedCreateNestedManyWithoutCandidateInput
-    votes?: VoteUncheckedCreateNestedManyWithoutCandidateInput
-  }
-
-  export type candidateCreateOrConnectWithoutUserInput = {
-    where: candidateWhereUniqueInput
-    create: XOR<candidateCreateWithoutUserInput, candidateUncheckedCreateWithoutUserInput>
-  }
-
-  export type candidateCreateManyUserInputEnvelope = {
-    data: candidateCreateManyUserInput | candidateCreateManyUserInput[]
-    skipDuplicates?: boolean
   }
 
   export type electionCreateWithoutUserInput = {
@@ -11511,10 +9836,30 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type takepartCreateWithoutUserInput = {
+    numberOfVotes: number
+    election: electionCreateNestedOneWithoutTakepartInput
+  }
+
+  export type takepartUncheckedCreateWithoutUserInput = {
+    electionId: number
+    numberOfVotes: number
+  }
+
+  export type takepartCreateOrConnectWithoutUserInput = {
+    where: takepartWhereUniqueInput
+    create: XOR<takepartCreateWithoutUserInput, takepartUncheckedCreateWithoutUserInput>
+  }
+
+  export type takepartCreateManyUserInputEnvelope = {
+    data: takepartCreateManyUserInput | takepartCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
   export type VoteCreateWithoutUserInput = {
     votedAt?: Date | string
     election: electionCreateNestedOneWithoutVotesInput
-    candidate: candidateCreateNestedOneWithoutVotesInput
+    candidate: userCreateNestedOneWithoutCandidateVotesInput
   }
 
   export type VoteUncheckedCreateWithoutUserInput = {
@@ -11534,32 +9879,27 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
-  export type candidateUpsertWithWhereUniqueWithoutUserInput = {
-    where: candidateWhereUniqueInput
-    update: XOR<candidateUpdateWithoutUserInput, candidateUncheckedUpdateWithoutUserInput>
-    create: XOR<candidateCreateWithoutUserInput, candidateUncheckedCreateWithoutUserInput>
+  export type VoteCreateWithoutCandidateInput = {
+    votedAt?: Date | string
+    user: userCreateNestedOneWithoutVotesInput
+    election: electionCreateNestedOneWithoutVotesInput
   }
 
-  export type candidateUpdateWithWhereUniqueWithoutUserInput = {
-    where: candidateWhereUniqueInput
-    data: XOR<candidateUpdateWithoutUserInput, candidateUncheckedUpdateWithoutUserInput>
+  export type VoteUncheckedCreateWithoutCandidateInput = {
+    id?: number
+    userId: number
+    electionId: number
+    votedAt?: Date | string
   }
 
-  export type candidateUpdateManyWithWhereWithoutUserInput = {
-    where: candidateScalarWhereInput
-    data: XOR<candidateUpdateManyMutationInput, candidateUncheckedUpdateManyWithoutUserInput>
+  export type VoteCreateOrConnectWithoutCandidateInput = {
+    where: VoteWhereUniqueInput
+    create: XOR<VoteCreateWithoutCandidateInput, VoteUncheckedCreateWithoutCandidateInput>
   }
 
-  export type candidateScalarWhereInput = {
-    AND?: candidateScalarWhereInput | candidateScalarWhereInput[]
-    OR?: candidateScalarWhereInput[]
-    NOT?: candidateScalarWhereInput | candidateScalarWhereInput[]
-    id?: IntFilter<"candidate"> | number
-    name?: StringFilter<"candidate"> | string
-    description?: StringNullableFilter<"candidate"> | string | null
-    image?: StringNullableFilter<"candidate"> | string | null
-    is_person?: BoolFilter<"candidate"> | boolean
-    clerkId?: StringNullableFilter<"candidate"> | string | null
+  export type VoteCreateManyCandidateInputEnvelope = {
+    data: VoteCreateManyCandidateInput | VoteCreateManyCandidateInput[]
+    skipDuplicates?: boolean
   }
 
   export type electionUpsertWithWhereUniqueWithoutUserInput = {
@@ -11612,6 +9952,22 @@ export namespace Prisma {
     data: XOR<poll_candidatesUpdateManyMutationInput, poll_candidatesUncheckedUpdateManyWithoutUserInput>
   }
 
+  export type takepartUpsertWithWhereUniqueWithoutUserInput = {
+    where: takepartWhereUniqueInput
+    update: XOR<takepartUpdateWithoutUserInput, takepartUncheckedUpdateWithoutUserInput>
+    create: XOR<takepartCreateWithoutUserInput, takepartUncheckedCreateWithoutUserInput>
+  }
+
+  export type takepartUpdateWithWhereUniqueWithoutUserInput = {
+    where: takepartWhereUniqueInput
+    data: XOR<takepartUpdateWithoutUserInput, takepartUncheckedUpdateWithoutUserInput>
+  }
+
+  export type takepartUpdateManyWithWhereWithoutUserInput = {
+    where: takepartScalarWhereInput
+    data: XOR<takepartUpdateManyMutationInput, takepartUncheckedUpdateManyWithoutUserInput>
+  }
+
   export type VoteUpsertWithWhereUniqueWithoutUserInput = {
     where: VoteWhereUniqueInput
     update: XOR<VoteUpdateWithoutUserInput, VoteUncheckedUpdateWithoutUserInput>
@@ -11628,6 +9984,22 @@ export namespace Prisma {
     data: XOR<VoteUpdateManyMutationInput, VoteUncheckedUpdateManyWithoutUserInput>
   }
 
+  export type VoteUpsertWithWhereUniqueWithoutCandidateInput = {
+    where: VoteWhereUniqueInput
+    update: XOR<VoteUpdateWithoutCandidateInput, VoteUncheckedUpdateWithoutCandidateInput>
+    create: XOR<VoteCreateWithoutCandidateInput, VoteUncheckedCreateWithoutCandidateInput>
+  }
+
+  export type VoteUpdateWithWhereUniqueWithoutCandidateInput = {
+    where: VoteWhereUniqueInput
+    data: XOR<VoteUpdateWithoutCandidateInput, VoteUncheckedUpdateWithoutCandidateInput>
+  }
+
+  export type VoteUpdateManyWithWhereWithoutCandidateInput = {
+    where: VoteScalarWhereInput
+    data: XOR<VoteUpdateManyMutationInput, VoteUncheckedUpdateManyWithoutCandidateInput>
+  }
+
   export type userCreateWithoutVotesInput = {
     clerkId: string
     fullName: string
@@ -11639,9 +10011,10 @@ export namespace Prisma {
     birthdate?: Date | string | null
     occupation?: string | null
     location?: string | null
-    candidates?: candidateCreateNestedManyWithoutUserInput
     election?: electionCreateNestedManyWithoutUserInput
     poll_candidates?: poll_candidatesCreateNestedManyWithoutUserInput
+    takepart?: takepartCreateNestedManyWithoutUserInput
+    candidateVotes?: VoteCreateNestedManyWithoutCandidateInput
   }
 
   export type userUncheckedCreateWithoutVotesInput = {
@@ -11656,9 +10029,10 @@ export namespace Prisma {
     birthdate?: Date | string | null
     occupation?: string | null
     location?: string | null
-    candidates?: candidateUncheckedCreateNestedManyWithoutUserInput
     election?: electionUncheckedCreateNestedManyWithoutUserInput
     poll_candidates?: poll_candidatesUncheckedCreateNestedManyWithoutUserInput
+    takepart?: takepartUncheckedCreateNestedManyWithoutUserInput
+    candidateVotes?: VoteUncheckedCreateNestedManyWithoutCandidateInput
   }
 
   export type userCreateOrConnectWithoutVotesInput = {
@@ -11704,28 +10078,44 @@ export namespace Prisma {
     create: XOR<electionCreateWithoutVotesInput, electionUncheckedCreateWithoutVotesInput>
   }
 
-  export type candidateCreateWithoutVotesInput = {
-    name: string
-    description?: string | null
-    image?: string | null
-    is_person: boolean
-    user?: userCreateNestedOneWithoutCandidatesInput
-    takepart?: takepartCreateNestedManyWithoutCandidateInput
+  export type userCreateWithoutCandidateVotesInput = {
+    clerkId: string
+    fullName: string
+    username: string
+    password: string
+    isAdmin: boolean
+    gender?: string | null
+    email: string
+    birthdate?: Date | string | null
+    occupation?: string | null
+    location?: string | null
+    election?: electionCreateNestedManyWithoutUserInput
+    poll_candidates?: poll_candidatesCreateNestedManyWithoutUserInput
+    takepart?: takepartCreateNestedManyWithoutUserInput
+    votes?: VoteCreateNestedManyWithoutUserInput
   }
 
-  export type candidateUncheckedCreateWithoutVotesInput = {
+  export type userUncheckedCreateWithoutCandidateVotesInput = {
     id?: number
-    name: string
-    description?: string | null
-    image?: string | null
-    is_person: boolean
-    clerkId?: string | null
-    takepart?: takepartUncheckedCreateNestedManyWithoutCandidateInput
+    clerkId: string
+    fullName: string
+    username: string
+    password: string
+    isAdmin: boolean
+    gender?: string | null
+    email: string
+    birthdate?: Date | string | null
+    occupation?: string | null
+    location?: string | null
+    election?: electionUncheckedCreateNestedManyWithoutUserInput
+    poll_candidates?: poll_candidatesUncheckedCreateNestedManyWithoutUserInput
+    takepart?: takepartUncheckedCreateNestedManyWithoutUserInput
+    votes?: VoteUncheckedCreateNestedManyWithoutUserInput
   }
 
-  export type candidateCreateOrConnectWithoutVotesInput = {
-    where: candidateWhereUniqueInput
-    create: XOR<candidateCreateWithoutVotesInput, candidateUncheckedCreateWithoutVotesInput>
+  export type userCreateOrConnectWithoutCandidateVotesInput = {
+    where: userWhereUniqueInput
+    create: XOR<userCreateWithoutCandidateVotesInput, userUncheckedCreateWithoutCandidateVotesInput>
   }
 
   export type userUpsertWithoutVotesInput = {
@@ -11750,9 +10140,10 @@ export namespace Prisma {
     birthdate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     occupation?: NullableStringFieldUpdateOperationsInput | string | null
     location?: NullableStringFieldUpdateOperationsInput | string | null
-    candidates?: candidateUpdateManyWithoutUserNestedInput
     election?: electionUpdateManyWithoutUserNestedInput
     poll_candidates?: poll_candidatesUpdateManyWithoutUserNestedInput
+    takepart?: takepartUpdateManyWithoutUserNestedInput
+    candidateVotes?: VoteUpdateManyWithoutCandidateNestedInput
   }
 
   export type userUncheckedUpdateWithoutVotesInput = {
@@ -11767,9 +10158,10 @@ export namespace Prisma {
     birthdate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     occupation?: NullableStringFieldUpdateOperationsInput | string | null
     location?: NullableStringFieldUpdateOperationsInput | string | null
-    candidates?: candidateUncheckedUpdateManyWithoutUserNestedInput
     election?: electionUncheckedUpdateManyWithoutUserNestedInput
     poll_candidates?: poll_candidatesUncheckedUpdateManyWithoutUserNestedInput
+    takepart?: takepartUncheckedUpdateManyWithoutUserNestedInput
+    candidateVotes?: VoteUncheckedUpdateManyWithoutCandidateNestedInput
   }
 
   export type electionUpsertWithoutVotesInput = {
@@ -11816,81 +10208,50 @@ export namespace Prisma {
     takepart?: takepartUncheckedUpdateManyWithoutElectionNestedInput
   }
 
-  export type candidateUpsertWithoutVotesInput = {
-    update: XOR<candidateUpdateWithoutVotesInput, candidateUncheckedUpdateWithoutVotesInput>
-    create: XOR<candidateCreateWithoutVotesInput, candidateUncheckedCreateWithoutVotesInput>
-    where?: candidateWhereInput
+  export type userUpsertWithoutCandidateVotesInput = {
+    update: XOR<userUpdateWithoutCandidateVotesInput, userUncheckedUpdateWithoutCandidateVotesInput>
+    create: XOR<userCreateWithoutCandidateVotesInput, userUncheckedCreateWithoutCandidateVotesInput>
+    where?: userWhereInput
   }
 
-  export type candidateUpdateToOneWithWhereWithoutVotesInput = {
-    where?: candidateWhereInput
-    data: XOR<candidateUpdateWithoutVotesInput, candidateUncheckedUpdateWithoutVotesInput>
+  export type userUpdateToOneWithWhereWithoutCandidateVotesInput = {
+    where?: userWhereInput
+    data: XOR<userUpdateWithoutCandidateVotesInput, userUncheckedUpdateWithoutCandidateVotesInput>
   }
 
-  export type candidateUpdateWithoutVotesInput = {
-    name?: StringFieldUpdateOperationsInput | string
-    description?: NullableStringFieldUpdateOperationsInput | string | null
-    image?: NullableStringFieldUpdateOperationsInput | string | null
-    is_person?: BoolFieldUpdateOperationsInput | boolean
-    user?: userUpdateOneWithoutCandidatesNestedInput
-    takepart?: takepartUpdateManyWithoutCandidateNestedInput
+  export type userUpdateWithoutCandidateVotesInput = {
+    clerkId?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
+    username?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    isAdmin?: BoolFieldUpdateOperationsInput | boolean
+    gender?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    birthdate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    occupation?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    election?: electionUpdateManyWithoutUserNestedInput
+    poll_candidates?: poll_candidatesUpdateManyWithoutUserNestedInput
+    takepart?: takepartUpdateManyWithoutUserNestedInput
+    votes?: VoteUpdateManyWithoutUserNestedInput
   }
 
-  export type candidateUncheckedUpdateWithoutVotesInput = {
+  export type userUncheckedUpdateWithoutCandidateVotesInput = {
     id?: IntFieldUpdateOperationsInput | number
-    name?: StringFieldUpdateOperationsInput | string
-    description?: NullableStringFieldUpdateOperationsInput | string | null
-    image?: NullableStringFieldUpdateOperationsInput | string | null
-    is_person?: BoolFieldUpdateOperationsInput | boolean
-    clerkId?: NullableStringFieldUpdateOperationsInput | string | null
-    takepart?: takepartUncheckedUpdateManyWithoutCandidateNestedInput
-  }
-
-  export type takepartCreateManyCandidateInput = {
-    electionId: number
-    numberOfVotes: number
-  }
-
-  export type VoteCreateManyCandidateInput = {
-    id?: number
-    userId: number
-    electionId: number
-    votedAt?: Date | string
-  }
-
-  export type takepartUpdateWithoutCandidateInput = {
-    numberOfVotes?: IntFieldUpdateOperationsInput | number
-    election?: electionUpdateOneRequiredWithoutTakepartNestedInput
-  }
-
-  export type takepartUncheckedUpdateWithoutCandidateInput = {
-    electionId?: IntFieldUpdateOperationsInput | number
-    numberOfVotes?: IntFieldUpdateOperationsInput | number
-  }
-
-  export type takepartUncheckedUpdateManyWithoutCandidateInput = {
-    electionId?: IntFieldUpdateOperationsInput | number
-    numberOfVotes?: IntFieldUpdateOperationsInput | number
-  }
-
-  export type VoteUpdateWithoutCandidateInput = {
-    votedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    user?: userUpdateOneRequiredWithoutVotesNestedInput
-    election?: electionUpdateOneRequiredWithoutVotesNestedInput
-  }
-
-  export type VoteUncheckedUpdateWithoutCandidateInput = {
-    id?: IntFieldUpdateOperationsInput | number
-    userId?: IntFieldUpdateOperationsInput | number
-    electionId?: IntFieldUpdateOperationsInput | number
-    votedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type VoteUncheckedUpdateManyWithoutCandidateInput = {
-    id?: IntFieldUpdateOperationsInput | number
-    userId?: IntFieldUpdateOperationsInput | number
-    electionId?: IntFieldUpdateOperationsInput | number
-    votedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    clerkId?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
+    username?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    isAdmin?: BoolFieldUpdateOperationsInput | boolean
+    gender?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    birthdate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    occupation?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    election?: electionUncheckedUpdateManyWithoutUserNestedInput
+    poll_candidates?: poll_candidatesUncheckedUpdateManyWithoutUserNestedInput
+    takepart?: takepartUncheckedUpdateManyWithoutUserNestedInput
+    votes?: VoteUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type poll_candidatesCreateManyElectionInput = {
@@ -11930,7 +10291,7 @@ export namespace Prisma {
 
   export type takepartUpdateWithoutElectionInput = {
     numberOfVotes?: IntFieldUpdateOperationsInput | number
-    candidate?: candidateUpdateOneRequiredWithoutTakepartNestedInput
+    user?: userUpdateOneRequiredWithoutTakepartNestedInput
   }
 
   export type takepartUncheckedUpdateWithoutElectionInput = {
@@ -11946,7 +10307,7 @@ export namespace Prisma {
   export type VoteUpdateWithoutElectionInput = {
     votedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: userUpdateOneRequiredWithoutVotesNestedInput
-    candidate?: candidateUpdateOneRequiredWithoutVotesNestedInput
+    candidate?: userUpdateOneRequiredWithoutCandidateVotesNestedInput
   }
 
   export type VoteUncheckedUpdateWithoutElectionInput = {
@@ -11961,14 +10322,6 @@ export namespace Prisma {
     userId?: IntFieldUpdateOperationsInput | number
     candidateId?: IntFieldUpdateOperationsInput | number
     votedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type candidateCreateManyUserInput = {
-    id?: number
-    name: string
-    description?: string | null
-    image?: string | null
-    is_person: boolean
   }
 
   export type electionCreateManyUserInput = {
@@ -11991,6 +10344,11 @@ export namespace Prisma {
     invited_at?: Date | string
   }
 
+  export type takepartCreateManyUserInput = {
+    electionId: number
+    numberOfVotes: number
+  }
+
   export type VoteCreateManyUserInput = {
     id?: number
     electionId: number
@@ -11998,31 +10356,11 @@ export namespace Prisma {
     votedAt?: Date | string
   }
 
-  export type candidateUpdateWithoutUserInput = {
-    name?: StringFieldUpdateOperationsInput | string
-    description?: NullableStringFieldUpdateOperationsInput | string | null
-    image?: NullableStringFieldUpdateOperationsInput | string | null
-    is_person?: BoolFieldUpdateOperationsInput | boolean
-    takepart?: takepartUpdateManyWithoutCandidateNestedInput
-    votes?: VoteUpdateManyWithoutCandidateNestedInput
-  }
-
-  export type candidateUncheckedUpdateWithoutUserInput = {
-    id?: IntFieldUpdateOperationsInput | number
-    name?: StringFieldUpdateOperationsInput | string
-    description?: NullableStringFieldUpdateOperationsInput | string | null
-    image?: NullableStringFieldUpdateOperationsInput | string | null
-    is_person?: BoolFieldUpdateOperationsInput | boolean
-    takepart?: takepartUncheckedUpdateManyWithoutCandidateNestedInput
-    votes?: VoteUncheckedUpdateManyWithoutCandidateNestedInput
-  }
-
-  export type candidateUncheckedUpdateManyWithoutUserInput = {
-    id?: IntFieldUpdateOperationsInput | number
-    name?: StringFieldUpdateOperationsInput | string
-    description?: NullableStringFieldUpdateOperationsInput | string | null
-    image?: NullableStringFieldUpdateOperationsInput | string | null
-    is_person?: BoolFieldUpdateOperationsInput | boolean
+  export type VoteCreateManyCandidateInput = {
+    id?: number
+    userId: number
+    electionId: number
+    votedAt?: Date | string
   }
 
   export type electionUpdateWithoutUserInput = {
@@ -12089,10 +10427,25 @@ export namespace Prisma {
     invited_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type takepartUpdateWithoutUserInput = {
+    numberOfVotes?: IntFieldUpdateOperationsInput | number
+    election?: electionUpdateOneRequiredWithoutTakepartNestedInput
+  }
+
+  export type takepartUncheckedUpdateWithoutUserInput = {
+    electionId?: IntFieldUpdateOperationsInput | number
+    numberOfVotes?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type takepartUncheckedUpdateManyWithoutUserInput = {
+    electionId?: IntFieldUpdateOperationsInput | number
+    numberOfVotes?: IntFieldUpdateOperationsInput | number
+  }
+
   export type VoteUpdateWithoutUserInput = {
     votedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     election?: electionUpdateOneRequiredWithoutVotesNestedInput
-    candidate?: candidateUpdateOneRequiredWithoutVotesNestedInput
+    candidate?: userUpdateOneRequiredWithoutCandidateVotesNestedInput
   }
 
   export type VoteUncheckedUpdateWithoutUserInput = {
@@ -12106,6 +10459,26 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     electionId?: IntFieldUpdateOperationsInput | number
     candidateId?: IntFieldUpdateOperationsInput | number
+    votedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type VoteUpdateWithoutCandidateInput = {
+    votedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: userUpdateOneRequiredWithoutVotesNestedInput
+    election?: electionUpdateOneRequiredWithoutVotesNestedInput
+  }
+
+  export type VoteUncheckedUpdateWithoutCandidateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    userId?: IntFieldUpdateOperationsInput | number
+    electionId?: IntFieldUpdateOperationsInput | number
+    votedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type VoteUncheckedUpdateManyWithoutCandidateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    userId?: IntFieldUpdateOperationsInput | number
+    electionId?: IntFieldUpdateOperationsInput | number
     votedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 

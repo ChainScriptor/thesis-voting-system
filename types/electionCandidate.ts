@@ -2,7 +2,6 @@
 export interface ElectionCandidate {
   id: number;            // το poll‐candidate id
   poll_id: number;       // το electionId
-  candidateId: number;   // το πραγματικό id του candidate
   numberOfVotes: number;
   name: string;
   description: string | null;

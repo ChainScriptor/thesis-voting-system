@@ -37,13 +37,12 @@ interface Election {
 }
 
 interface Candidate {
-  id: number;
-  poll_id: number;
-  user_id: number;
-  invited_at: string;
-  fullName: string;
-  email: string;
+  // Εδώ βλέπουμε τα δεδομένα που επιστρέφει το /api/elections/[id]/candidates
+  id: number;        // candidateId (PK του candidate table)
+  name: string;
+  email: string | null;
   occupation: string | null;
+  numberOfVotes: number;
 }
 
 export default function CandidatesPage() {
@@ -59,17 +58,21 @@ export default function CandidatesPage() {
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [open, setOpen] = useState<boolean>(false);
 
-  // 1) Φόρτωση ψηφοφοριών
+  // 1) Φόρτωση όλων των εκλογών
   useEffect(() => {
     fetch("/api/elections")
       .then((r) => r.json())
       .then(setElections)
       .catch(() =>
-        toast({ title: "Σφάλμα", description: "Αποτυχία φόρτωσης ψηφοφοριών", variant: "destructive" })
+        toast({
+          title: "Σφάλμα",
+          description: "Αποτυχία φόρτωσης ψηφοφοριών",
+          variant: "destructive",
+        })
       );
   }, [toast]);
 
-  // 2) Φόρτωση χρηστών
+  // 2) Φόρτωση όλων των χρηστών
   useEffect(() => {
     fetch("/api/users")
       .then((r) => r.json())
@@ -78,68 +81,98 @@ export default function CandidatesPage() {
           setUsers(data);
           setFilteredUsers(data);
         } else {
-          setUsers([]);
-          setFilteredUsers([]);
-          toast({ title: "Σφάλμα", description: data.error || "Αποτυχία φόρτωσης χρηστών", variant: "destructive" });
+          toast({
+            title: "Σφάλμα",
+            description: data.error || "Αποτυχία φόρτωσης χρηστών",
+            variant: "destructive",
+          });
         }
       })
       .catch(() =>
-        toast({ title: "Σφάλμα", description: "Αποτυχία φόρτωσης χρηστών", variant: "destructive" })
+        toast({
+          title: "Σφάλμα",
+          description: "Αποτυχία φόρτωσης χρηστών",
+          variant: "destructive",
+        })
       );
   }, [toast]);
 
-  // 3) Φόρτωση υποψηφίων όταν αλλάζει επιλογή ψηφοφορίας
+  // 3) Φόρτωση υποψηφίων (takepart) όταν αλλάζει η επιλογή ψηφοφορίας
   useEffect(() => {
     if (!selectedElection) {
       setCandidates([]);
       return;
     }
-    fetch(`/api/poll-candidates?pollId=${selectedElection}`)
-      .then((r) => r.json())
+
+    fetch(`/api/elections/${selectedElection}/candidates`)
+      .then((r) => {
+        if (!r.ok) throw new Error();
+        return r.json();
+      })
       .then(setCandidates)
       .catch(() =>
-        toast({ title: "Σφάλμα", description: "Αποτυχία φόρτωσης υποψηφίων", variant: "destructive" })
+        toast({
+          title: "Σφάλμα",
+          description: "Αποτυχία φόρτωσης υποψηφίων",
+          variant: "destructive",
+        })
       );
   }, [selectedElection, toast]);
 
-  // 4) Φιλτράρισμα διαθέσιμων χρηστών (όχι ήδη καλεσμένων) + αναζήτηση
+  // 4) Φιλτράρισμα διαθέσιμων χρηστών: δεν είναι ήδη καλεσμένοι
   useEffect(() => {
-    const invitedIds = new Set(candidates.map(c => c.user_id));
+    // οι userId που είναι ήδη υποψήφιοι:
+    const invitedIds = new Set(candidates.map((c) => c.id));
     setFilteredUsers(
-      users
-        .filter(u => !invitedIds.has(u.id))
-        .filter(u =>
-          u.fullName.toLowerCase().includes(search.toLowerCase()) ||
-          u.email.toLowerCase().includes(search.toLowerCase()) ||
-          (u.occupation ?? "").toLowerCase().includes(search.toLowerCase())
-        )
+      users.filter((u) => !invitedIds.has(u.id)).filter((u) =>
+        [u.fullName, u.email, u.occupation ?? ""]
+          .join(" ")
+          .toLowerCase()
+          .includes(search.toLowerCase())
+      )
     );
   }, [candidates, search, users]);
 
-  // 5) Χειριστής αναζήτησης
-  const onSearch = (q: string) => {
-    setSearch(q);
-  };
+  // 5) Handler αναζήτησης
+  const onSearch = (q: string) => setSearch(q);
 
-  // 6) Πρόσκληση νέου υποψηφίου
+  // 6) Πρόσκληση νέου υποψήφιου
   const inviteUser = async (u: User) => {
     if (!selectedElection) {
       toast({ title: "Επιλέξτε ψηφοφορία πρώτα", variant: "destructive" });
       return;
     }
     try {
-      const res = await fetch("/api/poll-candidates", {
+      // Log the request details for debugging
+      console.log("POSTing to", `/api/elections/${selectedElection}/candidates`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ pollId: selectedElection, userId: u.id }),
+        body: JSON.stringify({ userId: u.id }),
       });
-      if (!res.ok) throw new Error();
-      const newCand: Candidate = await res.json();
-      setCandidates(prev => [...prev, newCand]);
+      // Χρησιμοποιούμε το σωστό endpoint για προσθήκη υποψηφίου
+      const res = await fetch(
+        `/api/elections/${selectedElection}/candidates`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ userId: u.id }),
+        }
+      );
+      const data = await res.json();
+      if (!res.ok || !data.success) throw new Error();
+      // Επαναφόρτωση της λίστας υποψηφίων
+      const updated = await fetch(
+        `/api/elections/${selectedElection}/candidates`
+      ).then((r) => r.json());
+      setCandidates(updated);
       toast({ title: "Επιτυχία", description: "Υποψήφιος προστέθηκε" });
       setOpen(false);
     } catch {
-      toast({ title: "Σφάλμα", description: "Αποτυχία πρόσκλησης", variant: "destructive" });
+      toast({
+        title: "Σφάλμα",
+        description: "Αποτυχία πρόσκλησης",
+        variant: "destructive",
+      });
     }
   };
 
@@ -147,12 +180,24 @@ export default function CandidatesPage() {
   const removeCandidate = async (candidateId: number) => {
     if (!selectedElection) return;
     try {
-      const res = await fetch(`/api/poll-candidates/${candidateId}`, { method: "DELETE" });
-      if (!res.ok) throw new Error();
-      setCandidates(prev => prev.filter(c => c.id !== candidateId));
+      await fetch(
+        `/api/elections/${selectedElection}/candidates/${candidateId}`,
+        { method: "DELETE" }
+      ).then((r) => {
+        if (!r.ok) throw new Error();
+      });
+      // Επαναφόρτωση
+      const updated = await fetch(
+        `/api/elections/${selectedElection}/candidates`
+      ).then((r) => r.json());
+      setCandidates(updated);
       toast({ title: "Επιτυχία", description: "Υποψήφιος αφαιρέθηκε" });
     } catch {
-      toast({ title: "Σφάλμα", description: "Αποτυχία αφαίρεσης", variant: "destructive" });
+      toast({
+        title: "Σφάλμα",
+        description: "Αποτυχία αφαίρεσης",
+        variant: "destructive",
+      });
     }
   };
 
@@ -160,17 +205,21 @@ export default function CandidatesPage() {
     <div className="p-6 space-y-6">
       <h1 className="text-2xl font-bold">Διαχείριση Υποψηφίων</h1>
 
-      {/* Επιλογή Ψηφοφορίας */}
+      {/* Επιλογή ψηφοφορίας */}
       <div className="space-y-2">
         <label className="block text-sm font-medium">Επιλογή Ψηφοφορίας</label>
         <select
           value={selectedElection}
-          onChange={e => setSelectedElection(e.target.value)}
+          onChange={(e) => setSelectedElection(e.target.value)}
           className="w-full border rounded px-3 py-2"
         >
-          <option value="" disabled>-- Επιλέξτε --</option>
-          {elections.map(el => (
-            <option key={el.id} value={el.id}>{el.title}</option>
+          <option value="" disabled>
+            -- Επιλέξτε --
+          </option>
+          {elections.map((el) => (
+            <option key={el.id} value={el.id}>
+              {el.title}
+            </option>
           ))}
         </select>
       </div>
@@ -182,10 +231,13 @@ export default function CandidatesPage() {
           <p className="text-gray-500">Δεν υπάρχουν υποψήφιοι.</p>
         ) : (
           <div className="space-y-2">
-            {candidates.map(c => (
-              <div key={c.id} className="flex justify-between items-center border p-2 rounded">
+            {candidates.map((c) => (
+              <div
+                key={c.id}
+                className="flex justify-between items-center border p-2 rounded"
+              >
                 <div>
-                  <div className="font-medium">{c.fullName}</div>
+                  <div className="font-medium">{c.name}</div>
                   <div className="text-sm text-gray-600">{c.email}</div>
                 </div>
                 <Button
@@ -204,23 +256,30 @@ export default function CandidatesPage() {
       {/* Modal Πρόσκλησης */}
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
-          <Button><UserPlus className="mr-2 h-4 w-4" /> Προσθήκη</Button>
+          <Button>
+            <UserPlus className="mr-2 h-4 w-4" /> Προσθήκη
+          </Button>
         </DialogTrigger>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>Προσθήκη Υποψηφίου</DialogTitle>
-            <DialogDescription>Επίλεξε χρήστη για πρόσκληση</DialogDescription>
+            <DialogDescription>
+              Επίλεξε χρήστη για πρόσκληση
+            </DialogDescription>
           </DialogHeader>
+
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium">Αναζήτηση Χρηστών</label>
+              <label className="block text-sm font-medium">
+                Αναζήτηση Χρηστών
+              </label>
               <div className="relative">
                 <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 <Input
                   className="pl-10"
                   placeholder="Όνομα, email ή θέση..."
                   value={search}
-                  onChange={e => onSearch(e.target.value)}
+                  onChange={(e) => onSearch(e.target.value)}
                 />
               </div>
             </div>
@@ -235,7 +294,7 @@ export default function CandidatesPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredUsers.map(u => (
+                  {filteredUsers.map((u) => (
                     <TableRow key={u.id}>
                       <TableCell>{u.fullName}</TableCell>
                       <TableCell>{u.email}</TableCell>
@@ -255,6 +314,7 @@ export default function CandidatesPage() {
               </Table>
             </div>
           </div>
+
           <DialogFooter>
             <Button variant="outline" onClick={() => setOpen(false)}>
               Άκυρο

@@ -8,19 +8,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model candidate {
-  id          Int     @id @default(autoincrement())
-  name        String
-  description String?
-  image       String?
-  is_person   Boolean
-  clerkId     String? @unique
-
-  user     user?      @relation(fields: [clerkId], references: [clerkId])
-  takepart takepart[]
-  votes    Vote[]
-}
-
 model election {
   id                Int       @id @default(autoincrement())
   title             String
@@ -61,8 +48,8 @@ model takepart {
   candidateId   Int
   numberOfVotes Int
 
-  candidate candidate @relation(fields: [candidateId], references: [id])
-  election  election  @relation(fields: [electionId], references: [id])
+  user     user     @relation("TakepartUser", fields: [candidateId], references: [id])
+  election election @relation(fields: [electionId], references: [id])
 
   @@id([electionId, candidateId])
   @@index([candidateId])
@@ -81,10 +68,11 @@ model user {
   occupation String?
   location   String?
 
-  candidates      candidate[]
   election        election[]
   poll_candidates poll_candidates[]
-  votes           Vote[]
+  takepart        takepart[]        @relation("TakepartUser")
+  votes           Vote[]            @relation("VoteUser")
+  candidateVotes  Vote[]            @relation("VoteCandidate")
 }
 
 model Vote {
@@ -94,9 +82,9 @@ model Vote {
   candidateId Int
   votedAt     DateTime @default(now())
 
-  user      user      @relation(fields: [userId], references: [id])
-  election  election  @relation(fields: [electionId], references: [id])
-  candidate candidate @relation(fields: [candidateId], references: [id])
+  user      user     @relation("VoteUser", fields: [userId], references: [id])
+  election  election @relation(fields: [electionId], references: [id])
+  candidate user     @relation("VoteCandidate", fields: [candidateId], references: [id])
 
   @@unique([userId, electionId])
 }

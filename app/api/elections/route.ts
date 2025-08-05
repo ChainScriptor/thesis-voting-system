@@ -12,7 +12,7 @@ export async function GET() {
   try {
     const elections = await prisma.election.findMany({
       include: {
-        takepart: { include: { candidate: true } },
+        takepart: { include: { user: true } },
       },
       orderBy: { start_date: "desc" },
     });
@@ -29,7 +29,7 @@ export async function GET() {
         roles: el.target_occupation ? [el.target_occupation] : [],
         locations: el.target_location ? [el.target_location] : [],
       },
-      candidates: el.takepart.map((tp) => tp.candidate),
+      candidates: el.takepart.map((tp) => tp.user),
       createdAt: el.start_date.toISOString(),
       isActive: el.is_active,
     }));

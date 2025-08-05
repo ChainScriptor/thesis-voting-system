@@ -5,7 +5,7 @@ export interface Poll {
   title: string;
   description: string;
   options: PollOption[];
-  candidates: Candidate[];  // <- εδώ θα βλέπει πλέον email & occupation
+  candidates: User[];  // <- εδώ θα βλέπει πλέον email & occupation
   targeting: Targeting;
   dateRange: {
     startDate: Date;

@@ -27,9 +27,7 @@ export async function GET(request: Request) {
       include: {
         takepart: {
           include: {
-            candidate: {
-              include: { user: true },
-            },
+            user: true, // <-- αντί για candidate
           },
         },
       },
@@ -52,13 +50,10 @@ export async function GET(request: Request) {
         locations: election.target_location ? [election.target_location] : [],
       },
       candidates: election.takepart.map((tp) => ({
-        id: tp.candidate.id,
-        name: tp.candidate.name,
-        email: tp.candidate.user?.email ?? null,
-        occupation: tp.candidate.user?.occupation ?? null,
-        imageUrl: tp.candidate.image ?? null,
-        is_person: tp.candidate.is_person,
-        clerkId: tp.candidate.clerkId,
+        id: tp.user.id,
+        name: tp.user.fullName,
+        email: tp.user.email,
+        occupation: tp.user.occupation,
         numberOfVotes: tp.numberOfVotes,
       })),
       createdAt: election.start_date.toISOString(),
