@@ -19,8 +19,8 @@ export async function GET(request: Request) {
     const takepart = await prisma.takepart.findMany({
       where: { electionId },
       include: {
-        candidate: {
-          select: { id: true, name: true }
+        user: {
+          select: { id: true, fullName: true }
         }
       },
       orderBy: { numberOfVotes: "desc" }
@@ -28,8 +28,8 @@ export async function GET(request: Request) {
 
     // format σε array { candidateId, candidateName, votes }
     const results = takepart.map((tp) => ({
-      candidateId: tp.candidate.id,
-      candidateName: tp.candidate.name,
+      candidateId: tp.user.id,
+      candidateName: tp.user.fullName,
       votes: tp.numberOfVotes,
     }));
 

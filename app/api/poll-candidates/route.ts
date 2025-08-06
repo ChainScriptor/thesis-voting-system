@@ -41,7 +41,7 @@ export async function GET(request: Request) {
 
     // 2) Βρες τα matching candidate.id μέσω του clerkId
     const allClerkIds = pcs.map((p) => p.user.clerkId);
-    const candRecords = await prisma.candidate.findMany({
+    const candRecords = await prisma.user.findMany({
       where: { clerkId: { in: allClerkIds } },
       select: { id: true, clerkId: true },
     });
@@ -112,7 +112,7 @@ export async function POST(request: Request) {
     });
 
     // 2. Βρες candidateId από το clerkId του user
-    const candidate = await prisma.candidate.findUnique({
+    const candidate = await prisma.user.findUnique({
       where: {
         clerkId: newCandidate.user.clerkId,
       },
