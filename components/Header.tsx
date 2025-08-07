@@ -11,7 +11,6 @@ import { Switch } from "@/components/ui/switch";
 
 export default function Header() {
   const { user } = useUser();
-  const isAdmin = user?.publicMetadata?.role === "voting_admin"; // παραμένει, αλλά δεν τον χρησιμοποιούμε πια για το admin link
   const [profileComplete, setProfileComplete] = useState(false);
 
   // dark mode state
@@ -108,7 +107,7 @@ export default function Header() {
             />
           </div>
 
-          {/* Admin link — τώρα εμφανίζεται σε όλους τους συνδεδεμένους χρήστες */}
+          {/* Admin link — εμφανίζεται σε όλους τους συνδεδεμένους χρήστες */}
           {user && (
             <Link
               href="/admin"
