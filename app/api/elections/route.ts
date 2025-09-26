@@ -2,6 +2,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
+import { broadcastNewPoll } from "../polls-events/route";
 
 export const dynamic = "force-dynamic";
 
@@ -100,25 +101,28 @@ export async function POST(request: Request) {
       },
     });
 
-    return NextResponse.json(
-      {
-        id: newEl.id,
-        title: newEl.title,
-        description: newEl.description,
-        dateRange: {
-          startDate: newEl.start_date.toISOString(),
-          endDate: newEl.end_date.toISOString(),
-        },
-        targeting: {
-          roles: newEl.target_occupation ? [newEl.target_occupation] : [],
-          locations: newEl.target_location ? [newEl.target_location] : [],
-        },
-        candidates: [],
-        createdAt: newEl.start_date.toISOString(),
-        isActive: newEl.is_active,
+    const pollData = {
+      id: newEl.id,
+      title: newEl.title,
+      description: newEl.description,
+      dateRange: {
+        startDate: newEl.start_date.toISOString(),
+        endDate: newEl.end_date.toISOString(),
       },
-      { status: 201 }
-    );
+      targeting: {
+        roles: newEl.target_occupation ? [newEl.target_occupation] : [],
+        locations: newEl.target_location ? [newEl.target_location] : [],
+      },
+      candidates: [],
+      createdAt: newEl.start_date.toISOString(),
+      isActive: newEl.is_active,
+    };
+
+    // Broadcast the new poll to all connected clients
+    console.log('Broadcasting new poll:', pollData);
+    broadcastNewPoll(pollData);
+
+    return NextResponse.json(pollData, { status: 201 });
   } catch (error) {
     console.error("POST /api/elections error:", error);
     return NextResponse.json(

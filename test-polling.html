@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="el">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Polling System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        .log {
+            background: #f0f0f0;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin: 10px 5px;
+            cursor: pointer;
+        }
+
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Test Polling System</h1>
+
+    <div id="status" class="status">Αρχικοποίηση...</div>
+
+    <button onclick="testPolling()">Start Polling Test</button>
+    <button onclick="createTestPoll()">Create Test Poll</button>
+    <button onclick="stopPolling()">Stop Polling</button>
+
+    <div id="logs"></div>
+    <div id="polls"></div>
+
+    <script>
+        let pollingInterval = null;
+        let pollCount = 0;
+
+        function log(message) {
+            const logsDiv = document.getElementById('logs');
+            const logDiv = document.createElement('div');
+            logDiv.className = 'log';
+            logDiv.textContent = `${new Date().toLocaleTimeString()}: ${message}`;
+            logsDiv.appendChild(logDiv);
+            logsDiv.scrollTop = logsDiv.scrollHeight;
+        }
+
+        function updateStatus(message, isError = false) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${isError ? 'error' : 'success'}`;
+        }
+
+        async function fetchPolls() {
+            try {
+                const response = await fetch('/api/elections/filtered', {
+                    credentials: 'include'
+                });
+
+                if (response.ok) {
+                    const polls = await response.json();
+                    log(`Fetched ${polls.length} polls`);
+
+                    // Update polls display
+                    const pollsDiv = document.getElementById('polls');
+                    pollsDiv.innerHTML = '<h3>Current Polls:</h3>';
+
+                    if (polls.length === 0) {
+                        pollsDiv.innerHTML += '<p>No polls found</p>';
+                    } else {
+                        polls.forEach(poll => {
+                            const pollDiv = document.createElement('div');
+                            pollDiv.innerHTML = `
+                                <div style="border: 1px solid #ccc; padding: 10px; margin: 5px 0; border-radius: 3px;">
+                                    <strong>${poll.title}</strong><br>
+                                    <small>ID: ${poll.id} | End: ${new Date(poll.dateRange.endDate).toLocaleString()}</small>
+                                </div>
+                            `;
+                            pollsDiv.appendChild(pollDiv);
+                        });
+                    }
+
+                    updateStatus(`✅ Polling active - ${polls.length} relevant polls found`);
+                    return polls;
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                log(`❌ Error fetching polls: ${error.message}`);
+                updateStatus(`❌ Polling error: ${error.message}`, true);
+                return [];
+            }
+        }
+
+        function testPolling() {
+            if (pollingInterval) {
+                log('Polling already active');
+                return;
+            }
+
+            log('Starting polling test (every 3 seconds)...');
+            updateStatus('🔄 Polling started');
+
+            // Initial fetch
+            fetchPolls();
+
+            // Set up polling interval
+            pollingInterval = setInterval(() => {
+                pollCount++;
+                log(`Polling attempt #${pollCount}`);
+                fetchPolls();
+            }, 3000);
+        }
+
+        function stopPolling() {
+            if (pollingInterval) {
+                clearInterval(pollingInterval);
+                pollingInterval = null;
+                log('Polling stopped');
+                updateStatus('⏹️ Polling stopped');
+            } else {
+                log('Polling not active');
+            }
+        }
+
+        async function createTestPoll() {
+            try {
+                log('Creating test poll...');
+
+                const response = await fetch('/api/elections', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        title: `Test Poll ${Date.now()}`,
+                        description: 'Αυτή είναι μια test ψηφοφορία για το polling system',
+                        startDate: new Date().toISOString(),
+                        endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+                        targetOccupation: 'student',
+                        targetLocation: 'athens',
+                        targetGender: 'male',
+                        birthdateMin: '1990-01-01',
+                        birthdateMax: '2005-12-31',
+                    })
+                });
+
+                if (response.ok) {
+                    const poll = await response.json();
+                    log(`✅ Poll created: ${poll.title} (ID: ${poll.id})`);
+                    updateStatus(`✅ Poll created: ${poll.title}`);
+                } else {
+                    const error = await response.text();
+                    log(`❌ Error creating poll: ${response.status} - ${error}`);
+                    updateStatus(`❌ Error creating poll: ${response.status}`, true);
+                }
+            } catch (error) {
+                log(`❌ Exception: ${error.message}`);
+                updateStatus(`❌ Exception: ${error.message}`, true);
+            }
+        }
+
+        // Auto-start polling on page load
+        window.onload = function () {
+            setTimeout(() => {
+                testPolling();
+            }, 1000);
+        };
+    </script>
+</body>
+
+</html>

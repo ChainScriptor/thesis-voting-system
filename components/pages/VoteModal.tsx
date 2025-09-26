@@ -54,16 +54,23 @@ export default function VoteModal({
     }
     setLoading(true);
 
-    fetch(`/api/elections/${pollId}`)
+    fetch(`/api/elections/${pollId}`, {
+      credentials: 'include'
+    })
       .then((r) => {
-        if (!r.ok) throw new Error();
+        if (!r.ok) {
+          console.error('Failed to fetch election:', r.status, r.statusText);
+          throw new Error(`HTTP ${r.status}: ${r.statusText}`);
+        }
         return r.json();
       })
       .then((data: PollAPI) => {
+        console.log('Election data loaded:', data);
         setPoll(data);
       })
-      .catch(() => {
-        setErrorMsg("Κάποιο σφάλμα κατά τη φόρτωση.");
+      .catch((error) => {
+        console.error('Error loading election:', error);
+        setErrorMsg(`Κάποιο σφάλμα κατά τη φόρτωση: ${error.message}`);
       })
       .finally(() => {
         setLoading(false);
@@ -80,22 +87,30 @@ export default function VoteModal({
       const voteRes = await fetch("/api/vote", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: 'include',
         body: JSON.stringify({
           electionId: Number(pollId),
           candidateId: selectedId,
         }),
       });
+
       if (!voteRes.ok) {
+        const errorData = await voteRes.json().catch(() => ({}));
+        console.error('Vote submission failed:', voteRes.status, errorData);
+
         if (voteRes.status === 409) {
           alert("Έχετε ήδη ψηφίσει.");
           return;
         }
-        throw new Error();
+
+        const errorMessage = errorData.error || `HTTP ${voteRes.status}: ${voteRes.statusText}`;
+        throw new Error(errorMessage);
       }
       onOpenChange(false);
       onVoteSuccess?.();
-    } catch {
-      alert("Σφάλμα κατά την υποβολή της ψήφου.");
+    } catch (error) {
+      console.error('Vote submission error:', error);
+      alert(`Σφάλμα κατά την υποβολή της ψήφου: ${error.message}`);
     } finally {
       setLoading(false);
     }
@@ -110,8 +125,8 @@ export default function VoteModal({
             {loading
               ? "Φόρτωση..."
               : errorMsg
-              ? errorMsg
-              : poll?.title || ""}
+                ? errorMsg
+                : poll?.title || ""}
           </DialogDescription>
         </DialogHeader>
 
@@ -144,11 +159,10 @@ export default function VoteModal({
                     <label
                       key={c.id}
                       htmlFor={`cand-${c.id}`}
-                      className={`flex items-center p-3 border rounded-lg hover:bg-gray-50 cursor-pointer ${
-                        selectedId === c.id
-                          ? "border-black bg-gray-100"
-                          : "border-gray-200"
-                      }`}
+                      className={`flex items-center p-3 border rounded-lg hover:bg-gray-50 cursor-pointer ${selectedId === c.id
+                        ? "border-black bg-gray-100"
+                        : "border-gray-200"
+                        }`}
                     >
                       <input
                         id={`cand-${c.id}`}
@@ -164,9 +178,6 @@ export default function VoteModal({
                         <p className="text-xs text-gray-500">
                           {c.email ?? "-"} · {c.occupation ?? "-"}
                         </p>
-                      </div>
-                      <div className="text-xs text-gray-400">
-                        ({c.numberOfVotes} ψήφοι)
                       </div>
                     </label>
                   ))}

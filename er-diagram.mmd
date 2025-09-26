@@ -1,0 +1,60 @@
+erDiagram
+    USER {
+        int id PK
+        string clerkId UK
+        string fullName
+        string username UK
+        string password
+        boolean isAdmin
+        string gender
+        string email UK
+        datetime birthdate
+        string occupation
+        string location
+    }
+
+    ELECTION {
+        int id PK
+        string title
+        string description
+        datetime start_date
+        datetime end_date
+        boolean is_active
+        string target_occupation
+        string target_location
+        datetime birthdate_min
+        datetime birthdate_max
+        string target_gender
+        int userId FK
+    }
+
+    POLL_CANDIDATES {
+        int id PK
+        int poll_id FK
+        int user_id FK
+        datetime invited_at
+    }
+
+    VOTE {
+        int id PK
+        int userId FK
+        int electionId FK
+        int candidateId FK
+        datetime votedAt
+    }
+
+    TAKEPART {
+        int electionId PK,FK
+        int candidateId PK,FK
+        int numberOfVotes
+    }
+
+    %% Συσχετίσεις
+    USER ||--o{ ELECTION : "creates"
+    USER ||--o{ POLL_CANDIDATES : "is_candidate"
+    ELECTION ||--o{ POLL_CANDIDATES : "has_candidates"
+    USER ||--o{ VOTE : "votes"
+    ELECTION ||--o{ VOTE : "receives_votes"
+    USER ||--o{ VOTE : "receives_votes_as_candidate"
+    ELECTION ||--o{ TAKEPART : "has_results"
+    USER ||--o{ TAKEPART : "has_results"

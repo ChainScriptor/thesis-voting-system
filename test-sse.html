@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="el">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test SSE Connection</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+
+        .connected {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .disconnected {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .event {
+            background-color: #e2e3e5;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 3px;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin: 10px 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Test SSE Connection για Real-time Polls</h1>
+
+    <div id="status" class="status disconnected">
+        Ασύνδετος
+    </div>
+
+    <button onclick="connectSSE()">Σύνδεση</button>
+    <button onclick="disconnectSSE()">Αποσύνδεση</button>
+    <button onclick="testPollCreation()">Δημιουργία Test Poll</button>
+
+    <div id="events"></div>
+
+    <script>
+        let eventSource = null;
+
+        function connectSSE() {
+            if (eventSource) {
+                eventSource.close();
+            }
+
+            eventSource = new EventSource('/api/polls-events');
+
+            eventSource.onopen = function (event) {
+                document.getElementById('status').className = 'status connected';
+                document.getElementById('status').textContent = 'Συνδεδεμένος';
+                addEvent('Σύνδεση επιτυχής');
+            };
+
+            eventSource.onmessage = function (event) {
+                try {
+                    const data = JSON.parse(event.data);
+                    addEvent(`Event: ${data.type} - ${JSON.stringify(data)}`);
+                } catch (e) {
+                    addEvent(`Raw message: ${event.data}`);
+                }
+            };
+
+            eventSource.onerror = function (event) {
+                document.getElementById('status').className = 'status disconnected';
+                document.getElementById('status').textContent = 'Ασύνδετος - Σφάλμα';
+                addEvent('Σφάλμα σύνδεσης');
+            };
+        }
+
+        function disconnectSSE() {
+            if (eventSource) {
+                eventSource.close();
+                eventSource = null;
+                document.getElementById('status').className = 'status disconnected';
+                document.getElementById('status').textContent = 'Ασύνδετος';
+                addEvent('Αποσυνδέθηκε');
+            }
+        }
+
+        function addEvent(message) {
+            const eventsDiv = document.getElementById('events');
+            const eventDiv = document.createElement('div');
+            eventDiv.className = 'event';
+            eventDiv.textContent = `${new Date().toLocaleTimeString()}: ${message}`;
+            eventsDiv.insertBefore(eventDiv, eventsDiv.firstChild);
+        }
+
+        async function testPollCreation() {
+            try {
+                const response = await fetch('/api/elections', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        title: `Test Poll ${Date.now()}`,
+                        description: 'Αυτή είναι μια test ψηφοφορία',
+                        startDate: new Date().toISOString(),
+                        endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+                        targetOccupation: 'student',
+                        targetLocation: 'athens',
+                        targetGender: 'male',
+                        birthdateMin: '1990-01-01',
+                        birthdateMax: '2005-12-31',
+                    })
+                });
+
+                if (response.ok) {
+                    const poll = await response.json();
+                    addEvent(`Δημιουργήθηκε poll: ${poll.title} (ID: ${poll.id})`);
+                } else {
+                    addEvent(`Σφάλμα δημιουργίας poll: ${response.status}`);
+                }
+            } catch (error) {
+                addEvent(`Σφάλμα: ${error.message}`);
+            }
+        }
+
+        // Auto-connect on page load
+        window.onload = function () {
+            connectSSE();
+        };
+    </script>
+</body>
+
+</html>

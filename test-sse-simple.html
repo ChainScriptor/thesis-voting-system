@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="el">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple SSE Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        .log {
+            background: #f0f0f0;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin: 10px 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Simple SSE Test</h1>
+
+    <button onclick="testSSE()">Test SSE Connection</button>
+    <button onclick="testPollCreation()">Create Test Poll</button>
+
+    <div id="logs"></div>
+
+    <script>
+        function log(message) {
+            const logsDiv = document.getElementById('logs');
+            const logDiv = document.createElement('div');
+            logDiv.className = 'log';
+            logDiv.textContent = `${new Date().toLocaleTimeString()}: ${message}`;
+            logsDiv.appendChild(logDiv);
+        }
+
+        function testSSE() {
+            log('Testing SSE connection...');
+
+            const eventSource = new EventSource('/api/polls-events');
+
+            eventSource.onopen = function (event) {
+                log('✅ SSE connection opened');
+            };
+
+            eventSource.onmessage = function (event) {
+                log(`📨 Message: ${event.data}`);
+            };
+
+            eventSource.onerror = function (event) {
+                log('❌ SSE connection error');
+            };
+
+            // Close after 10 seconds
+            setTimeout(() => {
+                eventSource.close();
+                log('🔒 SSE connection closed');
+            }, 10000);
+        }
+
+        async function testPollCreation() {
+            try {
+                log('Creating test poll...');
+
+                const response = await fetch('/api/elections', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        title: `Test Poll ${Date.now()}`,
+                        description: 'Αυτή είναι μια test ψηφοφορία',
+                        startDate: new Date().toISOString(),
+                        endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+                        targetOccupation: 'student',
+                        targetLocation: 'athens',
+                        targetGender: 'male',
+                        birthdateMin: '1990-01-01',
+                        birthdateMax: '2005-12-31',
+                    })
+                });
+
+                if (response.ok) {
+                    const poll = await response.json();
+                    log(`✅ Poll created: ${poll.title} (ID: ${poll.id})`);
+                } else {
+                    const error = await response.text();
+                    log(`❌ Error creating poll: ${response.status} - ${error}`);
+                }
+            } catch (error) {
+                log(`❌ Exception: ${error.message}`);
+            }
+        }
+    </script>
+</body>
+
+</html>

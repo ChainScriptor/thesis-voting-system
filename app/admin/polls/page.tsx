@@ -60,11 +60,11 @@ export default function AdminPollsPage() {
   const [creating, setCreating] = useState<boolean>(false);
 
   useEffect(() => {
-  fetch("/api/elections/my")  
-    .then((r) => r.json())
-    .then((data: Poll[]) => setPolls(data))
-    .catch(console.error);
-}, []);
+    fetch("/api/elections/my")
+      .then((r) => r.json())
+      .then((data: Poll[]) => setPolls(data))
+      .catch(console.error);
+  }, []);
 
 
   const onChange = (
@@ -137,7 +137,10 @@ export default function AdminPollsPage() {
   return (
     <div className="p-6 space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Ψηφοφορίες</h1>
+        <div>
+          <h1 className="text-3xl font-bold">Ψηφοφορίες</h1>
+          <p className="text-sm text-gray-600 mt-1">Μόνο οι δικές σας ψηφοφορίες εμφανίζονται εδώ</p>
+        </div>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button>

@@ -58,15 +58,15 @@ export default function CandidatesPage() {
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [open, setOpen] = useState<boolean>(false);
 
-  // 1) Φόρτωση όλων των εκλογών
+  // 1) Φόρτωση μόνο των δικών του εκλογών
   useEffect(() => {
-    fetch("/api/elections")
+    fetch("/api/elections/my")
       .then((r) => r.json())
       .then(setElections)
       .catch(() =>
         toast({
           title: "Σφάλμα",
-          description: "Αποτυχία φόρτωσης ψηφοφοριών",
+          description: "Αποτυχία φόρτωσης των δικών σας ψηφοφοριών",
           variant: "destructive",
         })
       );
@@ -204,6 +204,7 @@ export default function CandidatesPage() {
   return (
     <div className="p-6 space-y-6">
       <h1 className="text-2xl font-bold">Διαχείριση Υποψηφίων</h1>
+      <p className="text-sm text-gray-600">Μόνο οι δικές σας ψηφοφορίες εμφανίζονται εδώ</p>
 
       {/* Επιλογή ψηφοφορίας */}
       <div className="space-y-2">
