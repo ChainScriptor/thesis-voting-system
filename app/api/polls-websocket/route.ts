@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
 }
 
 // Function to broadcast new poll to all connected clients
-export function broadcastNewPoll(pollData: any) {
+export function broadcastNewPoll(pollData: unknown) {
     console.log(`Broadcasting to ${connections.size} WebSocket connections`);
     const message = JSON.stringify({ type: 'new_poll', poll: pollData });
 

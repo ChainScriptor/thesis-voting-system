@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
 }
 
 // Function to broadcast new poll to all connected clients
-export function broadcastNewPoll(pollData: any) {
+export function broadcastNewPoll(pollData: unknown) {
     console.log(`Broadcasting to ${connections.size} connected clients`);
     const message = `data: ${JSON.stringify({ type: 'new_poll', poll: pollData })}\n\n`;
     const encodedMessage = new TextEncoder().encode(message);
@@ -61,14 +61,14 @@ export function broadcastNewPoll(pollData: any) {
 }
 
 // Function to broadcast poll update to all connected clients
-export function broadcastPollUpdate(pollData: any) {
+export function broadcastPollUpdate(pollData: unknown) {
     const message = `data: ${JSON.stringify({ type: 'poll_update', poll: pollData })}\n\n`;
     const encodedMessage = new TextEncoder().encode(message);
 
     connections.forEach(controller => {
         try {
             controller.enqueue(encodedMessage);
-        } catch (error) {
+        } catch {
             // Remove dead connections
             connections.delete(controller);
         }

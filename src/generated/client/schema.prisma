@@ -1,0 +1,100 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model election {
+  id                Int                    @id @default(autoincrement())
+  title             String
+  description       String?
+  start_date        DateTime
+  end_date          DateTime
+  is_active         Boolean
+  target_occupation String?
+  target_location   String?
+  birthdate_min     DateTime?
+  birthdate_max     DateTime?
+  target_gender     String?
+  userId            Int
+  access_code       String?
+  voting_type       String                 @default("public")
+  votes             Vote[]
+  user              user                   @relation(fields: [userId], references: [id])
+  poll_candidates   poll_candidates[]
+  takepart          takepart[]
+  invitations       election_invitations[]
+
+  @@index([userId])
+}
+
+model poll_candidates {
+  id             Int      @id @default(autoincrement())
+  poll_id        Int
+  user_id        Int?
+  invited_at     DateTime @default(now())
+  candidate_type String   @default("user")
+  text_option    String?
+  election       election @relation(fields: [poll_id], references: [id], onDelete: Cascade)
+  user           user?    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([poll_id])
+  @@index([user_id])
+}
+
+model takepart {
+  electionId    Int
+  candidateId   Int
+  numberOfVotes Int
+  election      election @relation(fields: [electionId], references: [id])
+
+  @@id([electionId, candidateId])
+  @@index([candidateId])
+}
+
+model user {
+  id              Int                    @id @default(autoincrement())
+  clerkId         String                 @unique
+  fullName        String
+  username        String                 @unique
+  password        String
+  isAdmin         Boolean
+  gender          String?
+  email           String                 @unique
+  birthdate       DateTime?
+  occupation      String?
+  location        String?
+  votes           Vote[]                 @relation("VoteUser")
+  election        election[]
+  poll_candidates poll_candidates[]
+  invitations     election_invitations[]
+}
+
+model Vote {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  electionId  Int
+  candidateId Int
+  votedAt     DateTime @default(now())
+  election    election @relation(fields: [electionId], references: [id])
+  user        user     @relation("VoteUser", fields: [userId], references: [id])
+
+  @@unique([userId, electionId])
+}
+
+model election_invitations {
+  id         Int      @id @default(autoincrement())
+  electionId Int
+  userId     Int
+  invitedAt  DateTime @default(now())
+  election   election @relation(fields: [electionId], references: [id], onDelete: Cascade)
+  user       user     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([electionId, userId])
+  @@index([electionId])
+  @@index([userId])
+}
