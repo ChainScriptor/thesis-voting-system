@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar";
-import { BarChart, PieChart, Users, CalendarClock } from "lucide-react";
+import { BarChart, PieChart, CalendarClock, UserCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface AdminSidebarProps {
@@ -17,15 +17,16 @@ const navItems = [
     icon: <BarChart className="h-5 w-5 text-neutral-700 dark:text-neutral-200" />,
   },
   {
-    href: "/admin/polls",
+    href: "/admin/create-poll",
     label: "Ψηφοφορίες",
     icon: <PieChart className="h-5 w-5 text-neutral-700 dark:text-neutral-200" />,
   },
   {
-    href: "/admin/candidates",
-    label: "Υποψήφιοι",
-    icon: <Users className="h-5 w-5 text-neutral-700 dark:text-neutral-200" />,
+    href: "/admin/my-polls",
+    label: "Οι Ψηφοφορίες Μου",
+    icon: <UserCheck className="h-5 w-5 text-neutral-700 dark:text-neutral-200" />,
   },
+
   {
     href: "/admin/schedule",
     label: "Χρονοδιάγραμμα",

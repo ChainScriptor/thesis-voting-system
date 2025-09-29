@@ -51,12 +51,14 @@ async function main() {
         start_date: new Date('2025-01-01'),
         end_date: new Date('2025-01-10'),
         is_active: true,
+        voting_type: 'public',
         userId: admin.id,
-        target_occupation: 'Developer',
-        target_location: 'Athens',
-        birthdate_min: new Date('1980-01-01'),
-        birthdate_max: new Date('2005-01-01'),
-        target_gender: 'male',
+        target_occupation: null,
+        target_location: null,
+        birthdate_min: null,
+        birthdate_max: null,
+        target_gender: null,
+        access_code: null,
       },
     })
   }
@@ -89,17 +91,19 @@ async function main() {
         start_date: new Date('2025-04-15'),
         end_date: new Date('2025-04-30'),
         is_active: true,
+        voting_type: 'private',
         userId: admin.id,
-        target_occupation: 'Student',
-        target_location: 'Thessaloniki',
-        birthdate_min: new Date('1998-01-01'),
-        birthdate_max: new Date('2006-12-31'),
-        target_gender: 'all',
+        target_occupation: null,
+        target_location: null,
+        birthdate_min: null,
+        birthdate_max: null,
+        target_gender: null,
+        access_code: 'SPRING2025', // Κωδικός πρόσβασης για άνοιξη
       },
     })
   }
 
-  // 6. Συσχέτιση υποψηφίου με δεύτερη εκλογήnpm
+  // 6. Συσχέτιση υποψηφίου με δεύτερη εκλογή
   await prisma.takepart.upsert({
     where: {
       electionId_candidateId: {
@@ -110,6 +114,46 @@ async function main() {
     update: {},
     create: {
       electionId: election2.id,
+      candidateId: candidate.id,
+      numberOfVotes: 0,
+    },
+  })
+
+  // 7. Δημιουργία περιορισμένης ψηφοφορίας (παράδειγμα)
+  let election3 = await prisma.election.findFirst({
+    where: { title: 'Εκλογές Φοιτητών 18-25' },
+  })
+  if (!election3) {
+    election3 = await prisma.election.create({
+      data: {
+        title: 'Εκλογές Φοιτητών 18-25',
+        description: 'Ψηφοφορία μόνο για φοιτητές ηλικίας 18-25 ετών',
+        start_date: new Date('2025-03-01'),
+        end_date: new Date('2025-03-15'),
+        is_active: true,
+        voting_type: 'restricted',
+        userId: admin.id,
+        target_occupation: 'Student',
+        target_location: 'Athens',
+        birthdate_min: new Date('2000-01-01'), // 25 ετών
+        birthdate_max: new Date('2007-12-31'), // 18 ετών
+        target_gender: 'all',
+        access_code: null,
+      },
+    })
+  }
+
+  // 8. Συσχέτιση υποψηφίου με τρίτη εκλογή
+  await prisma.takepart.upsert({
+    where: {
+      electionId_candidateId: {
+        electionId: election3.id,
+        candidateId: candidate.id,
+      },
+    },
+    update: {},
+    create: {
+      electionId: election3.id,
       candidateId: candidate.id,
       numberOfVotes: 0,
     },

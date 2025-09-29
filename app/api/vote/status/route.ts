@@ -56,7 +56,11 @@ export async function GET(request: Request) {
 
     return NextResponse.json({ hasVoted: !!vote });
   } catch (error) {
-    console.error("GET /api/vote/status error:", error);
+    // Αν είναι database connection error, επιστρέφουμε false (δεν έχει ψηφίσει)
+    if (error && typeof error === 'object' && 'code' in error && error.code === 'P1001') {
+      return NextResponse.json({ hasVoted: false });
+    }
+    
     return NextResponse.json(
       { error: "Failed to fetch voting status." },
       { status: 500 }

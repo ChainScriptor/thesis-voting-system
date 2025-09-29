@@ -23,12 +23,14 @@ interface Poll {
   id: number;
   title: string;
   description: string;
+  voting_type?: string;
+  access_code?: string | null;
   dateRange: { startDate: string; endDate: string };
+  isActive?: boolean;
 }
 
 export default function HomePage() {
   const { isLoaded: clerkLoaded, isSignedIn, user } = useUser();
-  const { isLoaded: authLoaded } = useAuth();
   const {
     profileData,
     isLoading: isProfileLoading,
@@ -37,29 +39,35 @@ export default function HomePage() {
   } = useProfileSync();
   const { polls: pollingPolls, isLoading: isPollingLoading, lastUpdate } = usePollsPolling(3000); // Poll every 3 seconds
 
-  const [polls, setPolls] = useState<Poll[]>([]);
-  const [votedMap, setVotedMap] = useState<Record<number, boolean>>({});
-  const [voteModalPoll, setVoteModalPoll] = useState<number | null>(null);
-  const [resultsPoll, setResultsPoll] = useState<number | null>(null);
+  const [polls, setPolls] = useState<Poll[]>([]); //λίστα ψηφοφοριών 
+  const [votedMap, setVotedMap] = useState<Record<number, boolean>>({}); //αν έχει ψηφίσει ο χρήστης 
+  const [voteModalPoll, setVoteModalPoll] = useState<number | null>(null); //id για το voting modal 
+  const [resultsPoll, setResultsPoll] = useState<number | null>(null); //id για τα αποτελέσματα 
 
   // Update polls from polling hook
   useEffect(() => {
     if (pollingPolls.length > 0) {
       setPolls(pollingPolls);
 
-      // Check vote status for all polls
-      pollingPolls.forEach((p) =>
-        fetch(`/api/vote/status?electionId=${p.id}`, {
-          credentials: "include",
-        })
-          .then((r2) => r2.json())
-          .then(({ hasVoted }) =>
-            setVotedMap((m) => ({ ...m, [p.id]: hasVoted }))
-          )
-          .catch(() => setVotedMap((m) => ({ ...m, [p.id]: false })))
-      );
+      // Check vote status from database API για polls που δεν έχουμε ελέγξει ακόμα
+      const pollsToCheck = pollingPolls.filter(p => !(p.id in votedMap));
+
+      if (pollsToCheck.length > 0) {
+        pollsToCheck.forEach((p) =>
+          fetch(`/api/vote/status?electionId=${p.id}`, {
+            credentials: "include",
+          })
+            .then((r2) => r2.json())
+            .then(({ hasVoted }) =>
+              setVotedMap((m) => ({ ...m, [p.id]: hasVoted }))
+            )
+            .catch(() => setVotedMap((m) => ({ ...m, [p.id]: false })))
+        );
+      }
     }
-  }, [pollingPolls]);
+  }, [pollingPolls, votedMap]); // Include votedMap in dependencies
+
+  // Remove unused handleVoteSuccess function
 
   if (!clerkLoaded)
     return <div className="p-8 text-center text-gray-500">Φόρτωση...</div>;
@@ -205,12 +213,17 @@ export default function HomePage() {
             const justVotedId = voteModalPoll;
             setVoteModalPoll(null);
             if (!justVotedId) return;
+
+            // Ενημέρωση του votedMap από τη βάση δεδομένων
             fetch(`/api/vote/status?electionId=${justVotedId}`, {
               credentials: "include",
             })
               .then((r) => r.json())
               .then(({ hasVoted }) =>
                 setVotedMap((m) => ({ ...m, [justVotedId]: hasVoted }))
+              )
+              .catch(() =>
+                setVotedMap((m) => ({ ...m, [justVotedId]: false }))
               );
           }}
         />

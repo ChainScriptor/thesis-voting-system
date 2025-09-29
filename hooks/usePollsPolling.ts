@@ -4,7 +4,10 @@ interface Poll {
     id: number;
     title: string;
     description: string;
+    voting_type?: string;
+    access_code?: string | null;
     dateRange: { startDate: string; endDate: string };
+    isActive?: boolean;
 }
 
 interface UsePollsPollingReturn {

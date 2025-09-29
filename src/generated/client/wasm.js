@@ -132,14 +132,18 @@ exports.Prisma.ElectionScalarFieldEnum = {
   birthdate_min: 'birthdate_min',
   birthdate_max: 'birthdate_max',
   target_gender: 'target_gender',
-  userId: 'userId'
+  userId: 'userId',
+  access_code: 'access_code',
+  voting_type: 'voting_type'
 };
 
 exports.Prisma.Poll_candidatesScalarFieldEnum = {
   id: 'id',
   poll_id: 'poll_id',
   user_id: 'user_id',
-  invited_at: 'invited_at'
+  invited_at: 'invited_at',
+  candidate_type: 'candidate_type',
+  text_option: 'text_option'
 };
 
 exports.Prisma.TakepartScalarFieldEnum = {
@@ -170,6 +174,13 @@ exports.Prisma.VoteScalarFieldEnum = {
   votedAt: 'votedAt'
 };
 
+exports.Prisma.Election_invitationsScalarFieldEnum = {
+  id: 'id',
+  electionId: 'electionId',
+  userId: 'userId',
+  invitedAt: 'invitedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -191,7 +202,8 @@ exports.Prisma.ModelName = {
   poll_candidates: 'poll_candidates',
   takepart: 'takepart',
   user: 'user',
-  Vote: 'Vote'
+  Vote: 'Vote',
+  election_invitations: 'election_invitations'
 };
 
 /**

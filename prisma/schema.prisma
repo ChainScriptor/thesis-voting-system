@@ -9,7 +9,7 @@ datasource db {
 }
 
 model election {
-  id                Int       @id @default(autoincrement())
+  id                Int                     @id @default(autoincrement())
   title             String
   description       String?
   start_date        DateTime
@@ -21,23 +21,26 @@ model election {
   birthdate_max     DateTime?
   target_gender     String?
   userId            Int
-
-  user              user              @relation(fields: [userId], references: [id])
+  access_code       String?
+  voting_type       String                  @default("public")
+  votes             Vote[]
+  user              user                    @relation(fields: [userId], references: [id])
   poll_candidates   poll_candidates[]
   takepart          takepart[]
-  votes             Vote[]
+  invitations       election_invitations[]
 
   @@index([userId])
 }
 
 model poll_candidates {
-  id         Int      @id @default(autoincrement())
-  poll_id    Int
-  user_id    Int
-  invited_at DateTime @default(now())
-
-  election   election @relation(fields: [poll_id], references: [id], onDelete: Cascade)
-  user       user     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  id             Int      @id @default(autoincrement())
+  poll_id        Int
+  user_id        Int?
+  invited_at     DateTime @default(now())
+  candidate_type String   @default("user")
+  text_option    String?
+  election       election @relation(fields: [poll_id], references: [id], onDelete: Cascade)
+  user           user?    @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@index([poll_id])
   @@index([user_id])
@@ -47,8 +50,6 @@ model takepart {
   electionId    Int
   candidateId   Int
   numberOfVotes Int
-
-  user          user     @relation("TakepartUser", fields: [candidateId], references: [id])
   election      election @relation(fields: [electionId], references: [id])
 
   @@id([electionId, candidateId])
@@ -56,35 +57,44 @@ model takepart {
 }
 
 model user {
-  id         Int       @id @default(autoincrement())
-  clerkId    String    @unique
-  fullName   String
-  username   String    @unique
-  password   String
-  isAdmin    Boolean
-  gender     String?
-  email      String    @unique
-  birthdate  DateTime?
-  occupation String?
-  location   String?
-
+  id              Int                     @id @default(autoincrement())
+  clerkId         String                  @unique
+  fullName        String
+  username        String                  @unique
+  password        String
+  isAdmin         Boolean
+  gender          String?
+  email           String                  @unique
+  birthdate       DateTime?
+  occupation      String?
+  location        String?
+  votes           Vote[]                  @relation("VoteUser")
   election        election[]
   poll_candidates poll_candidates[]
-  takepart        takepart[]        @relation("TakepartUser")
-  votes           Vote[]            @relation("VoteUser")
-  candidateVotes  Vote[]            @relation("VoteCandidate")
+  invitations     election_invitations[]
 }
 
 model Vote {
-  id          Int       @id @default(autoincrement())
+  id          Int      @id @default(autoincrement())
   userId      Int
   electionId  Int
   candidateId Int
-  votedAt     DateTime  @default(now())
-
-  user        user      @relation("VoteUser", fields: [userId], references: [id])
-  election    election  @relation(fields: [electionId], references: [id])
-  candidate   user      @relation("VoteCandidate", fields: [candidateId], references: [id])
+  votedAt     DateTime @default(now())
+  election    election @relation(fields: [electionId], references: [id])
+  user        user     @relation("VoteUser", fields: [userId], references: [id])
 
   @@unique([userId, electionId])
+}
+
+model election_invitations {
+  id         Int      @id @default(autoincrement())
+  electionId Int
+  userId     Int
+  invitedAt  DateTime @default(now())
+  election   election @relation(fields: [electionId], references: [id], onDelete: Cascade)
+  user       user     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([electionId, userId])
+  @@index([electionId])
+  @@index([userId])
 }

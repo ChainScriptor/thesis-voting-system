@@ -7,8 +7,8 @@ import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar";
 import {
   BarChart,
   PieChart,
-  Users,
   CalendarClock,
+  UserCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -26,14 +26,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       icon: <BarChart className="h-5 w-5 text-neutral-700 dark:text-neutral-200" />,
     },
     {
-      href: "/admin/polls",
+      href: "/admin/create-poll",
       label: "Ψηφοφορίες",
       icon: <PieChart className="h-5 w-5 text-neutral-700 dark:text-neutral-200" />,
     },
     {
-      href: "/admin/candidates",
-      label: "Υποψήφιοι",
-      icon: <Users className="h-5 w-5 text-neutral-700 dark:text-neutral-200" />,
+      href: "/admin/my-polls",
+      label: "Οι Ψηφοφορίες Μου",
+      icon: <UserCheck className="h-5 w-5 text-neutral-700 dark:text-neutral-200" />,
     },
     {
       href: "/admin/schedule",

@@ -1,49 +1,49 @@
 "use client";
-    import React, { useState } from "react";
-    
-    interface HalomotButtonProps {
-      gradient?: string; // Gradient for the button border/background
-      inscription: string; // Button text
-      onClick: () => void;
-      fillWidth?: boolean;
-      fixedWidth?: string;
-      href?: string;
-      backgroundColor?: string; // Solid color for the inner button (not gradient)
-      icon?: React.ReactElement;
-      borderWidth?: string; // Controls the padding (thickness of the gradient border)
-      padding?: string; // Custom padding for the inner button, e.g., "1rem 4rem"
-      outerBorderRadius?: string; // Border radius for the gradient outer border
-      innerBorderRadius?: string; // Border radius for the inner button
-      textColor?: string; // Text color for the button, default #fff
-      hoverTextColor?: string;
-    }
-    
-    export const HalomotButton: React.FC<HalomotButtonProps> = ({
-      gradient = "linear-gradient(135deg, #4776cb, #a19fe5, #6cc606)",
-      inscription,
-      onClick,
-      fillWidth = false,
-      fixedWidth,
-      href,
-      backgroundColor = "#000",
-      icon,
-      borderWidth = "1px",
-      padding,
-      outerBorderRadius = "6.34px",
-      innerBorderRadius = "6px",
-      textColor = "#fff",
-      hoverTextColor,
-    }) => {
-      const [isHovered, setIsHovered] = useState(false);
-      const [delayedColor, setDelayedColor] = useState<string | undefined>(undefined);
-    
-      // Container style for fixed width
-      const containerStyle: React.CSSProperties = fixedWidth
+import React, { useState } from "react";
+
+interface HalomotButtonProps {
+    gradient?: string; // Gradient for the button border/background
+    inscription: string; // Button text
+    onClick: () => void;
+    fillWidth?: boolean;
+    fixedWidth?: string;
+    href?: string;
+    backgroundColor?: string; // Solid color for the inner button (not gradient)
+    icon?: React.ReactElement;
+    borderWidth?: string; // Controls the padding (thickness of the gradient border)
+    padding?: string; // Custom padding for the inner button, e.g., "1rem 4rem"
+    outerBorderRadius?: string; // Border radius for the gradient outer border
+    innerBorderRadius?: string; // Border radius for the inner button
+    textColor?: string; // Text color for the button, default #fff
+    hoverTextColor?: string;
+}
+
+export const HalomotButton: React.FC<HalomotButtonProps> = ({
+    gradient = "linear-gradient(135deg, #4776cb, #a19fe5, #6cc606)",
+    inscription,
+    onClick,
+    fillWidth = false,
+    fixedWidth,
+    href,
+    backgroundColor = "#000",
+    icon,
+    borderWidth = "1px",
+    padding,
+    outerBorderRadius = "6.34px",
+    innerBorderRadius = "6px",
+    textColor = "#fff",
+    hoverTextColor,
+}) => {
+    const [isHovered, setIsHovered] = useState(false);
+    const [delayedColor, setDelayedColor] = useState<string | undefined>(undefined);
+
+    // Container style for fixed width
+    const containerStyle: React.CSSProperties = fixedWidth
         ? { width: fixedWidth, display: "inline-block" }
         : {};
-    
-      // Outer button style (gradient border)
-      const buttonStyle: React.CSSProperties = {
+
+    // Outer button style (gradient border)
+    const buttonStyle: React.CSSProperties = {
         margin: fillWidth || fixedWidth ? "0" : "auto",
         padding: borderWidth,
         background: gradient,
@@ -62,10 +62,10 @@
         width: fillWidth || fixedWidth ? "100%" : "fit-content",
         flexDirection: "row",
         boxSizing: "border-box",
-      };
-    
-      // Inner span style (actual clickable area)
-      const spanStyle: React.CSSProperties = {
+    };
+
+    // Inner span style (actual clickable area)
+    const spanStyle: React.CSSProperties = {
         background: isHovered ? "none" : backgroundColor,
         padding: padding ?? (fillWidth || fixedWidth ? "1rem 0" : "1rem 4rem"),
         border: "0",
@@ -85,55 +85,55 @@
         flexDirection: "row",
         boxSizing: "border-box",
         cursor: "pointer",
-      };
-    
-      // Icon style
-     
-    
-      // No delay, just set color immediately
-      const handleMouseEnter = () => {
+    };
+
+    // Icon style
+
+
+    // No delay, just set color immediately
+    const handleMouseEnter = () => {
         setIsHovered(true);
         if (hoverTextColor) {
-          setDelayedColor(hoverTextColor);
+            setDelayedColor(hoverTextColor);
         }
-      };
-    
-      const handleMouseLeave = () => {
+    };
+
+    const handleMouseLeave = () => {
         setIsHovered(false);
         setDelayedColor(undefined);
-      };
-    
-      const handleClick = (
+    };
+
+    const handleClick = (
         e: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement, MouseEvent>
-      ) => {
+    ) => {
         e.preventDefault();
         onClick();
-      };
-    
-      const ButtonContent = (
-        <span
-          style={spanStyle}
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
-        >
-          {icon && React.cloneElement(icon)}
-          {inscription}
-        </span>
-      );
-    
-      const ButtonElement = href ? (
-        <a href={href} style={buttonStyle} onClick={handleClick}>
-          {ButtonContent}
-        </a>
-      ) : (
-        <button type="button" style={buttonStyle} onClick={handleClick}>
-          {ButtonContent}
-        </button>
-      );
-    
-      return fixedWidth ? (
-        <div style={containerStyle}>{ButtonElement}</div>
-      ) : (
-        ButtonElement
-      );
     };
+
+    const ButtonContent = (
+        <span
+            style={spanStyle}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+        >
+            {icon && React.cloneElement(icon)}
+            {inscription}
+        </span>
+    );
+
+    const ButtonElement = href ? (
+        <a href={href} style={buttonStyle} onClick={handleClick}>
+            {ButtonContent}
+        </a>
+    ) : (
+        <button type="button" style={buttonStyle} onClick={handleClick}>
+            {ButtonContent}
+        </button>
+    );
+
+    return fixedWidth ? (
+        <div style={containerStyle}>{ButtonElement}</div>
+    ) : (
+        ButtonElement
+    );
+};

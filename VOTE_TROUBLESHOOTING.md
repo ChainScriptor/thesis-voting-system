@@ -95,3 +95,4 @@ SELECT * FROM election WHERE id = [ID_ΤΗΣ_ΨΗΦΟΦΟΡΙΑΣ];
 
 
 
+

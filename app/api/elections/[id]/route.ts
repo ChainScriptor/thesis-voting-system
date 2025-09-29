@@ -25,9 +25,9 @@ export async function GET(request: Request) {
     const election = await prisma.election.findUnique({
       where: { id: electionId },
       include: {
-        takepart: {
+        poll_candidates: {
           include: {
-            user: true, // <-- αντί για candidate
+            user: true,
           },
         },
       },
@@ -41,6 +41,8 @@ export async function GET(request: Request) {
       id: election.id,
       title: election.title,
       description: election.description,
+      voting_type: election.voting_type,
+      access_code: election.access_code,
       dateRange: {
         startDate: election.start_date.toISOString(),
         endDate: election.end_date.toISOString(),
@@ -49,20 +51,20 @@ export async function GET(request: Request) {
         roles: election.target_occupation ? [election.target_occupation] : [],
         locations: election.target_location ? [election.target_location] : [],
       },
-      candidates: election.takepart.map((tp) => ({
-        id: tp.user.id,
-        name: tp.user.fullName,
-        email: tp.user.email,
-        occupation: tp.user.occupation,
-        numberOfVotes: tp.numberOfVotes,
+      candidates: election.poll_candidates.map((pc) => ({
+        id: pc.id, // Πάντα το poll_candidates.id
+        name: pc.user ? pc.user.fullName : pc.text_option || `Επιλογή ${pc.id}`,
+        fullName: pc.user ? pc.user.fullName : pc.text_option || `Επιλογή ${pc.id}`,
+        email: pc.user ? pc.user.email : null,
+        occupation: pc.user ? pc.user.occupation : null,
+        numberOfVotes: 0, // Θα το υπολογίσουμε αργότερα
       })),
       createdAt: election.start_date.toISOString(),
       isActive: election.is_active,
     };
 
     return NextResponse.json(formatted);
-  } catch (error) {
-    console.error("GET /api/elections/[id] error:", error);
+  } catch {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
