@@ -19,6 +19,42 @@ import {
   TabsContent,
 } from "@/components/ui/tabs";
 
+// Helper function to translate voting types to Greek
+const getVotingTypeLabels = (votingType: string): { icon: string; label: string; description: string } => {
+  switch (votingType) {
+    case 'public':
+      return {
+        icon: '🌐',
+        label: 'Δημόσια',
+        description: 'Όλοι μπορούν να ψηφίσουν'
+      };
+    case 'private':
+      return {
+        icon: '🔒',
+        label: 'Ιδιωτική',
+        description: 'Με κωδικό πρόσβασης'
+      };
+    case 'invitation_only':
+      return {
+        icon: '📧',
+        label: 'Προσκεκλημένη',
+        description: 'Μόνο ειδικά προσκεκλημένοι'
+      };
+    case 'restricted':
+      return {
+        icon: '🎯',
+        label: 'Περιορισμένη',
+        description: 'Με targeting criteria'
+      };
+    default:
+      return {
+        icon: '❓',
+        label: 'Άγνωστος τύπος',
+        description: 'Τύπος ψηφοφορίας άγνωστος'
+      };
+  }
+};
+
 interface Poll {
   id: number;
   title: string;
@@ -144,12 +180,24 @@ export default function HomePage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {activePolls.map((p) => {
                   const hasVoted = votedMap[p.id];
+                  const votingTypeInfo = getVotingTypeLabels(p.voting_type || 'public');
                   return (
                     <Card key={p.id} className="p-6 hover:shadow-lg transition">
-                      <h3 className="text-xl font-bold mb-2 flex items-center">
-                        <Vote className="mr-2 text-indigo-600" />
-                        {p.title}
-                      </h3>
+                      <div className="flex items-start justify-between mb-2">
+                        <h3 className="text-xl font-bold flex items-center flex-1">
+                          <Vote className="mr-2 text-indigo-600" />
+                          {p.title}
+                        </h3>
+                        <div className="flex items-center ml-2">
+                          <span className="text-lg">{votingTypeInfo.icon}</span>
+                          <span className="text-sm font-medium text-gray-600 ml-1">
+                            {votingTypeInfo.label}
+                          </span>
+                        </div>
+                      </div>
+                      <p className="text-xs text-gray-500 mb-1 italic">
+                        {votingTypeInfo.description}
+                      </p>
                       <p className="text-gray-600 mb-2">{p.description}</p>
                       <p className="text-sm text-gray-500 mb-4">
                         Λήξη: {format(new Date(p.dateRange.endDate), "dd/MM/yyyy")}
@@ -176,24 +224,38 @@ export default function HomePage() {
                 {finishedPolls.length} ολοκληρωμένες ψηφοφορίες
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {finishedPolls.map((p) => (
-                  <Card key={p.id} className="p-6 hover:shadow-lg transition">
-                    <h3 className="text-xl font-bold mb-2 flex items-center">
-                      <BarChart className="mr-2 text-blue-600" />
-                      {p.title}
-                    </h3>
-                    <p className="text-gray-600 mb-2">{p.description}</p>
-                    <p className="text-sm text-gray-500 mb-4">
-                      Λήξη: {format(new Date(p.dateRange.endDate), "dd/MM/yyyy")}
-                    </p>
-                    <Button
-                      onClick={() => setResultsPoll(p.id)}
-                      className="bg-blue-600 text-white hover:bg-blue-700"
-                    >
-                      Δες Αποτελέσματα
-                    </Button>
-                  </Card>
-                ))}
+                {finishedPolls.map((p) => {
+                  const votingTypeInfo = getVotingTypeLabels(p.voting_type || 'public');
+                  return (
+                    <Card key={p.id} className="p-6 hover:shadow-lg transition">
+                      <div className="flex items-start justify-between mb-2">
+                        <h3 className="text-xl font-bold flex items-center flex-1">
+                          <BarChart className="mr-2 text-blue-600" />
+                          {p.title}
+                        </h3>
+                        <div className="flex items-center ml-2">
+                          <span className="text-lg">{votingTypeInfo.icon}</span>
+                          <span className="text-sm font-medium text-gray-600 ml-1">
+                            {votingTypeInfo.label}
+                          </span>
+                        </div>
+                      </div>
+                      <p className="text-xs text-gray-500 mb-1 italic">
+                        {votingTypeInfo.description}
+                      </p>
+                      <p className="text-gray-600 mb-2">{p.description}</p>
+                      <p className="text-sm text-gray-500 mb-4">
+                        Λήξη: {format(new Date(p.dateRange.endDate), "dd/MM/yyyy")}
+                      </p>
+                      <Button
+                        onClick={() => setResultsPoll(p.id)}
+                        className="bg-blue-600 text-white hover:bg-blue-700"
+                      >
+                        Δες Αποτελέσματα
+                      </Button>
+                    </Card>
+                  );
+                })}
               </div>
             </TabsContent>
           </Tabs>
