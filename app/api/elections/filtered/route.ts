@@ -26,79 +26,86 @@ export async function GET() {
             return NextResponse.json([], { status: 200 });
         }
 
-        const whereClause = {
-            AND: [
-                { is_active: true }, // Μόνο ενεργές ψηφοφορίες
-                {
-                    OR: [
-                        // Δημόσιες ψηφοφορίες - όλοι μπορούν να ψηφίσουν
-                        { voting_type: "public" },
-                        // Ιδιωτικές ψηφοφορίες - χρειάζεται κωδικός (θα ελεγχθεί στο frontend)
-                        { voting_type: "private" },
-                        // Προσκεκλημένοι - ελέγχουμε αν ο χρήστης είναι προσκεκλημένος
-                        {
-                            AND: [
-                                { voting_type: "invitation_only" },
-                                {
-                                    invitations: {
-                                        some: {
-                                            userId: dbUser.id
-                                        }
-                                    }
-                                }
-                            ]
-                        },
-                        // Περιορισμένες ψηφοφορίες - απλοποιημένο filtering
-                        {
-                            AND: [
-                                { voting_type: "restricted" },
-                                {
-                                    OR: [
-                                        // Αν δεν έχει κανένα targeting criteria, εμφανίζεται σε όλους
-                                        {
-                                            AND: [
-                                                { target_gender: null },
-                                                { target_occupation: null },
-                                                { target_location: null },
-                                                { birthdate_min: null },
-                                                { birthdate_max: null }
-                                            ]
-                                        },
-                                        // Αν έχει criteria, ελέγχουμε αν ταιριάζουν (πιο ευέλικτα)
-                                        {
-                                            OR: [
-                                                // Φύλο ταιριάζει ή είναι null
-                                                { OR: [{ target_gender: null }, { target_gender: dbUser.gender }, { target_gender: "all" }] },
-                                                // Επάγγελμα ταιριάζει ή είναι null  
-                                                { OR: [{ target_occupation: null }, { target_occupation: dbUser.occupation }, { target_occupation: "all" }] },
-                                                // Τοποθεσία ταιριάζει ή είναι null
-                                                { OR: [{ target_location: null }, { target_location: dbUser.location }, { target_location: "all" }] },
-                                                // Ηλικία εντός εύρους ή είναι null
-                                                ...(dbUser.birthdate ? [
-                                                    { OR: [{ birthdate_min: null }, { birthdate_min: { lte: dbUser.birthdate } }] },
-                                                    { OR: [{ birthdate_max: null }, { birthdate_max: { gte: dbUser.birthdate } }] }
-                                                ] : [])
-                                            ]
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ]
-                },
-            ],
-        };
-
+        // Query για ψηφοφορίες που μπορεί να δει ο χρήστης
         const elections = await prisma.election.findMany({
-            where: whereClause,
+            where: {
+                is_active: true,
+                OR: [
+                    { voting_type: "public" },
+                    { voting_type: "private" },
+                    {
+                        voting_type: "invitation_only",
+                        invitations: {
+                            some: {
+                                userId: dbUser.id
+                            }
+                        }
+                    },
+                    { voting_type: "restricted" } // Φέρνουμε όλες τις περιορισμένες και τις φιλτράρουμε μετά
+                ]
+            },
             include: {
                 poll_candidates: { include: { user: true } },
-                invitations: true
+                invitations: {
+                    where: { userId: dbUser.id }
+                }
             },
             orderBy: { start_date: "desc" },
         });
 
-        const formatted = elections.map((el) => ({
+        // Φιλτράρουμε τις περιορισμένες ψηφοφορίες βάσει των δημογραφικών στοιχείων
+        const filteredElections = elections.filter(election => {
+            if (election.voting_type !== "restricted") {
+                return true; // Δημόσιες, ιδιωτικές και προσκεκλημένες περνάνε όλες
+            }
+
+            // Έλεγχος targeting criteria - ΑΚΡΙΒΗΣ ταίριασμα
+            // Αν δεν έχει κανένα criteria, δεν εμφανίζεται σε κανέναν
+            const hasAnyCriteria = election.target_occupation || election.target_location ||
+                election.target_gender || election.birthdate_min || election.birthdate_max;
+
+            if (!hasAnyCriteria) {
+                return false; // Αν δεν έχει criteria, δεν εμφανίζεται
+            }
+
+            // Έλεγχος επαγγέλματος - ΑΚΡΙΒΗΣ ταίριασμα
+            if (election.target_occupation && election.target_occupation !== "") {
+                if (!dbUser.occupation || dbUser.occupation !== election.target_occupation) {
+                    return false;
+                }
+            }
+
+            // Έλεγχος τοποθεσίας - ΑΚΡΙΒΗΣ ταίριασμα
+            if (election.target_location && election.target_location !== "") {
+                if (!dbUser.location || dbUser.location !== election.target_location) {
+                    return false;
+                }
+            }
+
+            // Έλεγχος φύλου - ΑΚΡΙΒΗΣ ταίριασμα
+            if (election.target_gender && election.target_gender !== "") {
+                if (!dbUser.gender || dbUser.gender !== election.target_gender) {
+                    return false;
+                }
+            }
+
+            // Έλεγχος ηλικίας - ΑΚΡΙΒΗΣ ταίριασμα εντός ορίων
+            if (election.birthdate_min || election.birthdate_max) {
+                if (!dbUser.birthdate) {
+                    return false;
+                }
+                if (election.birthdate_min && dbUser.birthdate < election.birthdate_min) {
+                    return false;
+                }
+                if (election.birthdate_max && dbUser.birthdate > election.birthdate_max) {
+                    return false;
+                }
+            }
+
+            return true; // Όλα τα criteria ταιριάζουν ΑΚΡΙΒΩΣ
+        });
+
+        const formatted = filteredElections.map((el) => ({
             id: el.id,
             title: el.title,
             description: el.description,
@@ -122,7 +129,11 @@ export async function GET() {
         }));
 
         return NextResponse.json(formatted);
-    } catch {
-        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    } catch (err) {
+        console.error('GET /api/elections/filtered error:', err);
+        return NextResponse.json({
+            error: "Internal Server Error",
+            details: err instanceof Error ? err.message : String(err)
+        }, { status: 500 });
     }
 }

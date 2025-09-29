@@ -30,16 +30,39 @@ export async function GET(request: Request) {
     // δημιούργησε ένα map για γρήγορη αναζήτηση
     const candidateMap = new Map();
     pollCandidates.forEach(pc => {
+      let candidateName = 'Unknown';
+
+      if (pc.candidate_type === 'user' && pc.user) {
+        candidateName = pc.user.fullName || pc.user.email || 'Unknown User';
+      } else if (pc.candidate_type === 'text' && pc.text_option) {
+        candidateName = pc.text_option;
+      } else if (pc.text_option) {
+        candidateName = pc.text_option;
+      }
+
       candidateMap.set(pc.id, {
         id: pc.id,
-        name: pc.user?.fullName || pc.text_option || 'Unknown',
+        name: candidateName,
         type: pc.candidate_type
       });
     });
 
     // format σε array { candidateId, candidateName, votes }
-    const results = takepart.map((tp) => {
-      const candidate = candidateMap.get(tp.candidateId);
+    const results = takepart.map((tp, index) => {
+      // Try to find candidate by candidateId first
+      let candidate = candidateMap.get(tp.candidateId);
+
+      // If not found, use fallback logic to match by order
+      if (!candidate && pollCandidates.length > 0) {
+        // Match by order: first takepart record gets first candidate, etc.
+        const fallbackCandidate = pollCandidates[index] || pollCandidates[0];
+        candidate = {
+          id: fallbackCandidate.id,
+          name: fallbackCandidate.user?.fullName || fallbackCandidate.text_option || 'Unknown',
+          type: fallbackCandidate.candidate_type
+        };
+      }
+
       return {
         candidateId: tp.candidateId,
         candidateName: candidate?.name || 'Unknown',

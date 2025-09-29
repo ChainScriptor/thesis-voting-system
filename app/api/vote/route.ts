@@ -107,37 +107,69 @@ export async function POST(request: Request) {
         );
       }
 
-      // Έλεγχος targeting criteria (πιο ευέλικτος)
-      // Αν δεν έχει κανένα criteria, επιτρέπει την ψήφο
+      // Έλεγχος targeting criteria - ΑΚΡΙΒΗΣ ταίριασμα
+      // Αν δεν έχει κανένα criteria, δεν επιτρέπει την ψήφο
       const hasAnyCriteria = election.target_occupation || election.target_location ||
         election.target_gender || election.birthdate_min || election.birthdate_max;
 
-      if (hasAnyCriteria) {
-        // Έλεγχος αν τουλάχιστον ένα criteria ταιριάζει
-        const occupationMatch = !election.target_occupation ||
-          election.target_occupation === "all" ||
-          userProfile.occupation === election.target_occupation;
+      if (!hasAnyCriteria) {
+        return NextResponse.json(
+          { error: "Election has no targeting criteria" },
+          { status: 403 }
+        );
+      }
 
-        const locationMatch = !election.target_location ||
-          election.target_location === "all" ||
-          userProfile.location === election.target_location;
-
-        const genderMatch = !election.target_gender ||
-          election.target_gender === "all" ||
-          userProfile.gender === election.target_gender;
-
-        const ageMatch = (!election.birthdate_min || !userProfile.birthdate || userProfile.birthdate >= election.birthdate_min) &&
-          (!election.birthdate_max || !userProfile.birthdate || userProfile.birthdate <= election.birthdate_max);
-
-        // Αν κανένα criteria δεν ταιριάζει, απορρίπτει
-        if (!occupationMatch && !locationMatch && !genderMatch && !ageMatch) {
+      // Έλεγχος επαγγέλματος - ΑΚΡΙΒΗΣ ταίριασμα
+      if (election.target_occupation && election.target_occupation !== "") {
+        if (!userProfile.occupation || userProfile.occupation !== election.target_occupation) {
           return NextResponse.json(
-            { error: "User does not match any election criteria" },
+            { error: "User occupation does not match election criteria" },
             { status: 403 }
           );
         }
       }
-      // Αν δεν έχει criteria, επιτρέπει την ψήφο
+
+      // Έλεγχος τοποθεσίας - ΑΚΡΙΒΗΣ ταίριασμα
+      if (election.target_location && election.target_location !== "") {
+        if (!userProfile.location || userProfile.location !== election.target_location) {
+          return NextResponse.json(
+            { error: "User location does not match election criteria" },
+            { status: 403 }
+          );
+        }
+      }
+
+      // Έλεγχος φύλου - ΑΚΡΙΒΗΣ ταίριασμα
+      if (election.target_gender && election.target_gender !== "") {
+        if (!userProfile.gender || userProfile.gender !== election.target_gender) {
+          return NextResponse.json(
+            { error: "User gender does not match election criteria" },
+            { status: 403 }
+          );
+        }
+      }
+
+      // Έλεγχος ηλικίας - ΑΚΡΙΒΗΣ ταίριασμα εντός ορίων
+      if (election.birthdate_min || election.birthdate_max) {
+        if (!userProfile.birthdate) {
+          return NextResponse.json(
+            { error: "User birthdate is required for this election" },
+            { status: 403 }
+          );
+        }
+        if (election.birthdate_min && userProfile.birthdate < election.birthdate_min) {
+          return NextResponse.json(
+            { error: "User is too young for this election" },
+            { status: 403 }
+          );
+        }
+        if (election.birthdate_max && userProfile.birthdate > election.birthdate_max) {
+          return NextResponse.json(
+            { error: "User is too old for this election" },
+            { status: 403 }
+          );
+        }
+      }
     }
     // Για "public" ψηφοφορίες, δεν χρειάζεται έλεγχος
 

@@ -8,6 +8,13 @@ interface Poll {
     access_code?: string | null;
     dateRange: { startDate: string; endDate: string };
     isActive?: boolean;
+    candidates?: Array<{
+        id: number;
+        fullName?: string;
+        text_option?: string;
+        email?: string | null;
+        occupation?: string | null;
+    }>;
 }
 
 interface UsePollsPollingReturn {
