@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useToast } from "@/components/ui/use-toast";
@@ -360,7 +360,7 @@ export default function CreatePollPage() {
                 {selectedInvitedUsers.length === 0 && (
                   <div className="text-center py-4 text-gray-500 border-2 border-dashed border-gray-300 rounded-lg">
                     <p className="text-sm">Δεν έχουν επιλεγεί χρήστες ακόμα</p>
-                    <p className="text-xs">Πατήστε &quot;Προσθήκη Χρηστών&quot; για να επιλέξετε</p>
+                    <p className="text-xs">Πατήστε "Προσθήκη Χρηστών" για να επιλέξετε</p>
                   </div>
                 )}
               </div>

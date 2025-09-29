@@ -82,7 +82,7 @@ export default function VoteModal({
               }
               setLoading(false);
             })
-            .catch(() => {
+            .catch((e) => {
               setErrorMsg("Σφάλμα κατά τη φόρτωση της ψηφοφορίας.");
               setLoading(false);
             });
@@ -97,7 +97,7 @@ export default function VoteModal({
             setPoll(data);
             setLoading(false);
           })
-          .catch(() => {
+          .catch((e) => {
             setErrorMsg("Σφάλμα κατά τη φόρτωση της ψηφοφορίας.");
             setLoading(false);
           });
@@ -152,7 +152,7 @@ export default function VoteModal({
       }
 
       // Επιτυχής ψηφοφορία - κλείσιμο modal
-      await voteRes.json();
+      const successData = await voteRes.json();
 
       // Κλείσιμο modal και callback
       onOpenChange(false);
