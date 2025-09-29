@@ -53,16 +53,29 @@ export default function HomePage() {
       const pollsToCheck = pollingPolls.filter(p => !(p.id in votedMap));
 
       if (pollsToCheck.length > 0) {
-        pollsToCheck.forEach((p) =>
-          fetch(`/api/vote/status?electionId=${p.id}`, {
-            credentials: "include",
+        const electionIds = pollsToCheck.map(p => p.id).join(',');
+        fetch(`/api/vote/status?electionIds=${electionIds}`, {
+          credentials: "include",
+        })
+          .then((r2) => r2.json())
+          .then((voteStatus) => {
+            setVotedMap((m) => {
+              const newMap = { ...m };
+              pollsToCheck.forEach(p => {
+                newMap[p.id] = voteStatus[p.id] || false;
+              });
+              return newMap;
+            });
           })
-            .then((r2) => r2.json())
-            .then(({ hasVoted }) =>
-              setVotedMap((m) => ({ ...m, [p.id]: hasVoted }))
-            )
-            .catch(() => setVotedMap((m) => ({ ...m, [p.id]: false })))
-        );
+          .catch(() => {
+            setVotedMap((m) => {
+              const newMap = { ...m };
+              pollsToCheck.forEach(p => {
+                newMap[p.id] = false;
+              });
+              return newMap;
+            });
+          });
       }
     }
   }, [pollingPolls, votedMap]); // Include votedMap in dependencies
